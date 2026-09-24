@@ -421,6 +421,48 @@
         letter-spacing: 0.1em;
       }
 
+      /* 難易度の挿絵（仮置き）: 横長の枠に、難易度に合わせたお題のイメージを置く */
+      .level-art {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4rem;
+        margin: 0.6rem 0 0;
+        aspect-ratio: 16 / 9;
+        overflow: hidden;
+        border: 2px solid var(--edge);
+        border-radius: 1rem;
+        background: var(--ground);
+      }
+
+      .level-art svg {
+        display: block;
+        height: 100%;
+        width: auto;
+      }
+
+      .level-art.is-pair svg {
+        height: 88%;
+        border-radius: 0.6rem;
+      }
+
+      .level-art figcaption {
+        position: absolute;
+        left: 0.5rem;
+        top: 0.5rem;
+        padding: 0.12rem 0.55rem;
+        border-radius: 999px;
+        background: rgb(255 255 255 / 0.9);
+        font-size: 0.68rem;
+        font-weight: 700;
+        color: var(--muted);
+      }
+
+      .rules .wide {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
       .divider {
         height: 0;
         margin: 0.2rem 0;
@@ -655,6 +697,9 @@
               <p class="level-desc" id="level-desc"></p>
             </dd>
           </div>
+          <div class="wide">
+            <figure class="level-art" data-level-art><figcaption>挿絵（仮）</figcaption></figure>
+          </div>
           <div>
             <dt>制限時間</dt>
             <dd>
@@ -679,6 +724,9 @@
         <!-- ゲスト: ホストが決めた内容を文章で見せる -->
         <dl class="rules" id="rules-view" hidden>
           <div><dt>難易度</dt><dd class="summary" id="view-level"></dd></div>
+          <div class="wide">
+            <figure class="level-art" data-level-art><figcaption>挿絵（仮）</figcaption></figure>
+          </div>
           <div><dt>制限時間</dt><dd class="summary" id="view-time"></dd></div>
           <div><dt>選択の猶予</dt><dd class="summary" id="view-grace"></dd></div>
         </dl>
@@ -725,6 +773,7 @@
     </div>
 
     <script src="common.js"></script>
+    <script src="art.js"></script>
     <script>
       const $ = (id) => document.getElementById(id);
       const q = params();
@@ -791,9 +840,24 @@
         ふつう: "背景あり・1キャラクター",
         むずかしい: "背景あり・2キャラクター<b>EXTRA</b>",
       };
+      // 挿絵（仮置き）: お題の条件に合わせて、背景の有無とキャラクターの人数を変える
+      const LEVEL_ART = {
+        かんたん: [{ ...ART_TOPIC, bg: "white" }],
+        ふつう: [{ ...ART_TOPIC, bg: "room" }],
+        むずかしい: [
+          { ...ART_TOPIC, bg: "sky" },
+          { hair: "blonde", style: "bob", eyes: "red", outfit: "hoodie", face: "wink", bg: "sky" },
+        ],
+      };
       function renderLevel() {
         const level = document.querySelector("[name=level]:checked").value;
         $("level-desc").innerHTML = LEVELS[level];
+        const arts = LEVEL_ART[level];
+        document.querySelectorAll("[data-level-art]").forEach((fig) => {
+          fig.classList.toggle("is-pair", arts.length > 1);
+          fig.querySelectorAll("svg").forEach((svg) => svg.remove());
+          fig.insertAdjacentHTML("afterbegin", arts.map((f) => artSvg(f, `${level}のお題のイメージ`)).join(""));
+        });
       }
       document.querySelectorAll("[name=level]").forEach((i) => i.addEventListener("change", renderLevel));
       renderLevel();
