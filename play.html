@@ -758,7 +758,7 @@
       const q = params();
       const level = q.get("level") || "かんたん";
       const total = Math.max(10, Number(q.get("time")) || 90);
-      const GRACE = 15;
+      const GRACE = Math.max(5, Number(q.get("grace")) || 15); // 生成終了後に画像を選べる時間（ロビーで設定）
       const code = isValidCode(q.get("code") || "") ? q.get("code") : randomCode();
       const me = { name: q.get("name") || "ゲスト", color: "#ff2d87" };
       const opp = { name: q.get("opp") || "ぴよ丸", color: "#00b4fc", gens: 0, submitted: null, working: false };

@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@900&family=Zen+Kaku+Gothic+New:wght@500;700&family=Montserrat:ital,wght@1,500&family=JetBrains+Mono:wght@700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Maru+Gothic:wght@900&family=Zen+Kaku+Gothic+New:wght@500;700&family=Montserrat:ital,wght@1,500&family=JetBrains+Mono:wght@700&display=swap"
     />
     <link rel="stylesheet" href="common.css" />
     <link rel="stylesheet" href="transition.css" />
@@ -20,28 +20,39 @@
       } catch {}
     </script>
     <style>
+      :root {
+        --display: "Dela Gothic One", "Zen Maru Gothic", sans-serif;
+      }
+
+      /* 背景: トップと同じ角度（約18°）の淡いピンクの面と3色の線 */
+      .deco {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+      }
+
+      /* ---------- 上部 ---------- */
       .bar {
-        position: sticky;
-        top: 0;
+        position: relative;
         z-index: 5;
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 1rem;
-        padding: 0.9rem clamp(1rem, 4vw, 3rem);
-        background: rgb(245 246 248 / 0.85);
-        backdrop-filter: blur(8px);
-        border-bottom: 1px solid var(--line);
+        padding: 1rem clamp(1rem, 4vw, 3rem) 0;
       }
 
       .bar img {
         display: block;
-        width: 8.5rem;
+        width: 8rem;
         height: auto;
       }
 
       .leave {
-        padding: 0.5rem 1rem;
+        padding: 0.45rem 1.1rem;
         border: 2px solid var(--ink);
         border-radius: 999px;
         background: #fff;
@@ -55,251 +66,344 @@
       .lobby {
         position: relative;
         z-index: 1;
-        width: min(100%, 68rem);
+        width: min(100%, 72rem);
         margin: 0 auto;
-        padding: clamp(1.25rem, 4vw, 3rem) 16px 3rem;
+        padding: clamp(1rem, 3vw, 2rem) 16px 3rem;
         display: grid;
-        grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
-        gap: 1.5rem;
+        grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+        gap: clamp(1.25rem, 3vw, 2rem) clamp(1.25rem, 2.5vw, 1.75rem);
         align-items: start;
       }
 
-      .lobby-title {
+      /* ---------- 1. ルーム: 見出しとルームコード ---------- */
+      .room {
         grid-column: 1 / -1;
         display: flex;
         flex-wrap: wrap;
+        align-items: end;
+        justify-content: space-between;
+        gap: 1.25rem 2rem;
+      }
+
+      .headline {
+        margin: 0;
+        font-family: var(--display);
+        font-weight: 400;
+        font-size: clamp(2rem, 4.6vw, 3.3rem);
+        line-height: 1.25;
+        transform: rotate(-3deg) skewX(-6deg);
+        transform-origin: left center;
+      }
+
+      .headline small {
+        display: block;
+        margin-bottom: 0.2rem;
+        font-family: var(--latin);
+        font-style: italic;
+        font-size: 0.8rem;
+        letter-spacing: 0.3em;
+        color: var(--pink);
+        transform: none;
+      }
+
+      .headline em {
+        position: relative;
+        font-style: normal;
+        white-space: nowrap;
+      }
+
+      .headline em::after {
+        content: "";
+        position: absolute;
+        left: -0.1em;
+        right: -0.2em;
+        bottom: -0.06em;
+        height: 0.1em;
+        border-radius: 1em;
+        background: var(--pink-soft);
+        transform: rotate(-2deg);
+      }
+
+      .room-card {
+        display: grid;
+        gap: 0.7rem;
+      }
+
+      .room-label {
+        display: flex;
         align-items: baseline;
         justify-content: space-between;
-        gap: 0.5rem 1rem;
-      }
-
-      .lobby-title h1 {
-        margin: 0;
-        font-family: var(--round);
-        font-weight: 900;
-        font-size: clamp(1.6rem, 4.5vw, 2.4rem);
-      }
-
-      .status {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-weight: 700;
-        font-size: 0.9rem;
-        color: var(--muted);
-      }
-
-      .status::before {
-        content: "";
-        width: 0.55rem;
-        height: 0.55rem;
-        border-radius: 50%;
-        background: var(--yellow);
-        box-shadow: 0 0 0 4px rgb(253 219 19 / 0.25);
-      }
-
-      .status.is-ready::before {
-        background: #22c55e;
-        box-shadow: 0 0 0 4px rgb(34 197 94 / 0.2);
-      }
-
-      .panel {
-        padding: clamp(1.25rem, 3.5vw, 1.75rem);
-        background: #fff;
-        border-radius: 1.5rem;
-        box-shadow: 0 20px 50px -30px rgb(11 27 43 / 0.35);
-        display: grid;
-        gap: 1rem;
-      }
-
-      .panel h2 {
-        margin: 0;
-        font-size: 1rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-
-      .panel h2 small {
-        font-weight: 500;
-        color: var(--muted);
         font-size: 0.8rem;
+        font-weight: 700;
+        color: var(--muted);
       }
 
       .code {
         display: grid;
-        grid-template-columns: repeat(8, 1fr);
+        grid-template-columns: repeat(8, 2.6rem);
         gap: 0.35rem;
       }
 
       .code span {
-        padding-block: 0.55rem;
-        border-radius: 0.55rem;
-        background: #fff0f7;
-        text-align: center;
+        display: grid;
+        place-items: center;
+        aspect-ratio: 3 / 4;
+        border-radius: 0.6rem;
+        background: #fff;
+        border: 2.5px solid var(--ink);
+        box-shadow: 0 4px 0 var(--ink);
         font-family: var(--mono);
         font-weight: 700;
-        font-size: clamp(1.15rem, 4.5vw, 1.6rem);
+        font-size: 1.4rem;
       }
 
-      .share {
+      .code span:nth-child(odd) {
+        rotate: -2deg;
+      }
+
+      .code span:nth-child(even) {
+        rotate: 2deg;
+      }
+
+      .room-actions {
         display: flex;
         gap: 0.5rem;
       }
 
-      .share input {
-        flex: 1;
-        min-width: 0;
-        padding: 0.7rem 0.9rem;
-        border: 2px solid var(--line);
-        border-radius: 0.8rem;
-        font-family: var(--mono);
-        font-size: 0.8rem;
-        color: var(--muted);
-        background: var(--ground);
-      }
-
-      .small-btn {
-        flex: none;
-        padding: 0.7rem 1rem;
+      .btn-s {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4rem;
+        padding: 0.6rem 1rem;
         border: 2px solid var(--ink);
-        border-radius: 0.8rem;
-        background: var(--ink);
-        color: #fff;
+        border-radius: 999px;
+        background: #fff;
+        color: var(--ink);
         font: inherit;
         font-size: 0.85rem;
         font-weight: 700;
         cursor: pointer;
+        white-space: nowrap;
+        transition: transform 0.15s;
       }
 
-      .small-btn.ghost {
+      .btn-s:hover {
+        transform: translateY(-2px);
+      }
+
+      .btn-s.pink {
+        flex: 1;
+        border-color: var(--pink);
+        background: var(--pink);
+        color: #fff;
+        box-shadow: 0 8px 18px -8px rgb(255 45 135 / 0.7);
+      }
+
+      /* ---------- 共通のカード ---------- */
+      .card-box {
+        padding: clamp(1.1rem, 2.5vw, 1.5rem);
         background: #fff;
-        color: var(--ink);
-      }
-
-      .qr {
-        display: flex;
-        align-items: center;
+        border: 2.5px solid var(--ink);
+        border-radius: 1.6rem;
+        box-shadow: 0 8px 0 var(--ink);
+        display: grid;
         gap: 1rem;
-        padding: 0.9rem;
-        border: 2px dashed var(--line);
-        border-radius: 1rem;
-        font-size: 0.82rem;
-        color: var(--muted);
       }
 
-      .qr canvas {
-        flex: none;
-        width: 5.5rem;
-        height: 5.5rem;
-        image-rendering: pixelated;
+      .box-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 0.75rem;
       }
 
-      .members {
+      .box-head h2 {
         margin: 0;
-        padding: 0;
+        font-family: var(--display);
+        font-weight: 400;
+        font-size: 1.3rem;
+      }
+
+      .count {
+        font-family: var(--display);
+        font-size: 1.3rem;
+      }
+
+      .count small {
+        font-size: 0.75em;
+        color: #b5bcc6;
+      }
+
+      /* ---------- 2. プレイヤー ---------- */
+      .players {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 1rem 0.8rem;
+        margin: 0;
+        padding: 0.6rem 0 0.2rem;
         list-style: none;
+      }
+
+      .player {
+        position: relative;
         display: grid;
-        gap: 0.6rem;
+        justify-items: center;
+        align-content: start;
+        gap: 0.3rem;
+        padding: 1.05rem 0.5rem 0.8rem;
+        border: 2.5px solid var(--ink);
+        border-radius: 1.1rem;
+        background: #fff;
+        box-shadow: 0 5px 0 var(--ink);
+        text-align: center;
+        min-height: 9.2rem;
+        rotate: -1.5deg;
       }
 
-      .member {
-        display: grid;
-        grid-template-columns: 2.75rem 1fr auto;
-        align-items: center;
-        gap: 0.8rem;
-        padding: 0.75rem 0.9rem;
-        border: 2px solid var(--line);
-        border-radius: 1rem;
+      .player:nth-child(even) {
+        rotate: 1.5deg;
       }
 
-      .member.is-empty {
-        border-style: dashed;
-        color: var(--muted);
+      .player.is-me {
+        border-color: var(--pink);
+        box-shadow: 0 5px 0 var(--pink);
       }
 
-      .avatar {
+      .player .avatar {
         display: grid;
         place-items: center;
-        width: 2.75rem;
-        height: 2.75rem;
+        width: 3.3rem;
+        height: 3.3rem;
         border-radius: 50%;
+        background: var(--c);
+        color: var(--on, #fff);
+        font-family: var(--display);
+        font-size: 1.3rem;
+      }
+
+      .player .name {
+        max-width: 100%;
         font-family: var(--round);
         font-weight: 900;
-        font-size: 1.1rem;
-        color: #fff;
-      }
-
-      .member.is-empty .avatar {
-        background: var(--ground);
-      }
-
-      .member-name {
-        min-width: 0;
-        font-weight: 700;
+        font-size: 0.95rem;
+        line-height: 1.3;
         overflow-wrap: anywhere;
       }
 
-      .member-name small {
-        display: block;
-        font-weight: 500;
-        font-size: 0.75rem;
-        color: var(--muted);
-      }
-
-      .badge {
-        display: inline-block;
-        margin-left: 0.35rem;
-        padding: 0.05rem 0.45rem;
-        border-radius: 0.35rem;
-        background: var(--yellow);
-        font-size: 0.68rem;
-        vertical-align: 0.15em;
-      }
-
-      .ready {
-        padding: 0.3rem 0.7rem;
-        border-radius: 999px;
-        background: var(--ground);
-        font-size: 0.75rem;
+      .player .ready {
+        margin-top: auto;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        font-size: 0.72rem;
         font-weight: 700;
-        color: var(--muted);
-        white-space: nowrap;
+        color: #9aa3ae;
       }
 
-      .ready.is-on {
-        background: #dcfce7;
+      .player .ready::before {
+        content: "";
+        width: 0.5rem;
+        height: 0.5rem;
+        border-radius: 50%;
+        background: #d3d7dd;
+      }
+
+      .player .ready.is-on {
         color: #15803d;
       }
 
-      .dots::after {
-        content: "";
-        animation: dots 1.4s steps(4) infinite;
+      .player .ready.is-on::before {
+        background: #22c55e;
       }
 
-      @keyframes dots {
-        0% { content: ""; }
-        25% { content: "."; }
-        50% { content: ".."; }
-        75% { content: "..."; }
+      .player .tag {
+        position: absolute;
+        top: -0.75rem;
+        left: 50%;
+        padding: 0.12rem 0.55rem;
+        border-radius: 999px;
+        border: 2px solid var(--ink);
+        background: var(--yellow);
+        font-size: 0.66rem;
+        font-weight: 700;
+        white-space: nowrap;
+        translate: -50% 0;
       }
 
-      .settings {
+      .player .tag.me {
+        border-color: var(--pink);
+        background: var(--pink);
+        color: #fff;
+      }
+
+      .player.is-empty {
+        border: 2.5px dashed #cfd4db;
+        background: rgb(255 255 255 / 0.5);
+        box-shadow: none;
+        justify-content: center;
+        align-content: center;
+        color: #b5bcc6;
+        font-size: 0.8rem;
+        font-weight: 700;
+        rotate: 0deg;
+      }
+
+      .player.is-empty .plus {
         display: grid;
-        gap: 0.9rem;
+        place-items: center;
+        width: 2.6rem;
+        height: 2.6rem;
+        border-radius: 50%;
+        border: 2px dashed #cfd4db;
+        font-size: 1.3rem;
       }
 
-      .setting {
+      .player.is-next {
+        border-color: var(--pink-soft);
+        color: var(--pink);
+      }
+
+      .player.is-next .plus {
+        border-color: var(--pink-soft);
+        animation: waiting 1.4s ease-in-out infinite;
+      }
+
+      @keyframes waiting {
+        50% {
+          transform: scale(0.88);
+        }
+      }
+
+      .player.is-joined {
+        animation: joined 0.5s cubic-bezier(0.3, 1.6, 0.5, 1);
+      }
+
+      @keyframes joined {
+        from {
+          transform: scale(0.8) rotate(-6deg);
+          opacity: 0;
+        }
+      }
+
+      /* ---------- 3. ルールと開始 ---------- */
+      .side {
         display: grid;
-        gap: 0.4rem;
+        gap: clamp(1.25rem, 3vw, 1.75rem);
+      }
+
+      .rule {
+        display: grid;
+        gap: 0.5rem;
         margin: 0;
         padding: 0;
         border: 0;
+        min-width: 0;
       }
 
-      .setting legend {
+      .rule legend {
         padding: 0;
-        margin-bottom: 0.4rem;
+        margin-bottom: 0.5rem;
         font-size: 0.85rem;
         font-weight: 700;
       }
@@ -320,7 +424,7 @@
       }
 
       .seg label {
-        padding: 0.55rem 0.4rem;
+        padding: 0.5rem 0.3rem;
         border-radius: 999px;
         text-align: center;
         font-size: 0.85rem;
@@ -331,32 +435,120 @@
       }
 
       .seg input:checked + label {
-        background: #fff;
-        color: var(--ink);
-        box-shadow: 0 2px 8px rgb(11 27 43 / 0.12);
+        background: var(--ink);
+        color: #fff;
+      }
+
+      .seg.level input:checked + label {
+        background: var(--pink);
       }
 
       .seg input:focus-visible + label {
         outline: 3px solid var(--cyan);
+        outline-offset: 2px;
       }
 
       .seg input:disabled + label {
         cursor: default;
       }
 
-      .actions {
-        display: grid;
-        gap: 0.75rem;
-      }
-
-      .actions .note {
+      .level-desc {
         margin: 0;
-        text-align: center;
         font-size: 0.8rem;
         color: var(--muted);
       }
 
-      /* カウントダウン */
+      .level-desc b {
+        margin-left: 0.4rem;
+        padding: 0.05rem 0.4rem;
+        border-radius: 0.3rem;
+        background: var(--ink);
+        color: var(--yellow);
+        font-family: var(--latin);
+        font-style: italic;
+        font-weight: 500;
+        font-size: 0.62rem;
+        letter-spacing: 0.1em;
+      }
+
+      .rule-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 1rem;
+      }
+
+      .host-note {
+        margin: 0;
+        font-size: 0.78rem;
+        color: var(--muted);
+      }
+
+      .go {
+        display: grid;
+        gap: 0.7rem;
+      }
+
+      .go-status {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        margin: 0;
+        font-weight: 700;
+      }
+
+      .go-status .dots {
+        display: flex;
+        gap: 0.25rem;
+      }
+
+      .go-status .dots i {
+        width: 0.6rem;
+        height: 0.6rem;
+        border-radius: 50%;
+        background: #d3d7dd;
+      }
+
+      .go-status .dots i.on {
+        background: #22c55e;
+      }
+
+      .go .note {
+        margin: 0;
+        text-align: center;
+        font-size: 0.78rem;
+        color: var(--muted);
+      }
+
+      /* ---------- QRコード ---------- */
+      .qr-card {
+        justify-items: center;
+        text-align: center;
+      }
+
+      .qr-card canvas {
+        width: 11rem;
+        height: 11rem;
+        padding: 0.6rem;
+        border: 2.5px solid var(--ink);
+        border-radius: 1rem;
+        background: #fff;
+        image-rendering: pixelated;
+      }
+
+      .url {
+        width: 100%;
+        padding: 0.65rem 0.9rem;
+        border: 2px solid var(--line);
+        border-radius: 0.8rem;
+        background: var(--ground);
+        font-family: var(--mono);
+        font-size: 0.8rem;
+        color: var(--muted);
+        text-align: center;
+      }
+
+      /* ---------- カウントダウン ---------- */
       .countdown {
         position: fixed;
         inset: 0;
@@ -366,14 +558,21 @@
         align-content: center;
         gap: 1rem;
         padding: 16px;
-        background: rgb(11 27 43 / 0.82);
+        background: rgb(11 27 43 / 0.88);
         color: #fff;
         text-align: center;
       }
 
+      .countdown-label {
+        margin: 0;
+        padding: 0.35rem 1rem;
+        border-radius: 999px;
+        background: rgb(255 255 255 / 0.12);
+        font-weight: 700;
+      }
+
       .countdown-num {
-        font-family: var(--round);
-        font-weight: 900;
+        font-family: var(--display);
         font-size: clamp(6rem, 30vw, 12rem);
         line-height: 1;
         color: var(--yellow);
@@ -390,110 +589,191 @@
         font-weight: 700;
       }
 
-      .countdown .pill {
-        width: auto;
-        margin-top: 1rem;
-      }
-
       @media (max-width: 820px) {
         .lobby {
           grid-template-columns: minmax(0, 1fr);
-          padding-bottom: calc(8.5rem + env(safe-area-inset-bottom, 0px));
+          padding-bottom: calc(9rem + env(safe-area-inset-bottom, 0px));
         }
-        .room-panel {
-          order: 2;
+        .deco {
+          -webkit-mask-image: linear-gradient(to bottom, transparent 40%, #000 80%);
+          mask-image: linear-gradient(to bottom, transparent 40%, #000 80%);
         }
-        /* 下部に固定したボタンを含むパネルを前面に（登場アニメーション中も隠れないように） */
-        .panel[data-enter="fade"] {
+        .room {
+          align-items: stretch;
+        }
+        .room-card {
+          width: 100%;
+        }
+        .code {
+          grid-template-columns: repeat(8, minmax(0, 1fr));
+        }
+        /* 画面下に固定したボタンを含むカードを前面に（登場アニメーション中も隠れないように） */
+        .go-card[data-enter="fade"] {
           position: relative;
           z-index: 6;
         }
-        /* スマホでは開始ボタンを画面下に固定 */
-        .actions {
+        /* スマホでは、状況と開始ボタンを画面下に固定する */
+        .go {
           position: fixed;
           z-index: 6;
           left: 0;
           right: 0;
           bottom: 0;
-          padding: 0.9rem 16px calc(0.9rem + env(safe-area-inset-bottom, 0px));
+          grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+          padding: 0.75rem 16px calc(0.75rem + env(safe-area-inset-bottom, 0px));
           background: #fff;
-          border-top: 1px solid var(--line);
-          box-shadow: 0 -10px 30px -20px rgb(11 27 43 / 0.4);
+          border-top: 2.5px solid var(--ink);
         }
-        .qr canvas {
-          width: 4.5rem;
-          height: 4.5rem;
+        .go-status {
+          grid-column: 1 / -1;
+        }
+        .go .note {
+          display: none;
+        }
+        .go .pill {
+          padding-inline: 0.5rem;
+          font-size: 0.95rem;
+        }
+        .go-card {
+          padding-block: 0;
+          border: 0;
+          box-shadow: none;
+          background: none;
+        }
+        .go-card .box-head {
+          display: none;
+        }
+      }
+
+      @media (max-width: 560px) {
+        .players {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .rule-row {
+          grid-template-columns: minmax(0, 1fr);
+        }
+        .room-actions .btn-s {
+          flex: 1;
         }
       }
 
       @media (prefers-reduced-motion: reduce) {
         .countdown-num,
-        .dots::after {
+        .player.is-next .plus,
+        .player.is-joined {
           animation: none;
+        }
+        .btn-s {
+          transition: none;
         }
       }
     </style>
   </head>
   <body>
+    <svg class="deco" viewBox="0 0 1600 900" preserveAspectRatio="xMaxYMid slice" aria-hidden="true">
+      <path d="M1250 900 L1542 0 H1600 V900 Z" fill="#ffe4f1" />
+      <path d="M1198 900 L1490 0 H1506 L1214 900 Z" fill="#00b4fc" />
+      <path d="M1150 900 L1234 640 H1246 L1162 900 Z" fill="#fddb13" />
+      <path d="M1340 330 L1447 0 H1455 L1348 330 Z" fill="#ff72b9" />
+      <path d="M0 150 L60 -35 H72 L12 150 Z" fill="#ff72b9" />
+      <path d="M40 210 L148 -120 H164 L56 210 Z" fill="#00b4fc" />
+    </svg>
+
     <header class="bar">
       <a href="index.html"><img src="animic-logo.svg" alt="Animic トップ" width="2078" height="607" /></a>
       <button class="leave" type="button" id="leave">退出</button>
     </header>
 
     <main class="lobby">
-      <div class="lobby-title" data-enter>
-        <h1>ロビー</h1>
-        <span class="status" id="status">対戦相手を待っています</span>
-      </div>
-
-      <section class="panel room-panel" aria-labelledby="room-title" data-enter>
-        <h2 id="room-title">ルームコード <small>相手に伝えてね</small></h2>
-        <div class="code" id="code"></div>
-        <div class="share">
-          <input id="room-url" readonly aria-label="ルームURL" />
-          <button class="small-btn" type="button" id="copy">コピー</button>
-        </div>
-        <div class="qr">
-          <canvas id="qr" width="21" height="21" aria-label="ルームURLのQRコード（モック）"></canvas>
-          <span>スマホで読み取って参加できます。<br />（QRコードはモックです）</span>
+      <!-- 1. ルーム -->
+      <section class="room" aria-label="ルーム" data-enter>
+        <h1 class="headline" id="headline"><small>LOBBY</small>メンバーを<em>集めよう！</em></h1>
+        <div class="room-card">
+          <div class="room-label"><span>ルームコード</span><span>相手に伝えてね</span></div>
+          <div class="code" id="code"></div>
+          <div class="room-actions">
+            <button class="btn-s pink" type="button" id="copy">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7" /><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7" /></svg>
+              招待リンクをコピー
+            </button>
+            <button class="btn-s" type="button" id="open-qr">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4" /></svg>
+              QRコード
+            </button>
+          </div>
         </div>
       </section>
 
-      <div class="panel" data-enter="fade">
-        <h2>参加者 <small id="member-count">1 / 2人</small></h2>
-        <ul class="members" id="members"></ul>
+      <!-- 2. プレイヤー -->
+      <section class="card-box" aria-labelledby="players-title" data-enter>
+        <div class="box-head">
+          <h2 id="players-title">プレイヤー</h2>
+          <span class="count" id="member-count" aria-live="polite">1<small> / 8</small></span>
+        </div>
+        <ul class="players" id="players"></ul>
+      </section>
 
-        <div class="settings" id="settings">
-          <fieldset class="setting">
+      <!-- 3. ルールと開始 -->
+      <div class="side">
+        <section class="card-box" aria-labelledby="rules-title" data-enter>
+          <div class="box-head">
+            <h2 id="rules-title">ルール</h2>
+          </div>
+          <fieldset class="rule">
             <legend>難易度</legend>
-            <div class="seg">
+            <div class="seg level">
               <input type="radio" name="level" id="lv-easy" value="かんたん" checked /><label for="lv-easy">かんたん</label>
               <input type="radio" name="level" id="lv-normal" value="ふつう" /><label for="lv-normal">ふつう</label>
               <input type="radio" name="level" id="lv-hard" value="むずかしい" /><label for="lv-hard">むずかしい</label>
             </div>
+            <p class="level-desc" id="level-desc"></p>
           </fieldset>
-          <fieldset class="setting">
-            <legend>制限時間</legend>
-            <div class="seg">
-              <input type="radio" name="time" id="t-60" value="60" /><label for="t-60">60秒</label>
-              <input type="radio" name="time" id="t-90" value="90" checked /><label for="t-90">90秒</label>
-              <input type="radio" name="time" id="t-120" value="120" /><label for="t-120">120秒</label>
-            </div>
-          </fieldset>
-        </div>
+          <div class="rule-row">
+            <fieldset class="rule">
+              <legend>制限時間</legend>
+              <div class="seg">
+                <input type="radio" name="time" id="t-60" value="60" /><label for="t-60">60秒</label>
+                <input type="radio" name="time" id="t-90" value="90" checked /><label for="t-90">90秒</label>
+                <input type="radio" name="time" id="t-120" value="120" /><label for="t-120">120秒</label>
+              </div>
+            </fieldset>
+            <fieldset class="rule">
+              <legend>選択の猶予</legend>
+              <div class="seg">
+                <input type="radio" name="grace" id="g-10" value="10" /><label for="g-10">10秒</label>
+                <input type="radio" name="grace" id="g-15" value="15" checked /><label for="g-15">15秒</label>
+                <input type="radio" name="grace" id="g-30" value="30" /><label for="g-30">30秒</label>
+              </div>
+            </fieldset>
+          </div>
+          <p class="host-note" id="host-note"></p>
+        </section>
 
-        <div class="actions">
-          <button class="pill" type="button" id="ready">準備完了にする</button>
-          <button class="pill pill-pink" type="button" id="start" disabled>対戦をはじめる</button>
-          <p class="note" id="note">2人そろうと開始できます</p>
-        </div>
+        <section class="card-box go-card" aria-label="対戦をはじめる" data-enter="fade">
+          <div class="go">
+            <p class="go-status"><span id="go-text">参加者を待っています</span><span class="dots" id="go-dots" aria-hidden="true"></span></p>
+            <button class="pill" type="button" id="ready">準備完了にする</button>
+            <button class="pill pill-pink" type="button" id="start" disabled>対戦をはじめる</button>
+            <p class="note" id="note">2人以上そろうと開始できます</p>
+          </div>
+        </section>
       </div>
     </main>
+
+    <dialog class="dialog" id="qr-dialog" aria-labelledby="qr-title">
+      <form class="card qr-card" method="dialog">
+        <h1 id="qr-title">QRコードで招待</h1>
+        <p class="sub">スマホのカメラで読み取ると、このルームに入れます。（QRコードはモックです）</p>
+        <canvas id="qr" width="21" height="21" aria-label="ルームURLのQRコード（モック）"></canvas>
+        <input class="url" id="room-url" readonly aria-label="ルームURL" />
+        <button class="pill" value="close">閉じる</button>
+      </form>
+    </dialog>
 
     <dialog class="dialog" id="leave-dialog">
       <form class="card" method="dialog">
         <h1>ルームを出ますか？</h1>
-        <p class="sub">ホストの場合は、相手にホストを引き継ぎます。</p>
+        <p class="sub">ホストの場合は、次に参加した人にホストを引き継ぎます。</p>
         <div class="dialog-actions">
           <button class="pill" value="cancel">やめる</button>
           <button class="pill pill-pink" value="leave">退出する</button>
@@ -502,34 +782,51 @@
     </dialog>
 
     <div class="countdown" id="countdown" hidden>
-      <p id="countdown-label">かんたん・90秒</p>
+      <p class="countdown-label" id="countdown-label">かんたん・90秒</p>
       <div class="countdown-num" id="countdown-num">3</div>
       <p id="countdown-sub">お題が公開されます</p>
     </div>
-
 
     <script src="common.js"></script>
     <script>
       const $ = (id) => document.getElementById(id);
       const q = params();
       const code = isValidCode(q.get("code") || "") ? q.get("code") : randomCode();
-      const me = { name: escapeHtml(q.get("name") || "ゲスト"), via: escapeHtml(q.get("via") || ""), host: q.get("role") !== "guest", ready: false, color: "#ff2d87" };
-      const other = { name: me.host ? "ぴよ丸" : "ホストさん", via: null, host: !me.host, ready: false, color: "#00b4fc", here: !me.host };
+      const roomUrl = `https://animic.party/rooms/${code}`;
+      const MAX = 8;
+      // 参加者の色はロゴと同じ色だけを使う（参加順に割り当てる）
+      const COLORS = [
+        ["#ff2d87", "#fff"],
+        ["#00b4fc", "#fff"],
+        ["#fddb13", "#0b1b2b"],
+        ["#0b1b2b", "#fff"],
+        ["#ff72b9", "#fff"],
+        ["#6fd3ff", "#0b1b2b"],
+        ["#ffe98a", "#0b1b2b"],
+        ["#5b6573", "#fff"],
+      ];
+      const isHost = q.get("role") !== "guest";
+      const me = { name: q.get("name") || "ゲスト", ready: false, isMe: true };
+      const players = isHost ? [me] : [{ name: "ホストさん", ready: true }, me];
+      const host = players[0];
+      // モック: あとから参加してくる人
+      const POOL = ["ぴよ丸", "ぴくせる侍", "プロンプト職人", "もちもち"];
 
-      // ルームコードとURL
       $("code").innerHTML = [...code].map((ch) => `<span>${ch}</span>`).join("");
-      $("code").setAttribute("aria-label", code);
-      $("room-url").value = `https://animic.app/rooms/${code}`;
+      $("code").setAttribute("aria-label", `ルームコード ${code}`);
+      $("room-url").value = roomUrl;
       playWipeOut();
-      $("copy").addEventListener("click", async () => {
+
+      async function copy(text, done) {
         try {
-          await navigator.clipboard.writeText($("room-url").value);
-          toast("URLをコピーしました");
+          await navigator.clipboard.writeText(text);
+          toast(done);
         } catch {
-          $("room-url").select();
-          toast("URLを選択しました");
+          toast("コピーできませんでした");
         }
-      });
+      }
+      $("copy").addEventListener("click", () => copy(roomUrl, "招待リンクをコピーしました"));
+      $("open-qr").addEventListener("click", () => $("qr-dialog").showModal());
 
       // QRっぽい模様（モック）
       (() => {
@@ -547,57 +844,92 @@
         }
       })();
 
-      // 参加者
-      function memberRow(p, isMe) {
-        const via = p.via ? `${p.via}でログイン` : "ゲスト";
-        return `<li class="member">
-          <span class="avatar" style="background:${p.color}">${[...p.name][0]}</span>
-          <span class="member-name">${p.name}${p.host ? '<span class="badge">ホスト</span>' : ""}<small>${isMe ? "あなた・" : ""}${via}</small></span>
-          <span class="ready ${p.ready ? "is-on" : ""}">${p.ready ? "準備OK" : "準備中"}</span>
-        </li>`;
+      // 難易度の説明は、選んでいるものだけを表示する
+      const LEVELS = {
+        かんたん: "白背景・1キャラクター",
+        ふつう: "背景あり・1キャラクター",
+        むずかしい: "背景あり・2キャラクター<b>EXTRA</b>",
+      };
+      function renderLevel() {
+        const level = document.querySelector("[name=level]:checked").value;
+        $("level-desc").innerHTML = `お題：${LEVELS[level]}`;
+      }
+      document.querySelectorAll("[name=level]").forEach((i) => i.addEventListener("change", renderLevel));
+      renderLevel();
+
+      // プレイヤーの枠（参加順に並べ、先頭がホスト）
+      const shown = new Set(players);
+      function renderPlayers() {
+        const cells = [];
+        for (let i = 0; i < MAX; i++) {
+          const p = players[i];
+          if (!p) {
+            const next = i === players.length;
+            cells.push(`<li class="player is-empty${next ? " is-next" : ""}"><span class="plus" aria-hidden="true">+</span>${next ? "参加を待っています" : "空き"}</li>`);
+            continue;
+          }
+          const [bg, fg] = COLORS[i % COLORS.length];
+          const joined = shown.has(p) ? "" : " is-joined";
+          shown.add(p);
+          const tag = p === host ? `<span class="tag">ホスト</span>` : p.isMe ? `<span class="tag me">あなた</span>` : "";
+          cells.push(`<li class="player${p.isMe ? " is-me" : ""}${joined}" style="--c:${bg};--on:${fg}">
+            ${tag}
+            <span class="avatar" aria-hidden="true">${escapeHtml([...p.name][0])}</span>
+            <b class="name">${escapeHtml(p.name)}${p.isMe && p === host ? "<small>（あなた）</small>" : ""}</b>
+            <span class="ready ${p.ready ? "is-on" : ""}">${p.ready ? "準備OK" : "準備中"}</span>
+          </li>`);
+        }
+        $("players").innerHTML = cells.join("");
       }
 
       function render() {
-        const list = [me.host ? me : other, me.host ? other : me].filter((p) => p === me || other.here);
-        $("members").innerHTML =
-          list.map((p) => memberRow(p, p === me)).join("") +
-          (other.here ? "" : `<li class="member is-empty"><span class="avatar"></span><span class="member-name">対戦相手<small class="dots">参加を待っています</small></span><span></span></li>`);
-        $("member-count").textContent = `${list.length} / 2人`;
+        renderPlayers();
+        const count = players.length;
+        const enough = count >= 2;
+        const readyCount = players.filter((p) => p.ready).length;
+        const allReady = enough && readyCount === count;
+        $("member-count").innerHTML = `${count}<small> / ${MAX}</small>`;
+        $("headline").innerHTML = enough
+          ? `<small>LOBBY</small>${count}人<em>そろった！</em>`
+          : `<small>LOBBY</small>メンバーを<em>集めよう！</em>`;
 
-        const bothHere = other.here;
-        $("status").textContent = !bothHere ? "対戦相手を待っています" : me.ready && other.ready ? "全員準備OK" : "そろいました";
-        $("status").classList.toggle("is-ready", bothHere);
-
+        // 開始の状況は1か所にまとめる（準備完了は任意）
+        $("go-text").textContent = !enough ? "参加者を待っています" : `準備OK ${readyCount} / ${count}人`;
+        $("go-dots").innerHTML = players.map((p) => `<i class="${p.ready ? "on" : ""}"></i>`).join("");
         $("ready").textContent = me.ready ? "準備完了を取り消す" : "準備完了にする";
-        $("settings").querySelectorAll("input").forEach((i) => (i.disabled = !me.host));
-        $("start").hidden = !me.host;
-        $("start").disabled = !bothHere;
-        $("note").textContent = me.host
-          ? bothHere
-            ? other.ready ? "全員の準備ができました" : "準備完了を待たずに開始することもできます"
-            : "2人そろうと開始できます"
+        document.querySelectorAll("[name=level], [name=time], [name=grace]").forEach((i) => (i.disabled = !isHost));
+        $("host-note").textContent = isHost ? "ルールはホストのあなたが決めます。" : "ルールはホストが決めます。";
+        $("start").hidden = !isHost;
+        $("start").disabled = !enough;
+        $("note").textContent = isHost
+          ? enough
+            ? allReady ? "全員の準備ができました" : "準備完了を待たずに開始することもできます"
+            : "2人以上そろうと開始できます"
           : "ホストが開始するのを待っています";
       }
       render();
 
-      // 相手の動き（モック）
+      // 他の参加者の動き（モック）: 時間差で入ってきて、しばらくすると準備完了にする
       (async () => {
-        if (!other.here) {
-          await wait(3000);
-          other.here = true;
+        const arrivals = isHost ? POOL.slice(0, 3) : POOL.slice(1, 3);
+        for (const [i, name] of arrivals.entries()) {
+          await wait(i === 0 ? 2500 : 2200);
+          const p = { name, ready: false };
+          players.push(p);
           render();
-          toast(`${other.name} さんが参加しました`);
+          toast(`${name} さんが参加しました`);
+          setTimeout(() => {
+            p.ready = true;
+            render();
+          }, 1800 + i * 900);
         }
-        await wait(2500);
-        other.ready = true;
-        render();
       })();
 
       $("ready").addEventListener("click", async () => {
         me.ready = !me.ready;
         render();
         // ゲストのときは、準備完了するとホストが開始する想定
-        if (!me.host && me.ready && other.here) {
+        if (!isHost && me.ready && players.length >= 2) {
           await wait(1800);
           if (me.ready) startCountdown();
         }
@@ -608,7 +940,8 @@
       async function startCountdown() {
         const level = document.querySelector("[name=level]:checked").value;
         const time = document.querySelector("[name=time]:checked").value;
-        $("countdown-label").textContent = `${level}・${time}秒`;
+        const grace = document.querySelector("[name=grace]:checked").value;
+        $("countdown-label").textContent = `${level}・${time}秒・猶予${grace}秒`;
         $("countdown").hidden = false;
         for (const n of [3, 2, 1]) {
           const el = $("countdown-num");
@@ -622,15 +955,9 @@
         $("countdown-num").style.fontSize = "clamp(3.5rem, 16vw, 7rem)";
         $("countdown-sub").textContent = "お題を公開します";
         await wait(700);
-        // 対戦画面へ（名前はエスケープ前の値を渡す）
-        wipeTo("play.html", {
-          code,
-          level,
-          time,
-          name: q.get("name") || "ゲスト",
-          opp: other.name,
-          role: me.host ? "host" : "guest",
-        });
+        // 対戦画面は今のところ1対1のため、最初の相手を渡す
+        const opponent = players.find((p) => p !== me);
+        wipeTo("play.html", { code, level, time, grace, name: me.name, opp: opponent?.name || "ぴよ丸", role: isHost ? "host" : "guest" });
       }
 
       // 退出
