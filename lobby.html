@@ -70,11 +70,8 @@
 
       /* プレイヤーのカードの上部: 人数と、ルームコード・招待 */
       .players-head {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: end;
-        justify-content: space-between;
-        gap: 1rem 1.5rem;
+        display: grid;
+        gap: 1rem;
         padding-bottom: 1.1rem;
         border-bottom: 2px dashed var(--line);
       }
@@ -86,7 +83,9 @@
         font-size: 1.3rem;
       }
 
+      /* ルームコードはカードの中央に置く */
       .room-card {
+        justify-self: center;
         display: grid;
         grid-template-columns: auto auto;
         align-items: end;
@@ -95,6 +94,7 @@
 
       .room-card .room-label {
         grid-column: 1 / -1;
+        text-align: center;
       }
 
       .room-label {
