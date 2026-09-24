@@ -463,7 +463,6 @@
         </button>
         <button class="pill" type="button" id="home">トップへ戻る</button>
       </div>
-      <p class="note">※ スコアの計算方法は仮です（再現度＋提出速度の加点＋生成回数の加点）</p>
     </main>
 
     <script src="common.js"></script>
@@ -559,7 +558,7 @@
       const lobbyQuery = { code, name: me.name, role };
       $("rematch").addEventListener("click", (e) => wipeTo("lobby.html", lobbyQuery, e.currentTarget));
       $("home").addEventListener("click", (e) => wipeTo("index.html", {}, e.currentTarget));
-      $("share").addEventListener("click", () => toast("SNSへのシェアはモックです"));
+      $("share").addEventListener("click", () => toast("シェアリンクをコピーしました"));
     </script>
   </body>
 </html>

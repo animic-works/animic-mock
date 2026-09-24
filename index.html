@@ -1145,12 +1145,6 @@
         outline: none;
       }
 
-      .code-boxes.is-focused:has(.code-field:focus-visible) {
-        outline: 3px solid var(--cyan);
-        outline-offset: 4px;
-        border-radius: 0.7rem;
-      }
-
       .code-msg {
         margin: -0.4rem 0 0;
         min-height: 1.4em;
@@ -1423,7 +1417,7 @@
               <circle cx="27.5" cy="9" r="4" />
               <path d="M34 22 c0-4.5-2.8-7-6.5-7 c-1.4 0-2.6.3-3.6 1 c2 1.8 3.1 4.1 3.1 6 Z" />
             </svg>
-            <span class="label">ロビーに参加する</span>
+            <span class="label">ルームに参加する</span>
             <svg width="12" height="20" viewBox="0 0 12 20" aria-hidden="true">
               <path d="M2 2 L10 10 L2 18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
@@ -1438,7 +1432,6 @@
       <div class="section-head" data-reveal style="--r: 0">
         <p class="eyebrow">HOW TO PLAY</p>
         <h2 id="how-title">遊び方</h2>
-        <p>ルームに2人そろったら対戦スタート。制限時間内に、お題にいちばん近い1枚を作ろう。</p>
       </div>
       <div class="carousel" id="how-carousel" role="region" aria-roledescription="カルーセル" aria-label="遊び方の手順" data-reveal style="--r: 1">
         <ol class="steps" id="how-steps">
@@ -1446,7 +1439,7 @@
             <div class="step-body">
               <span class="step-num">1<small>/ 4</small></span>
               <h3>ルームに集まる</h3>
-              <p>「スタート」でルームを作って、URLかQRコードで相手を招待。コードを聞いたら「ロビーに参加する」から入れます。</p>
+              <p>「スタート」でルームを作って、相手を招待できます。ルーム作成画面で難易度と制限時間を設定することができます。</p>
             </div>
             <div class="step-visual" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7" /><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7" /></svg>
@@ -1456,7 +1449,7 @@
             <div class="step-body">
               <span class="step-num">2<small>/ 4</small></span>
               <h3>お題が公開される</h3>
-              <p>ホストが開始すると、2人同時にお題のイラストが公開されます。難易度と制限時間はホストが決めます。</p>
+              <p>ゲームを開始すると、難易度に応じてお題のイラストが公開されます。</p>
             </div>
             <div class="step-visual" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3" /><circle cx="9" cy="9" r="2" /><path d="m21 15-5-5L5 21" /></svg>
@@ -1563,7 +1556,6 @@
             </div>
           </li>
         </ul>
-        <p class="gallery-note" data-reveal style="--r: 5">※ 画像と対戦結果はモックです</p>
       </div>
       <footer class="footer">
         <img src="animic-logo.svg" alt="Animic" width="2078" height="607" />
@@ -1579,15 +1571,15 @@
 
     <dialog class="dialog" id="join-dialog" aria-labelledby="join-title">
       <form id="join-form" novalidate>
-        <h2 id="join-title">ロビーに参加</h2>
-        <p class="sub">相手から聞いた8文字のルームコードを入力してね</p>
+        <h2 id="join-title">ルームに参加</h2>
+        <p class="sub">英数字8文字のルームコードを入力してください</p>
         <div class="code-boxes" id="code-boxes">
           <input class="code-field" id="room-code" autocomplete="off" autocapitalize="characters" spellcheck="false" inputmode="text" aria-label="ルームコード（8文字）" aria-describedby="code-msg" />
           <div class="code-cells" id="code-cells" aria-hidden="true">
             <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
           </div>
         </div>
-        <p class="code-msg" id="code-msg">英数字8文字（0・O・1・I・Lは使いません）</p>
+        <p class="code-msg" id="code-msg"></p>
         <div class="dialog-actions">
           <button type="button" id="join-cancel">やめる</button>
           <button class="primary" type="submit" id="join-submit" disabled>参加する</button>
