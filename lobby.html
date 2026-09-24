@@ -96,10 +96,12 @@
         grid-column: 1 / -1;
       }
 
+      /* 「ルームコード」は、下の「プレイヤー」と同じ太い見出しにする */
       .room-label {
-        font-size: 0.8rem;
-        font-weight: 700;
-        color: var(--muted);
+        font-family: var(--display);
+        font-weight: 400;
+        font-size: 1.3rem;
+        color: var(--ink);
       }
 
       .code {
@@ -185,9 +187,11 @@
       }
 
       /* ---------- 2. プレイヤー ---------- */
+      /* 最初から8人分（4列×2段）の高さを確保し、参加者が増えてもカードの大きさを変えない */
       .players {
         display: grid;
         grid-template-columns: repeat(4, minmax(0, 1fr));
+        grid-template-rows: repeat(2, minmax(9.2rem, auto));
         gap: 1rem 0.8rem;
         margin: 0;
         padding: 0.6rem 0 0.2rem;
@@ -593,6 +597,7 @@
       @media (max-width: 560px) {
         .players {
           grid-template-columns: repeat(2, minmax(0, 1fr));
+          grid-template-rows: repeat(4, minmax(9.2rem, auto));
         }
 
       }
