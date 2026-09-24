@@ -83,9 +83,9 @@
         font-size: 1.3rem;
       }
 
-      /* ルームコードはカードの中央に置く */
+      /* ルームコードは、下のプレイヤーの見出しと同じく左端にそろえる */
       .room-card {
-        justify-self: center;
+        justify-self: start;
         display: grid;
         grid-template-columns: auto auto;
         align-items: end;
@@ -94,7 +94,6 @@
 
       .room-card .room-label {
         grid-column: 1 / -1;
-        text-align: center;
       }
 
       .room-label {
