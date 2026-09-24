@@ -278,7 +278,7 @@ html.wipe-pending body > :not(.wipe) {
   opacity: 0.9;
 }
 
-/* ルーム作成の演出を飛ばすボタン（画面下部の中央） */
+/* ルーム作成の演出を飛ばすボタン（画面下部の中央）。枠線やリングは付けず、暗めの半透明にする */
 .wipe-skip {
   position: absolute;
   z-index: 1;
@@ -287,10 +287,10 @@ html.wipe-pending body > :not(.wipe) {
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
-  padding: 0.65rem 1.1rem 0.65rem 1.4rem;
-  border: 2px solid #fff;
+  padding: 0.7rem 1.1rem 0.7rem 1.4rem;
+  border: 0;
   border-radius: 999px;
-  background: rgb(11 27 43 / 0.25);
+  background: rgb(11 27 43 / 0.55);
   color: #fff;
   font-family: "Zen Kaku Gothic New", "Hiragino Sans", sans-serif;
   font-size: 0.95rem;
@@ -300,38 +300,32 @@ html.wipe-pending body > :not(.wipe) {
   pointer-events: auto;
   opacity: 0;
   translate: -50% 0;
-  transition:
-    background 0.2s,
-    color 0.2s;
+  transition: background 0.2s;
 }
 
 .wipe.is-in .wipe-skip {
   animation: room-in 0.4s ease-out 0.95s forwards;
 }
 
+/* フォーカス中・カーソルを合わせたときは、リングの代わりに背景をさらに暗くする */
 .wipe-skip:hover,
 .wipe-skip:focus-visible {
-  background: #fff;
-  color: #ff2d87;
+  background: rgb(11 27 43 / 0.8);
 }
 
+.wipe-skip:focus,
 .wipe-skip:focus-visible {
-  outline: 3px solid #0b1b2b;
-  outline-offset: 3px;
+  outline: none;
 }
 
 .wipe-skip kbd {
   padding: 0.1rem 0.45rem;
   border-radius: 0.35rem;
-  background: rgb(255 255 255 / 0.25);
-  font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  background: rgb(255 255 255 / 0.18);
+  font-family: "Zen Kaku Gothic New", "Hiragino Sans", sans-serif;
   font-size: 0.7rem;
+  font-weight: 700;
   letter-spacing: 0;
-}
-
-.wipe-skip:hover kbd,
-.wipe-skip:focus-visible kbd {
-  background: #fff0f7;
 }
 
 .wipe-skip:disabled {
