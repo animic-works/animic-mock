@@ -402,20 +402,25 @@
         cursor: default;
       }
 
-      /* 難易度の説明は挿絵の上の中央に置き、ピンクで強調する */
+      /* 難易度の説明は、挿絵の画像の上端の中央に前面のレイヤーとして重ね、ピンクで強調する */
       .level-desc {
-        justify-self: center;
+        position: absolute;
+        z-index: 1;
+        top: 0.6rem;
+        left: 50%;
         display: flex;
         align-items: center;
         gap: 0.2rem;
-        width: fit-content;
-        margin: 0.6rem auto 0;
-        padding: 0.35rem 1rem;
+        margin: 0;
+        padding: 0.3rem 0.8rem;
         border-radius: 999px;
         background: #fff0f7;
+        box-shadow: 0 4px 12px -6px rgb(11 27 43 / 0.35);
         color: var(--pink);
-        font-size: 0.85rem;
+        font-size: 0.74rem;
         font-weight: 700;
+        white-space: nowrap;
+        translate: -50% 0;
       }
 
       .level-desc b {
@@ -436,7 +441,7 @@
         position: relative;
         display: flex;
         justify-self: center;
-        width: min(100%, 12.5rem);
+        width: min(100%, 14rem);
         margin: 0.6rem auto 0;
         aspect-ratio: 3 / 4;
         overflow: hidden;
@@ -455,8 +460,8 @@
 
       .level-art figcaption {
         position: absolute;
-        left: 0.5rem;
-        top: 0.5rem;
+        right: 0.5rem;
+        bottom: 0.5rem;
         padding: 0.12rem 0.55rem;
         border-radius: 999px;
         background: rgb(255 255 255 / 0.9);
@@ -740,8 +745,10 @@
             </dd>
           </div>
           <div class="wide">
-            <p class="level-desc" data-level-desc></p>
-            <figure class="level-art" data-level-art><figcaption>挿絵（仮）</figcaption></figure>
+            <figure class="level-art" data-level-art>
+              <p class="level-desc" data-level-desc></p>
+              <figcaption>挿絵（仮）</figcaption>
+            </figure>
           </div>
           <div>
             <dt>制限時間</dt>
@@ -768,8 +775,10 @@
         <dl class="rules" id="rules-view" hidden>
           <div><dt>難易度</dt><dd class="summary" id="view-level"></dd></div>
           <div class="wide">
-            <p class="level-desc" data-level-desc></p>
-            <figure class="level-art" data-level-art><figcaption>挿絵（仮）</figcaption></figure>
+            <figure class="level-art" data-level-art>
+              <p class="level-desc" data-level-desc></p>
+              <figcaption>挿絵（仮）</figcaption>
+            </figure>
           </div>
           <div><dt>制限時間</dt><dd class="summary" id="view-time"></dd></div>
           <div><dt>選択の猶予</dt><dd class="summary" id="view-grace"></dd></div>
