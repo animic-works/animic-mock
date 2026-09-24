@@ -94,12 +94,12 @@
           opacity 0.3s;
       }
 
-      /* JavaScriptが動かない場合は、下線を各リンクに直接付ける */
-      html:not(.is-paged) .nav-indicator {
+      /* JavaScriptが動かない場合は、下線を各リンクに直接付ける（スクロール版は下線を動かす） */
+      html:not(.is-paged):not(.is-scroll) .nav-indicator {
         display: none;
       }
 
-      html:not(.is-paged) .nav a[aria-current="page"]::after {
+      html:not(.is-paged):not(.is-scroll) .nav a[aria-current="page"]::after {
         content: "";
         position: absolute;
         inset: auto 0 0;
@@ -184,7 +184,7 @@
         translate: 0 -50%;
       }
 
-      html:not(.is-paged) .pager {
+      html:not(.is-paged):not(.is-scroll) .pager {
         display: none;
       }
 
@@ -417,7 +417,7 @@
       }
 
       /* 画面の中身は、進む方向から順に入ってくる */
-      html.is-paged .screen [data-reveal] {
+      html:is(.is-paged, .is-scroll) .screen [data-reveal] {
         opacity: 0;
         transform: translateY(var(--from, 2rem));
       }
@@ -426,7 +426,7 @@
         --from: -2rem;
       }
 
-      html.is-paged .screen.is-active [data-reveal] {
+      html:is(.is-paged, .is-scroll) .screen.is-active [data-reveal] {
         opacity: 1;
         transform: none;
         transition:
@@ -439,6 +439,34 @@
         position: relative;
         min-height: 100vh;
         min-height: 100svh;
+      }
+
+      /* スクロールロックなし版（index.html?scroll）: 全セクションを縦に並べて普通にスクロールする。
+         ホーム以外は中身の高さに合わせ、遊び方はカルーセルのまま使う */
+      html.is-scroll {
+        scroll-behavior: smooth;
+      }
+
+      html.is-scroll .screen:not(.hero) {
+        min-height: auto;
+      }
+
+      html.is-scroll .screen:not(.hero, .how) {
+        padding-top: clamp(5rem, 10vh, 7rem);
+      }
+
+      html.is-scroll .credits-body {
+        padding-top: 0;
+      }
+
+      html.is-scroll .steps {
+        height: min(30rem, 62vh);
+      }
+
+      @media (max-width: 900px) {
+        html.is-scroll .steps {
+          height: min(27rem, 60svh);
+        }
       }
 
       /* 画面の下に出す「スクロールで次へ」 */
@@ -472,7 +500,7 @@
         animation: hint-line 1.6s ease-in-out infinite;
       }
 
-      html:not(.is-paged) .scroll-hint {
+      html:not(.is-paged):not(.is-scroll) .scroll-hint {
         display: none;
       }
 
@@ -734,19 +762,19 @@
       }
 
       /* JavaScriptが動かない場合は全ステップを縦に並べる */
-      html:not(.is-paged) .steps {
+      html:not(.is-paged):not(.is-scroll) .steps {
         display: grid;
         gap: 1.5rem;
         height: auto;
         max-height: none;
       }
 
-      html:not(.is-paged) .step {
+      html:not(.is-paged):not(.is-scroll) .step {
         position: relative;
         min-height: 18rem;
       }
 
-      html:not(.is-paged) .carousel-controls {
+      html:not(.is-paged):not(.is-scroll) .carousel-controls {
         display: none;
       }
 
@@ -1428,10 +1456,13 @@
       }
 
       @media (prefers-reduced-motion: reduce) {
+        html.is-scroll {
+          scroll-behavior: auto;
+        }
         html.is-paged .screen,
         html.is-paged .screen.is-active,
-        html.is-paged .screen [data-reveal],
-        html.is-paged .screen.is-active [data-reveal],
+        html:is(.is-paged, .is-scroll) .screen [data-reveal],
+        html:is(.is-paged, .is-scroll) .screen.is-active [data-reveal],
         .step,
         .carousel-dots button,
         .nav-indicator,
@@ -1815,9 +1846,11 @@
         }
       });
 
-      // 画面の切り替え: ホイール・スワイプ・上下キーで1画面ずつ進み、ページ自体は動かさない
+      // 画面の切り替え: ホイール・スワイプ・上下キーで1画面ずつ進み、ページ自体は動かさない。
+      // index.html?scroll ではスクロールロックなし版として、普通のスクロールに任せる
       (() => {
         const root = document.documentElement;
+        const scrollMode = new URLSearchParams(location.search).has("scroll");
         const screens = [...document.querySelectorAll(".screen")];
         const nav = document.getElementById("nav");
         const navLinks = [...nav.querySelectorAll("a[data-nav]")];
@@ -1852,9 +1885,11 @@
 
         function render(index, back) {
           const screen = screens[index];
-          root.classList.toggle("is-back", back);
-          screens.forEach((el, i) => el.classList.toggle("is-active", i === index));
-          screen.scrollTop = 0;
+          if (!scrollMode) {
+            root.classList.toggle("is-back", back);
+            screens.forEach((el, i) => el.classList.toggle("is-active", i === index));
+            screen.scrollTop = 0;
+          }
           // ヘッダー: 表示中の項目に下線を移す。ホーム以外では左上にロゴを出す
           const key = screen.dataset.nav;
           navLinks.forEach((a) => (a.dataset.nav === key ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current")));
@@ -1873,6 +1908,8 @@
 
         function go(index) {
           index = Math.max(0, Math.min(screens.length - 1, index));
+          // スクロール版: 該当のセクションまでスクロールする（表示の更新はスクロール位置の監視で行う）
+          if (scrollMode) return screens[index].scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth" });
           if (index === current) return;
           render(index, index < current);
           lock(reducedMotion ? 350 : 700);
@@ -1964,7 +2001,7 @@
         addEventListener(
           "wheel",
           (event) => {
-            if (busy()) return;
+            if (scrollMode || busy()) return;
             event.preventDefault();
             const now = Date.now();
             const value = -event.deltaY;
@@ -1993,12 +2030,14 @@
             if (Math.abs(dx) >= 40 && onHow() && target.closest("#how-carousel")) slide(Math.sign(dx));
             return;
           }
-          if (locked || Math.abs(dy) < innerHeight * 0.05 || canScrollInside(Math.sign(dy))) return;
+          if (scrollMode || locked || Math.abs(dy) < innerHeight * 0.05 || canScrollInside(Math.sign(dy))) return;
           go(current + Math.sign(dy));
         });
 
         addEventListener("keydown", (event) => {
           if (busy() || event.target.closest?.("input, textarea, select")) return;
+          // スクロール版では、遊び方の左右キー以外はブラウザ本来のスクロールに任せる
+          if (scrollMode && !(onHow() && (event.key === "ArrowLeft" || event.key === "ArrowRight"))) return;
           if (event.key === "Home" || event.key === "End") {
             event.preventDefault();
             return go(event.key === "Home" ? 0 : screens.length - 1);
@@ -2026,8 +2065,29 @@
         cornerLogo.addEventListener("click", jump);
         document.querySelectorAll("[data-go='next']").forEach((el) => el.addEventListener("click", () => go(current + 1)));
 
-        root.classList.add("is-paged");
-        render(Math.max(0, indexOf(location.hash.slice(1))), false);
+        if (scrollMode) {
+          root.classList.add("is-scroll");
+          // 画面の中央にあるセクションを「表示中」として、ヘッダーの下線・右端の位置・左上のロゴを合わせる
+          const centered = new IntersectionObserver(
+            (entries) => entries.forEach((e) => e.isIntersecting && render(screens.indexOf(e.target), false)),
+            { rootMargin: "-45% 0px -45% 0px" },
+          );
+          // 画面に入った、または通り過ぎたセクションの中身を出す（一度出したら戻さない）。
+          // リンクで一気に移動した場合も、途中のセクションが空のまま残らないようにする
+          const reveal = () => {
+            for (const el of screens) if (!el.classList.contains("is-active") && el.getBoundingClientRect().top < innerHeight * 0.85) el.classList.add("is-active");
+          };
+          addEventListener("scroll", reveal, { passive: true });
+          addEventListener("resize", reveal);
+          reveal();
+          screens.forEach((el) => centered.observe(el));
+          render(0, false);
+          const start = indexOf(location.hash.slice(1));
+          if (start > 0) screens[start].scrollIntoView();
+        } else {
+          root.classList.add("is-paged");
+          render(Math.max(0, indexOf(location.hash.slice(1))), false);
+        }
         addEventListener("resize", moveIndicator);
         document.fonts?.ready.then(moveIndicator);
       })();
