@@ -300,7 +300,7 @@ html.wipe-pending body > :not(.wipe) {
   pointer-events: auto;
   opacity: 0;
   translate: -50% 0;
-  transition: background 0.2s;
+  transition: background 0.2s, scale 0.16s ease;
 }
 
 .wipe.is-in .wipe-skip {
@@ -311,21 +311,32 @@ html.wipe-pending body > :not(.wipe) {
 .wipe-skip:hover,
 .wipe-skip:focus-visible {
   background: rgb(11 27 43 / 0.8);
+  scale: 1.04;
+}
+
+.wipe-skip:active {
+  scale: 0.96;
+}
+
+.wipe-skip svg {
+  width: 1rem;
+  height: 1rem;
+  fill: currentColor;
+  stroke: currentColor;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: translate 0.16s ease;
+}
+
+.wipe-skip:hover svg,
+.wipe-skip:focus-visible svg {
+  translate: 2px 0;
 }
 
 .wipe-skip:focus,
 .wipe-skip:focus-visible {
   outline: none;
-}
-
-.wipe-skip kbd {
-  padding: 0.1rem 0.45rem;
-  border-radius: 0.35rem;
-  background: rgb(255 255 255 / 0.18);
-  font-family: "Zen Kaku Gothic New", "Hiragino Sans", sans-serif;
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0;
 }
 
 .wipe-skip:disabled {

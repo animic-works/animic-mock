@@ -441,27 +441,49 @@
         min-height: 100svh;
       }
 
-      /* スクロールロックなし版（index.html?scroll）: 全セクションを縦に並べて普通にスクロールする。
-         ホーム以外は中身の高さに合わせ、遊び方はカルーセルのまま使う */
+      /* 全セクションを縦に並べ、通常のスクロールとスナップで移動する */
       html.is-scroll {
+        --snap-head-offset: clamp(7rem, 16vh, 9rem);
         scroll-behavior: smooth;
+        scroll-snap-type: y mandatory;
       }
 
-      html.is-scroll .screen:not(.hero) {
-        min-height: auto;
+      html.is-scroll .screen {
+        scroll-snap-align: start;
+        scroll-snap-stop: always;
       }
 
       html.is-scroll .screen:not(.hero, .how) {
-        padding-top: clamp(5rem, 10vh, 7rem);
+        padding-top: 0;
+      }
+
+      html.is-scroll .how {
+        height: 100svh;
+        padding-top: 0;
+      }
+
+      html.is-scroll .how > .section-head,
+      html.is-scroll .score-screen > .section-head,
+      html.is-scroll .gallery-body > .section-head {
+        margin-top: var(--snap-head-offset);
+      }
+
+      html.is-scroll .score-screen {
+        align-content: start;
+      }
+
+      html.is-scroll .gallery-body {
+        align-content: start;
+        padding-top: 0;
       }
 
       html.is-scroll .steps {
-        height: min(30rem, 62vh);
+        height: 100%;
       }
 
       @media (max-width: 900px) {
-        html.is-scroll .steps {
-          height: min(27rem, 60svh);
+        html.is-scroll {
+          --snap-head-offset: 5.5rem;
         }
       }
 
@@ -1665,10 +1687,10 @@
       });
 
       // 画面の切り替え: ホイール・スワイプ・上下キーで1画面ずつ進み、ページ自体は動かさない。
-      // index.html?scroll ではスクロールロックなし版として、普通のスクロールに任せる
+      // セクションを縦に並べ、スクロール位置に応じて表示状態を更新する
       (() => {
         const root = document.documentElement;
-        const scrollMode = new URLSearchParams(location.search).has("scroll");
+        const scrollMode = true;
         const screens = [...document.querySelectorAll(".screen")];
         const nav = document.getElementById("nav");
         const navLinks = [...nav.querySelectorAll("a[data-nav]")];

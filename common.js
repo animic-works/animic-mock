@@ -139,7 +139,7 @@ async function buildRoomTo(query, { label, done, sub }) {
   const skipSignal = new Promise((resolve) => (onSkip = resolve));
   const pause = (ms) => Promise.race([wait(ms), skipSignal]);
   const skipButton = Object.assign(document.createElement("button"), { type: "button", className: "wipe-skip" });
-  skipButton.innerHTML = 'スキップ<kbd aria-hidden="true">どのキーでも</kbd>';
+  skipButton.innerHTML = 'スキップ<svg viewBox="0 0 20 16" aria-hidden="true"><path d="M4 2 13 8l-9 6V2Zm11 0v12" /></svg>';
   skipButton.setAttribute("aria-label", "演出をスキップしてロビーへ進む");
   wipe.append(skipButton);
   const skip = () => {
