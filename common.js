@@ -90,7 +90,8 @@ async function wipeTo(path, query, trigger) {
   go(path, query);
 }
 
-// 帯で塗りつぶし、ルームコードをスロットのように回して確定させてからロビーへ移動する
+// 帯で塗りつぶし、ルームコードをスロットのように回して確定させてからロビーへ移動する。
+// 画面下部の「スキップ」ボタン、または Enter・Space・Esc で、演出を飛ばしてすぐ移動できる
 async function buildRoomTo(query, { label, done, sub }) {
   if (reducedMotion) return go("lobby.html", query);
   if (document.querySelector(".wipe")) return;
@@ -101,21 +102,54 @@ async function buildRoomTo(query, { label, done, sub }) {
   const labelEl = wipe.querySelector(".wipe-room-label");
   spans.forEach((span) => span.classList.add("is-spinning"));
 
-  await wait(900);
-  let settled = 0;
-  const spin = setInterval(() => {
-    for (let i = settled; i < spans.length; i++) spans[i].textContent = CODE_CHARS[Math.floor(Math.random() * CODE_CHARS.length)];
-  }, 55);
-  await wait(700);
-  for (let i = 0; i < spans.length; i++) {
-    settled = i + 1;
-    spans[i].textContent = code[i];
-    spans[i].classList.replace("is-spinning", "is-set");
-    await wait(150);
+  // スキップ: 待ち時間を途中で打ち切れるようにする
+  let skipped = false;
+  let onSkip;
+  const skipSignal = new Promise((resolve) => (onSkip = resolve));
+  const pause = (ms) => Promise.race([wait(ms), skipSignal]);
+  const skipButton = Object.assign(document.createElement("button"), { type: "button", className: "wipe-skip" });
+  skipButton.innerHTML = 'スキップ<kbd aria-hidden="true">Enter</kbd>';
+  skipButton.setAttribute("aria-label", "演出をスキップしてロビーへ進む");
+  wipe.append(skipButton);
+  const skip = () => {
+    if (skipped) return;
+    skipped = true;
+    onSkip();
+  };
+  // 表示名の入力欄で Enter を押して作成を始めた場合に、同じ Enter で飛ばさないよう、開始直後は受け付けない
+  const armedAt = performance.now() + 400;
+  const onKey = (event) => {
+    if (!["Enter", " ", "Escape"].includes(event.key) || event.repeat || performance.now() < armedAt) return;
+    event.preventDefault();
+    skip();
+  };
+  skipButton.addEventListener("click", skip);
+  addEventListener("keydown", onKey);
+
+  let spin;
+  await pause(900);
+  if (!skipped) {
+    skipButton.focus({ preventScroll: true });
+    let settled = 0;
+    spin = setInterval(() => {
+      for (let i = settled; i < spans.length; i++) spans[i].textContent = CODE_CHARS[Math.floor(Math.random() * CODE_CHARS.length)];
+    }, 55);
+    await pause(700);
+    for (let i = 0; i < spans.length && !skipped; i++) {
+      settled = i + 1;
+      spans[i].textContent = code[i];
+      spans[i].classList.replace("is-spinning", "is-set");
+      await pause(150);
+    }
+    clearInterval(spin);
+    if (!skipped) {
+      labelEl.textContent = done;
+      await pause(900);
+    }
   }
   clearInterval(spin);
-  labelEl.textContent = done;
-  await wait(900);
+  removeEventListener("keydown", onKey);
+  skipButton.disabled = true;
   go("lobby.html", query);
 }
 
