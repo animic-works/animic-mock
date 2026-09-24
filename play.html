@@ -1,0 +1,995 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <link rel="icon" type="image/svg+xml" href="animic-favicon.svg" />
+    <title>対戦中 | Animic</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Maru+Gothic:wght@900&family=Zen+Kaku+Gothic+New:wght@500;700&family=Montserrat:ital,wght@1,500&family=JetBrains+Mono:wght@700&display=swap"
+    />
+    <link rel="stylesheet" href="common.css" />
+    <link rel="stylesheet" href="transition.css" />
+    <script>
+      // 前の画面から塗りつぶして来た場合、描画前に中身を隠す
+      try {
+        if (sessionStorage.getItem("animic-wipe")) document.documentElement.classList.add("wipe-pending");
+      } catch {}
+    </script>
+    <style>
+      :root {
+        --display: "Dela Gothic One", "Zen Maru Gothic", sans-serif;
+      }
+
+      /* ---------- 上部: ルーム情報と残り時間 ---------- */
+      .bar {
+        position: sticky;
+        top: 0;
+        z-index: 5;
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.7rem clamp(1rem, 4vw, 3rem);
+        background: rgb(245 246 248 / 0.9);
+        backdrop-filter: blur(8px);
+      }
+
+      .bar-left {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        min-width: 0;
+      }
+
+      .bar-left img {
+        display: block;
+        width: 7.5rem;
+        height: auto;
+        flex: none;
+      }
+
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.3rem 0.75rem;
+        border-radius: 999px;
+        background: #fff;
+        border: 2px solid var(--line);
+        font-size: 0.8rem;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+
+      .chip code {
+        font-family: var(--mono);
+        letter-spacing: 0.1em;
+      }
+
+      .chip-level {
+        border-color: transparent;
+        background: #e0f6ff;
+      }
+
+      .timer {
+        display: grid;
+        justify-items: center;
+        line-height: 1;
+      }
+
+      .timer-label {
+        font-family: var(--latin);
+        font-style: italic;
+        font-size: 0.68rem;
+        letter-spacing: 0.25em;
+        color: var(--muted);
+      }
+
+      .timer-num {
+        font-family: var(--display);
+        font-size: clamp(2rem, 4vw, 2.8rem);
+        font-variant-numeric: tabular-nums;
+        transition: color 0.3s;
+      }
+
+      .timer.is-hurry .timer-num {
+        color: var(--pink);
+        animation: beat 1s ease-in-out infinite;
+      }
+
+      @keyframes beat {
+        50% {
+          transform: scale(1.08);
+        }
+      }
+
+      .bar-right {
+        justify-self: end;
+      }
+
+      .time-track {
+        position: sticky;
+        top: 0;
+        z-index: 5;
+        height: 6px;
+        background: #e6e8ec;
+      }
+
+      .time-track span {
+        display: block;
+        height: 100%;
+        width: 100%;
+        background: linear-gradient(90deg, var(--cyan), var(--pink));
+        transform-origin: left;
+        transition: transform 0.25s linear;
+      }
+
+      /* 生成終了後の案内 */
+      .phase {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4rem 1rem;
+        margin: 0;
+        padding: 0.7rem 16px;
+        background: var(--yellow);
+        font-weight: 700;
+        text-align: center;
+      }
+
+      .phase b {
+        font-family: var(--display);
+        font-weight: 400;
+        font-size: 1.2rem;
+      }
+
+      /* ---------- 本体 ---------- */
+      .play {
+        position: relative;
+        z-index: 1;
+        width: min(100%, 76rem);
+        margin: 0 auto;
+        padding: clamp(1rem, 3vw, 1.75rem) 16px 3rem;
+        display: grid;
+        grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.3fr);
+        gap: 1.25rem;
+        align-items: start;
+      }
+
+      .col {
+        display: grid;
+        gap: 1.25rem;
+      }
+
+      .panel {
+        padding: clamp(1rem, 2.5vw, 1.4rem);
+        background: #fff;
+        border: 2.5px solid var(--ink);
+        border-radius: 1.5rem;
+        box-shadow: 0 6px 0 var(--ink);
+        display: grid;
+        gap: 0.9rem;
+      }
+
+      .panel-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+      }
+
+      .panel-head h2 {
+        margin: 0;
+        font-family: var(--round);
+        font-weight: 900;
+        font-size: 1.15rem;
+      }
+
+      .panel-head small {
+        color: var(--muted);
+        font-size: 0.8rem;
+      }
+
+      /* お題 */
+      .topic-img {
+        position: relative;
+        margin: 0;
+        aspect-ratio: 1;
+        border-radius: 1rem;
+        overflow: hidden;
+        border: 2px solid var(--line);
+        background: #fff;
+      }
+
+      .topic-img svg {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+
+      .topic-img figcaption {
+        position: absolute;
+        left: 0.7rem;
+        top: 0.7rem;
+        padding: 0.2rem 0.7rem;
+        border-radius: 999px;
+        background: var(--ink);
+        color: #fff;
+        font-family: var(--latin);
+        font-style: italic;
+        font-size: 0.7rem;
+        letter-spacing: 0.2em;
+      }
+
+      .topic-note {
+        margin: 0;
+        font-size: 0.82rem;
+        color: var(--muted);
+      }
+
+      /* 対戦相手の状況 */
+      .versus {
+        display: grid;
+        gap: 0.6rem;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .player {
+        display: grid;
+        grid-template-columns: 2.4rem 1fr auto;
+        align-items: center;
+        gap: 0.7rem;
+        padding: 0.6rem 0.75rem;
+        border-radius: 1rem;
+        background: var(--ground);
+      }
+
+      .avatar {
+        display: grid;
+        place-items: center;
+        width: 2.4rem;
+        height: 2.4rem;
+        border-radius: 50%;
+        color: #fff;
+        font-family: var(--round);
+        font-weight: 900;
+      }
+
+      .player-name {
+        min-width: 0;
+        font-weight: 700;
+        font-size: 0.92rem;
+        overflow-wrap: anywhere;
+      }
+
+      .player-name small {
+        display: block;
+        font-weight: 500;
+        font-size: 0.75rem;
+        color: var(--muted);
+      }
+
+      .state {
+        padding: 0.25rem 0.65rem;
+        border-radius: 999px;
+        background: #fff;
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: var(--muted);
+        white-space: nowrap;
+      }
+
+      .state.is-done {
+        background: #dcfce7;
+        color: #15803d;
+      }
+
+      .state.is-working {
+        background: #fff0f7;
+        color: var(--pink);
+      }
+
+      /* プロンプト入力 */
+      .seg {
+        display: grid;
+        grid-auto-flow: column;
+        padding: 0.2rem;
+        border-radius: 999px;
+        background: var(--ground);
+      }
+
+      .seg button {
+        padding: 0.35rem 0.9rem;
+        border: 0;
+        border-radius: 999px;
+        background: none;
+        font: inherit;
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: var(--muted);
+        cursor: pointer;
+      }
+
+      .seg button[aria-pressed="true"] {
+        background: #fff;
+        color: var(--ink);
+        box-shadow: 0 2px 8px rgb(11 27 43 / 0.12);
+      }
+
+      .prompt {
+        width: 100%;
+        min-height: 6.5rem;
+        padding: 0.9rem 1rem;
+        border: 2px solid var(--line);
+        border-radius: 1rem;
+        font: inherit;
+        font-size: 1rem;
+        line-height: 1.7;
+        color: var(--ink);
+        resize: vertical;
+      }
+
+      .prompt:focus {
+        border-color: var(--ink);
+        outline: none;
+      }
+
+      .prompt.is-tags {
+        font-family: var(--mono);
+        font-size: 0.9rem;
+      }
+
+      .prompt:disabled {
+        background: var(--ground);
+        color: var(--muted);
+      }
+
+      .chips {
+        display: grid;
+        gap: 0.5rem;
+      }
+
+      .chip-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.35rem;
+      }
+
+      .chip-row > span {
+        width: 3.4rem;
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: var(--muted);
+      }
+
+      .chips button {
+        padding: 0.3rem 0.7rem;
+        border: 1.5px solid var(--line);
+        border-radius: 999px;
+        background: #fff;
+        font: inherit;
+        font-size: 0.8rem;
+        color: var(--ink);
+        cursor: pointer;
+        transition:
+          border-color 0.15s,
+          background 0.15s;
+      }
+
+      .chips button:hover:not(:disabled) {
+        border-color: var(--pink);
+        background: #fff0f7;
+      }
+
+      .chips button:disabled {
+        opacity: 0.5;
+        cursor: default;
+      }
+
+      .compose-foot {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+      }
+
+      .count {
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+
+      .count b {
+        font-family: var(--display);
+        font-weight: 400;
+        font-size: 1.3rem;
+        color: var(--ink);
+      }
+
+      .compose-foot .pill {
+        width: auto;
+        min-width: 12rem;
+      }
+
+      /* 生成した画像 */
+      .shots {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
+        gap: 0.75rem;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .shots .empty {
+        grid-column: 1 / -1;
+        padding: 1.5rem;
+        border: 2px dashed var(--line);
+        border-radius: 1rem;
+        text-align: center;
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+
+      .shot {
+        position: relative;
+        aspect-ratio: 1;
+        padding: 0;
+        border: 3px solid transparent;
+        border-radius: 1rem;
+        overflow: hidden;
+        background: var(--ground);
+        cursor: pointer;
+        box-shadow: 0 0 0 2px var(--line);
+        transition:
+          transform 0.15s,
+          box-shadow 0.15s;
+        animation: shot-in 0.45s cubic-bezier(0.3, 1.6, 0.5, 1);
+      }
+
+      @keyframes shot-in {
+        from {
+          transform: scale(0.8);
+          opacity: 0;
+        }
+      }
+
+      .shot svg {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+
+      .shot:hover:not(:disabled) {
+        transform: translateY(-2px);
+      }
+
+      .shot[aria-pressed="true"] {
+        border-color: var(--pink);
+        box-shadow: 0 0 0 4px rgb(255 45 135 / 0.25);
+      }
+
+      .shot .no {
+        position: absolute;
+        left: 0.4rem;
+        top: 0.4rem;
+        padding: 0.1rem 0.5rem;
+        border-radius: 999px;
+        background: rgb(11 27 43 / 0.75);
+        color: #fff;
+        font-family: var(--mono);
+        font-size: 0.7rem;
+      }
+
+      .shot .check {
+        position: absolute;
+        right: 0.4rem;
+        top: 0.4rem;
+        display: none;
+        place-items: center;
+        width: 1.6rem;
+        height: 1.6rem;
+        border-radius: 50%;
+        background: var(--pink);
+        color: #fff;
+      }
+
+      .shot[aria-pressed="true"] .check {
+        display: grid;
+      }
+
+      .shot.is-pending {
+        display: grid;
+        place-items: center;
+        align-content: center;
+        gap: 0.5rem;
+        cursor: default;
+        color: var(--muted);
+        font-size: 0.78rem;
+        font-weight: 700;
+        background:
+          linear-gradient(110deg, transparent 30%, rgb(255 255 255 / 0.7) 50%, transparent 70%) 0 0 / 250% 100%,
+          var(--ground);
+        animation:
+          shot-in 0.45s cubic-bezier(0.3, 1.6, 0.5, 1),
+          shimmer 1.2s linear infinite;
+      }
+
+      @keyframes shimmer {
+        to {
+          background-position: -250% 0, 0 0;
+        }
+      }
+
+      .shot.is-failed {
+        display: grid;
+        place-items: center;
+        cursor: default;
+        color: #d4145a;
+        font-size: 0.78rem;
+        font-weight: 700;
+      }
+
+      .submit-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+      }
+
+      .submit-row p {
+        margin: 0;
+        font-size: 0.8rem;
+        color: var(--muted);
+      }
+
+      .submit-row .pill {
+        width: auto;
+        min-width: 14rem;
+      }
+
+      /* 提出確認・待機・採点 */
+      .confirm-shot {
+        width: 11rem;
+        margin: 0 auto;
+        border-radius: 1rem;
+        overflow: hidden;
+        border: 3px solid var(--pink);
+      }
+
+      .confirm-shot svg {
+        display: block;
+        width: 100%;
+      }
+
+      .overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 30;
+        display: grid;
+        place-items: center;
+        align-content: center;
+        gap: 1rem;
+        padding: 16px;
+        background: rgb(11 27 43 / 0.82);
+        color: #fff;
+        text-align: center;
+      }
+
+      .overlay h2 {
+        margin: 0;
+        font-family: var(--display);
+        font-weight: 400;
+        font-size: clamp(1.8rem, 6vw, 2.8rem);
+        color: var(--yellow);
+      }
+
+      .overlay p {
+        margin: 0;
+        font-weight: 700;
+      }
+
+      .overlay .spinner {
+        width: 2.4rem;
+        height: 2.4rem;
+        border-width: 4px;
+      }
+
+      @media (max-width: 860px) {
+        .play {
+          grid-template-columns: minmax(0, 1fr);
+        }
+        .col-topic {
+          grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+          align-items: start;
+        }
+        .bar {
+          grid-template-columns: 1fr auto;
+        }
+        .bar-right {
+          display: none;
+        }
+        .bar-left .chip-level {
+          display: none;
+        }
+      }
+
+      @media (max-width: 560px) {
+        .col-topic {
+          grid-template-columns: minmax(0, 1fr);
+        }
+        .bar-left img {
+          width: 6rem;
+        }
+        .compose-foot,
+        .submit-row {
+          flex-direction: column;
+          align-items: stretch;
+        }
+        .compose-foot .pill,
+        .submit-row .pill {
+          width: 100%;
+          min-width: 0;
+        }
+        .chip-row > span {
+          width: 100%;
+        }
+        /* お題は小さめにして、入力欄までの距離を縮める */
+        .topic-img {
+          width: min(100%, 13rem);
+          justify-self: center;
+        }
+        .topic-note {
+          text-align: center;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .timer.is-hurry .timer-num,
+        .shot,
+        .shot.is-pending {
+          animation: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="bar">
+      <div class="bar-left">
+        <img src="animic-logo.svg" alt="Animic" width="2078" height="607" />
+        <span class="chip">ルーム <code id="room-code"></code></span>
+        <span class="chip chip-level" id="level-chip"></span>
+      </div>
+      <div class="timer" id="timer" role="timer" aria-live="off">
+        <span class="timer-label" id="timer-label">TIME LEFT</span>
+        <span class="timer-num" id="timer-num">1:30</span>
+      </div>
+      <div class="bar-right">
+        <span class="chip" id="opp-chip"></span>
+      </div>
+    </header>
+    <div class="time-track" aria-hidden="true"><span id="time-bar"></span></div>
+    <p class="phase" id="phase" role="status" hidden></p>
+
+    <main class="play">
+      <div class="col col-topic">
+        <section class="panel" aria-labelledby="topic-title" data-enter>
+          <div class="panel-head">
+            <h2 id="topic-title">お題</h2>
+            <small id="topic-rule">白背景・1キャラクター</small>
+          </div>
+          <figure class="topic-img" id="topic-img"><figcaption>THEME</figcaption></figure>
+          <p class="topic-note">このイラストにいちばん近い1枚を作ろう。</p>
+        </section>
+
+        <section class="panel" aria-labelledby="versus-title" data-enter>
+          <div class="panel-head">
+            <h2 id="versus-title">対戦状況</h2>
+          </div>
+          <ul class="versus" id="versus"></ul>
+        </section>
+      </div>
+
+      <div class="col">
+        <section class="panel" aria-labelledby="prompt-title" data-enter>
+          <div class="panel-head">
+            <h2 id="prompt-title">プロンプト</h2>
+            <div class="seg" role="group" aria-label="入力方法">
+              <button type="button" id="mode-text" aria-pressed="true">文章</button>
+              <button type="button" id="mode-tag" aria-pressed="false">タグ</button>
+            </div>
+          </div>
+          <textarea class="prompt" id="prompt" aria-label="プロンプト" placeholder="例：ピンクの髪でツインテールの女の子、青い目、セーラー服、笑顔、白背景"></textarea>
+          <div class="chips" id="chips" aria-label="よく使う表現"></div>
+          <div class="compose-foot">
+            <span class="count">成功した生成 <b id="gen-count">0</b> 回</span>
+            <button class="pill pill-pink" type="button" id="generate">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z" /><path d="M19 17v4M17 19h4" /></svg>
+              生成する
+            </button>
+          </div>
+        </section>
+
+        <section class="panel" aria-labelledby="shots-title" data-enter>
+          <div class="panel-head">
+            <h2 id="shots-title">生成した画像</h2>
+            <small>1枚選んで提出</small>
+          </div>
+          <ol class="shots" id="shots">
+            <li class="empty" id="empty">まだ画像がありません。プロンプトを入力して「生成する」を押そう。</li>
+          </ol>
+          <div class="submit-row">
+            <p>提出後は変更できません。</p>
+            <button class="pill pill-pink" type="button" id="submit" disabled>この1枚で提出</button>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <dialog class="dialog" id="confirm">
+      <form class="card" method="dialog">
+        <h1>この1枚で提出しますか？</h1>
+        <div class="confirm-shot" id="confirm-shot"></div>
+        <p class="sub">提出後は画像を変更できません。</p>
+        <div class="dialog-actions">
+          <button class="pill" value="cancel">選び直す</button>
+          <button class="pill pill-pink" value="ok">提出する</button>
+        </div>
+      </form>
+    </dialog>
+
+    <div class="overlay" id="overlay" hidden>
+      <span class="spinner" aria-hidden="true"></span>
+      <h2 id="overlay-title">提出しました！</h2>
+      <p id="overlay-sub">相手の提出を待っています</p>
+    </div>
+
+    <script src="common.js"></script>
+    <script src="art.js"></script>
+    <script>
+      const $ = (id) => document.getElementById(id);
+      const q = params();
+      const level = q.get("level") || "かんたん";
+      const total = Math.max(10, Number(q.get("time")) || 90);
+      const GRACE = 15;
+      const code = isValidCode(q.get("code") || "") ? q.get("code") : randomCode();
+      const me = { name: q.get("name") || "ゲスト", color: "#ff2d87" };
+      const opp = { name: q.get("opp") || "ぴよ丸", color: "#00b4fc", gens: 0, submitted: null, working: false };
+      const role = q.get("role") || "host";
+
+      $("room-code").textContent = code;
+      $("level-chip").textContent = `${level}・${total}秒`;
+      $("topic-img").insertAdjacentHTML("afterbegin", artSvg(ART_TOPIC, "お題のイラスト"));
+      playWipeOut();
+
+      // ---------- よく使う表現 ----------
+      const GROUPS = [
+        ["髪の色", "hair"],
+        ["髪型", "style"],
+        ["目", "eyes"],
+        ["服", "outfit"],
+        ["表情", "face"],
+        ["背景", "bg"],
+      ];
+      let mode = "text";
+      function renderChips() {
+        $("chips").innerHTML = GROUPS.map(
+          ([label, key]) =>
+            `<div class="chip-row"><span>${label}</span>${ART_FEATURES[key]
+              .map((o) => `<button type="button" data-word="${escapeHtml(mode === "tag" ? o.tag : o.label)}">${escapeHtml(mode === "tag" ? o.tag : o.label)}</button>`)
+              .join("")}</div>`,
+        ).join("");
+      }
+      renderChips();
+      $("chips").addEventListener("click", (event) => {
+        const b = event.target.closest("button[data-word]");
+        if (!b) return;
+        const input = $("prompt");
+        const sep = mode === "tag" ? ", " : "、";
+        input.value = input.value.trim() ? `${input.value.trim().replace(/[、,]\s*$/, "")}${sep}${b.dataset.word}` : b.dataset.word;
+        input.focus();
+      });
+      function setMode(next) {
+        mode = next;
+        $("mode-text").setAttribute("aria-pressed", String(mode === "text"));
+        $("mode-tag").setAttribute("aria-pressed", String(mode === "tag"));
+        $("prompt").classList.toggle("is-tags", mode === "tag");
+        $("prompt").placeholder =
+          mode === "tag" ? "例：1girl, pink hair, twintails, blue eyes, sailor uniform, smile, white background" : "例：ピンクの髪でツインテールの女の子、青い目、セーラー服、笑顔、白背景";
+        renderChips();
+      }
+      $("mode-text").addEventListener("click", () => setMode("text"));
+      $("mode-tag").addEventListener("click", () => setMode("tag"));
+
+      // ---------- 対戦状況 ----------
+      function renderVersus() {
+        const row = (p, isMe, gens, stateText, stateClass) => `<li class="player">
+          <span class="avatar" style="background:${p.color}">${escapeHtml([...p.name][0])}</span>
+          <span class="player-name">${escapeHtml(p.name)}<small>${isMe ? "あなた・" : ""}成功した生成 ${gens}回</small></span>
+          <span class="state ${stateClass}">${stateText}</span>
+        </li>`;
+        const myState = mine.submitted ? ["提出済み", "is-done"] : pending > 0 ? ["生成中", "is-working"] : ["考え中", ""];
+        const oppState = opp.submitted ? ["提出済み", "is-done"] : opp.working ? ["生成中", "is-working"] : ["考え中", ""];
+        $("versus").innerHTML = row(me, true, success, ...myState) + row(opp, false, opp.gens, ...oppState);
+        $("opp-chip").textContent = `${opp.name}：${opp.submitted ? "提出済み" : `生成 ${opp.gens}回`}`;
+      }
+
+      // ---------- 生成と提出 ----------
+      const mine = { submitted: null };
+      let phase = "play"; // play → select（生成終了後の選択猶予）→ done
+      let attempts = 0;
+      let success = 0;
+      let pending = 0;
+      let selected = null;
+      const shots = [];
+
+      function updateControls() {
+        const canGenerate = phase === "play" && !mine.submitted;
+        $("generate").disabled = !canGenerate || pending >= 3;
+        $("prompt").disabled = !canGenerate;
+        $("chips").querySelectorAll("button").forEach((b) => (b.disabled = !canGenerate));
+        $("submit").disabled = !selected || Boolean(mine.submitted) || phase === "done";
+        $("gen-count").textContent = success;
+        renderVersus();
+      }
+
+      $("generate").addEventListener("click", async () => {
+        const prompt = $("prompt").value.trim();
+        if (!prompt) {
+          toast("プロンプトを入力してください");
+          $("prompt").focus();
+          return;
+        }
+        attempts += 1;
+        pending += 1;
+        const no = attempts;
+        $("empty")?.remove();
+        const li = document.createElement("li");
+        li.innerHTML = `<div class="shot is-pending"><span class="spinner" aria-hidden="true"></span>生成中…</div>`;
+        $("shots").prepend(li);
+        updateControls();
+        await wait(1800 + Math.random() * 1600);
+        pending -= 1;
+        // モック: まれに生成に失敗する（失敗は生成回数に数えない）
+        if (Math.random() < 0.08) {
+          li.innerHTML = `<div class="shot is-failed">生成に失敗しました</div>`;
+          updateControls();
+          return;
+        }
+        success += 1;
+        const { features } = artFromPrompt(prompt, `${code}-${no}`);
+        const sim = artSimilarity(features, `${code}-${no}`);
+        const shot = { no, features, sim };
+        shots.push(shot);
+        li.innerHTML = `<button type="button" class="shot" aria-pressed="false" aria-label="${no}回目の画像">${artSvg(features, `${no}回目の画像`)}<span class="no">#${no}</span><span class="check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7" /></svg></span></button>`;
+        li.querySelector("button").addEventListener("click", (event) => {
+          if (mine.submitted || phase === "done") return;
+          selected = shot;
+          $("shots").querySelectorAll(".shot").forEach((b) => b.setAttribute("aria-pressed", String(b === event.currentTarget)));
+          updateControls();
+        });
+        updateControls();
+      });
+
+      $("submit").addEventListener("click", () => {
+        if (!selected) return;
+        $("confirm-shot").innerHTML = artSvg(selected.features, "提出する画像");
+        $("confirm").showModal();
+      });
+      $("confirm").addEventListener("close", () => {
+        if ($("confirm").returnValue !== "ok" || !selected || mine.submitted) return;
+        mine.submitted = { ...selected, remain: Math.max(0, remainSec()), gens: success, late: phase === "select" };
+        updateControls();
+        showOverlay("提出しました！", `${opp.name} さんの提出を待っています`);
+        // モック: 自分が提出したら、相手も少し後に提出する
+        setTimeout(opponentSubmit, 2500 + Math.random() * 2000);
+        checkFinish();
+      });
+
+      function showOverlay(title, sub) {
+        $("overlay-title").textContent = title;
+        $("overlay-sub").textContent = sub;
+        $("overlay").hidden = false;
+      }
+
+      // ---------- 相手の動き（モック） ----------
+      function opponentGenerate() {
+        if (opp.submitted || phase !== "play") return;
+        opp.working = true;
+        renderVersus();
+        setTimeout(() => {
+          opp.working = false;
+          opp.gens += 1;
+          renderVersus();
+          setTimeout(opponentGenerate, 4000 + Math.random() * 6000);
+        }, 2500);
+      }
+      setTimeout(opponentGenerate, 2500);
+      function opponentSubmit() {
+        if (opp.submitted) return;
+        if (opp.gens === 0) opp.gens = 1;
+        const seed = `${code}-opp`;
+        const rand = artRandom(seed);
+        const features = { ...ART_TOPIC };
+        for (const key of ART_KEYS) if (rand() < 0.35) features[key] = ART_FEATURES[key][Math.floor(rand() * ART_FEATURES[key].length)].id;
+        opp.submitted = { features, sim: artSimilarity(features, seed), remain: Math.max(0, remainSec()), gens: opp.gens };
+        renderVersus();
+        if (!mine.submitted) toast(`${opp.name} さんが提出しました`);
+        checkFinish();
+      }
+      setTimeout(opponentSubmit, total * 1000 * (0.55 + Math.random() * 0.25));
+
+      // ---------- 残り時間 ----------
+      const startAt = performance.now();
+      const remainSec = () => total - (performance.now() - startAt) / 1000;
+      const fmt = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
+      const timer = setInterval(() => {
+        const remain = remainSec();
+        if (phase === "play") {
+          const shown = Math.max(0, Math.ceil(remain));
+          $("timer-num").textContent = fmt(shown);
+          $("time-bar").style.transform = `scaleX(${Math.max(0, remain / total)})`;
+          $("timer").classList.toggle("is-hurry", shown <= 10);
+          if (remain <= 0) {
+            phase = "select";
+            $("timer-label").textContent = "SELECT";
+            $("timer").classList.add("is-hurry");
+            if (!opp.submitted) setTimeout(opponentSubmit, 1500);
+            updateControls();
+          }
+        }
+        if (phase === "select") {
+          const left = Math.max(0, Math.ceil(GRACE + remain));
+          $("timer-num").textContent = fmt(left);
+          $("time-bar").style.transform = `scaleX(${left / GRACE})`;
+          if (!mine.submitted) {
+            $("phase").hidden = false;
+            $("phase").innerHTML =
+              `生成終了！<span>生成中の画像も完成すれば選べます。</span><span>残り <b>${left}</b> 秒で1枚選んで提出</span>`;
+          } else {
+            $("phase").hidden = true;
+          }
+          if (left <= 0) {
+            phase = "done";
+            $("phase").hidden = true;
+            updateControls();
+            checkFinish(true);
+          }
+        }
+      }, 200);
+
+      // ---------- 採点へ ----------
+      let finishing = false;
+      async function checkFinish(timeUp = false) {
+        if (finishing) return;
+        if (!(timeUp || (mine.submitted && opp.submitted))) return;
+        finishing = true;
+        clearInterval(timer);
+        if (!opp.submitted && !timeUp) return;
+        showOverlay("採点中…", "AIが再現度を評価しています");
+        await wait(1800);
+        const m = mine.submitted;
+        const o = opp.submitted;
+        wipeTo("result.html", {
+          code,
+          level,
+          time: total,
+          name: me.name,
+          opp: opp.name,
+          role,
+          me: m ? `${artEncode(m.features)}~${m.sim}~${Math.round(m.remain)}~${m.gens}` : "none",
+          them: o ? `${artEncode(o.features)}~${o.sim}~${Math.round(o.remain)}~${o.gens}` : "none",
+        });
+      }
+
+      updateControls();
+    </script>
+  </body>
+</html>

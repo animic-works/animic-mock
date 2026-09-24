@@ -1,0 +1,565 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <link rel="icon" type="image/svg+xml" href="animic-favicon.svg" />
+    <title>結果発表 | Animic</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Maru+Gothic:wght@900&family=Zen+Kaku+Gothic+New:wght@500;700&family=Montserrat:ital,wght@1,500&family=JetBrains+Mono:wght@700&display=swap"
+    />
+    <link rel="stylesheet" href="common.css" />
+    <link rel="stylesheet" href="transition.css" />
+    <script>
+      // 前の画面から塗りつぶして来た場合、描画前に中身を隠す
+      try {
+        if (sessionStorage.getItem("animic-wipe")) document.documentElement.classList.add("wipe-pending");
+      } catch {}
+    </script>
+    <style>
+      :root {
+        --display: "Dela Gothic One", "Zen Maru Gothic", sans-serif;
+      }
+
+      .bar {
+        position: relative;
+        z-index: 5;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.9rem clamp(1rem, 4vw, 3rem);
+      }
+
+      .bar img {
+        display: block;
+        width: 8rem;
+        height: auto;
+      }
+
+      .chip {
+        padding: 0.3rem 0.75rem;
+        border-radius: 999px;
+        background: #fff;
+        border: 2px solid var(--line);
+        font-size: 0.8rem;
+        font-weight: 700;
+      }
+
+      .chip code {
+        font-family: var(--mono);
+        letter-spacing: 0.1em;
+      }
+
+      /* 背景の3色の帯（勝敗の見出しの後ろ） */
+      .burst {
+        position: absolute;
+        inset: 0 0 auto;
+        height: 26rem;
+        overflow: hidden;
+        pointer-events: none;
+      }
+
+      .burst span {
+        position: absolute;
+        top: -20%;
+        height: 140%;
+        width: 5rem;
+        transform: skewX(-18deg);
+        opacity: 0.9;
+      }
+
+      .result {
+        position: relative;
+        z-index: 1;
+        width: min(100%, 72rem);
+        margin: 0 auto;
+        padding: 0 16px 3rem;
+        display: grid;
+        gap: clamp(1.5rem, 4vh, 2.5rem);
+      }
+
+      .verdict {
+        display: grid;
+        justify-items: center;
+        gap: 0.4rem;
+        text-align: center;
+      }
+
+      .verdict .eyebrow {
+        margin: 0;
+        font-family: var(--latin);
+        font-style: italic;
+        font-size: 0.8rem;
+        letter-spacing: 0.3em;
+        color: var(--pink);
+      }
+
+      .verdict h1 {
+        margin: 0;
+        font-family: var(--display);
+        font-weight: 400;
+        font-size: clamp(3rem, 10vw, 6.5rem);
+        line-height: 1.1;
+        transform: rotate(-4deg) skewX(-6deg);
+        color: var(--ink);
+        text-shadow:
+          4px 4px 0 #fff,
+          8px 8px 0 var(--pink-soft);
+      }
+
+      .verdict.is-lose h1 {
+        text-shadow:
+          4px 4px 0 #fff,
+          8px 8px 0 var(--cyan);
+      }
+
+      .verdict p {
+        margin: 0.6rem 0 0;
+        font-weight: 700;
+        color: var(--muted);
+      }
+
+      /* 対戦の結果ボード */
+      .board {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr) minmax(0, 1fr);
+        gap: clamp(1rem, 2.5vw, 2rem);
+        align-items: center;
+      }
+
+      .topic {
+        display: grid;
+        gap: 0.6rem;
+        justify-items: center;
+        text-align: center;
+      }
+
+      .topic figure {
+        position: relative;
+        width: 100%;
+        margin: 0;
+        aspect-ratio: 1;
+        border-radius: 1.25rem;
+        overflow: hidden;
+        border: 2.5px solid var(--ink);
+        background: #fff;
+        rotate: -2deg;
+      }
+
+      .topic svg {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+
+      .topic .tag {
+        position: absolute;
+        left: 0.7rem;
+        top: 0.7rem;
+        padding: 0.2rem 0.7rem;
+        border-radius: 999px;
+        background: var(--ink);
+        color: #fff;
+        font-family: var(--latin);
+        font-style: italic;
+        font-size: 0.7rem;
+        letter-spacing: 0.2em;
+      }
+
+      .topic small {
+        font-size: 0.8rem;
+        color: var(--muted);
+      }
+
+      .vs {
+        font-family: var(--display);
+        font-size: 1.4rem;
+        color: #b5bcc6;
+      }
+
+      .player {
+        position: relative;
+        display: grid;
+        gap: 0.9rem;
+        padding: clamp(1rem, 2.5vw, 1.4rem);
+        background: #fff;
+        border: 2.5px solid var(--ink);
+        border-radius: 1.5rem;
+        box-shadow: 0 6px 0 var(--ink);
+      }
+
+      .player.is-winner {
+        border-color: var(--pink);
+        box-shadow:
+          0 6px 0 var(--pink),
+          0 0 0 6px rgb(255 45 135 / 0.15);
+      }
+
+      .crown {
+        position: absolute;
+        top: -1.4rem;
+        left: 50%;
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.35rem 1rem;
+        border-radius: 999px;
+        background: var(--yellow);
+        border: 2.5px solid var(--ink);
+        font-family: var(--display);
+        font-size: 0.95rem;
+        white-space: nowrap;
+        translate: -50% 0;
+        rotate: -4deg;
+      }
+
+      .who {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+      }
+
+      .avatar {
+        display: grid;
+        place-items: center;
+        flex: none;
+        width: 2.3rem;
+        height: 2.3rem;
+        border-radius: 50%;
+        color: #fff;
+        font-family: var(--round);
+        font-weight: 900;
+      }
+
+      .who b {
+        min-width: 0;
+        overflow-wrap: anywhere;
+      }
+
+      .who small {
+        margin-left: auto;
+        font-size: 0.75rem;
+        color: var(--muted);
+        white-space: nowrap;
+      }
+
+      .shot {
+        margin: 0;
+        aspect-ratio: 1;
+        border-radius: 1rem;
+        overflow: hidden;
+        background: var(--ground);
+      }
+
+      .shot svg {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+
+      .shot.is-missing {
+        display: grid;
+        place-items: center;
+        border: 2px dashed var(--line);
+        color: var(--muted);
+        font-weight: 700;
+      }
+
+      .total {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 0.5rem;
+        padding-bottom: 0.6rem;
+        border-bottom: 2px dashed var(--line);
+      }
+
+      .total span {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: var(--muted);
+      }
+
+      .total b {
+        font-family: var(--display);
+        font-weight: 400;
+        font-size: clamp(2rem, 4vw, 2.8rem);
+        line-height: 1;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .is-winner .total b {
+        color: var(--pink);
+      }
+
+      .breakdown {
+        display: grid;
+        gap: 0.55rem;
+        margin: 0;
+      }
+
+      .breakdown div {
+        display: grid;
+        grid-template-columns: 4.5rem 1fr auto;
+        align-items: center;
+        gap: 0.6rem;
+        font-size: 0.82rem;
+      }
+
+      .breakdown dt {
+        font-weight: 700;
+      }
+
+      .breakdown dd {
+        margin: 0;
+        font-family: var(--mono);
+        font-size: 0.85rem;
+        text-align: right;
+        min-width: 3.5rem;
+      }
+
+      .meter {
+        height: 0.55rem;
+        border-radius: 99px;
+        background: var(--ground);
+        overflow: hidden;
+      }
+
+      .meter span {
+        display: block;
+        height: 100%;
+        width: 0;
+        border-radius: inherit;
+        background: var(--c);
+        transition: width 1s cubic-bezier(0.2, 0.9, 0.3, 1);
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.9rem;
+      }
+
+      .actions .pill {
+        width: auto;
+        min-width: 13rem;
+      }
+
+      .pill-x {
+        border-color: #000;
+        background: #000;
+        color: #fff;
+      }
+
+      .note {
+        margin: -0.5rem 0 0;
+        text-align: center;
+        font-size: 0.78rem;
+        color: #9aa3ae;
+      }
+
+      @media (max-width: 860px) {
+        .board {
+          grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        }
+        .topic {
+          grid-column: 1 / -1;
+          order: -1;
+          width: min(100%, 16rem);
+          justify-self: center;
+        }
+        .vs {
+          display: none;
+        }
+      }
+
+      @media (max-width: 560px) {
+        .board {
+          gap: 1.6rem 0.6rem;
+        }
+        .player {
+          padding: 0.8rem;
+          border-radius: 1.1rem;
+        }
+        .breakdown div {
+          grid-template-columns: minmax(0, 1fr) auto;
+        }
+        .breakdown .meter {
+          grid-column: 1 / -1;
+          grid-row: 2;
+        }
+        .actions .pill {
+          width: 100%;
+        }
+        .crown {
+          font-size: 0.8rem;
+        }
+        .who small {
+          display: none;
+        }
+        .who b {
+          font-size: 0.9rem;
+        }
+        .total {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 0.2rem;
+        }
+        .total span {
+          white-space: nowrap;
+        }
+        .total b {
+          font-size: 1.9rem;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .meter span {
+          transition: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="burst" aria-hidden="true">
+      <span style="left: 6%; background: var(--cyan)"></span>
+      <span style="left: 12%; width: 1.2rem; background: var(--yellow)"></span>
+      <span style="right: 10%; background: var(--pink-soft)"></span>
+      <span style="right: 4%; width: 1.2rem; background: var(--yellow)"></span>
+    </div>
+
+    <header class="bar">
+      <a href="index.html"><img src="animic-logo.svg" alt="Animic トップ" width="2078" height="607" /></a>
+      <span class="chip">ルーム <code id="room-code"></code></span>
+    </header>
+
+    <main class="result">
+      <section class="verdict" id="verdict" data-enter>
+        <p class="eyebrow">RESULT</p>
+        <h1 id="verdict-title">YOU WIN!</h1>
+        <p id="verdict-sub"></p>
+      </section>
+
+      <section class="board" aria-label="対戦結果">
+        <article class="player" id="card-me" data-enter></article>
+        <div class="topic" data-enter>
+          <figure id="topic-img"><span class="tag">THEME</span></figure>
+          <small id="topic-meta"></small>
+          <span class="vs" aria-hidden="true">VS</span>
+        </div>
+        <article class="player" id="card-them" data-enter></article>
+      </section>
+
+      <div class="actions" data-enter>
+        <button class="pill pill-pink" type="button" id="rematch">同じメンバーで再戦</button>
+        <button class="pill pill-x" type="button" id="share">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z" /></svg>
+          結果をシェア
+        </button>
+        <button class="pill" type="button" id="home">トップへ戻る</button>
+      </div>
+      <p class="note">※ スコアの計算方法は仮です（再現度＋提出速度の加点＋生成回数の加点）</p>
+    </main>
+
+    <script src="common.js"></script>
+    <script src="art.js"></script>
+    <script>
+      const $ = (id) => document.getElementById(id);
+      const q = params();
+      const code = isValidCode(q.get("code") || "") ? q.get("code") : randomCode();
+      const level = q.get("level") || "かんたん";
+      const total = Math.max(10, Number(q.get("time")) || 90);
+      const role = q.get("role") || "host";
+
+      // 受け取った提出内容（特徴~再現度~残り秒~生成回数、未提出は none）。直接開いた場合はモックの値を使う
+      function parse(value, fallback) {
+        if (value === "none") return null;
+        const [f, sim, remain, gens] = String(value ?? fallback).split("~");
+        return { features: artDecode(f), sim: Number(sim), remain: Number(remain), gens: Number(gens) };
+      }
+      const me = { name: q.get("name") || "ねこぜ", color: "#ff2d87", entry: parse(q.get("me"), "pink.twin.blue.hoodie.smile.white~84.6~41~3") };
+      const them = { name: q.get("opp") || "ぴよ丸", color: "#00b4fc", entry: parse(q.get("them"), "pink.bob.blue.sailor.smile.sky~79.2~22~5") };
+
+      // 仮のスコア: 再現度 + 提出速度（最大20） + 生成回数（1回で15、1回増えるごとに-3）
+      function score(e) {
+        if (!e) return null;
+        const speed = Math.round((Math.max(0, e.remain) / total) * 20);
+        const gens = Math.max(0, 15 - (Math.max(1, e.gens) - 1) * 3);
+        return { sim: e.sim, speed, gens, total: Math.round((e.sim + speed + gens) * 10) / 10 };
+      }
+      me.score = score(me.entry);
+      them.score = score(them.entry);
+
+      let result;
+      if (!me.score && !them.score) result = "none";
+      else if (!them.score || (me.score && me.score.total > them.score.total)) result = "win";
+      else if (!me.score || them.score.total > me.score.total) result = "lose";
+      else result = "draw";
+
+      const TITLES = {
+        win: ["YOU WIN!", `${them.name} さんに勝ちました！`],
+        lose: ["YOU LOSE…", `${them.name} さんの勝ちです。次こそは！`],
+        draw: ["DRAW", "最終スコアが同点でした"],
+        none: ["NO GAME", "どちらも提出しなかったため、勝負不成立です"],
+      };
+      $("verdict-title").textContent = TITLES[result][0];
+      $("verdict-sub").textContent = TITLES[result][1];
+      $("verdict").classList.toggle("is-lose", result === "lose" || result === "none");
+      $("room-code").textContent = code;
+      $("topic-img").insertAdjacentHTML("afterbegin", artSvg(ART_TOPIC, "お題のイラスト"));
+      $("topic-meta").textContent = `お題・${level}・${total}秒`;
+
+      function card(p, isMe, winner) {
+        const s = p.score;
+        const row = (label, value, max, color, text) =>
+          `<div><dt>${label}</dt><span class="meter"><span data-w="${Math.min(100, (value / max) * 100)}" style="--c:${color}"></span></span><dd>${text}</dd></div>`;
+        return `${winner ? '<span class="crown"><svg width="20" height="16" viewBox="0 0 24 18" aria-hidden="true"><path d="M2 5l5 4 5-7 5 7 5-4-2 11H4z" fill="#ff2d87" stroke="#0b1b2b" stroke-width="2" stroke-linejoin="round" /></svg>WINNER</span>' : ""}
+          <div class="who"><span class="avatar" style="background:${p.color}">${escapeHtml([...p.name][0])}</span><b>${escapeHtml(p.name)}</b><small>${isMe ? "あなた" : "対戦相手"}</small></div>
+          ${s ? `<figure class="shot">${artSvg(p.entry.features, `${p.name}さんの提出画像`)}</figure>` : `<figure class="shot is-missing">未提出</figure>`}
+          <div class="total"><span>最終スコア</span><b data-to="${s ? s.total : 0}">${s ? "0.0" : "—"}</b></div>
+          ${
+            s
+              ? `<dl class="breakdown">
+            ${row("再現度", s.sim, 100, "var(--pink)", s.sim.toFixed(1))}
+            ${row("提出速度", s.speed, 20, "var(--cyan)", `+${s.speed}`)}
+            ${row("生成回数", s.gens, 15, "var(--yellow)", `+${s.gens}<small>（${p.entry.gens}回）</small>`)}
+          </dl>`
+              : `<p class="topic-note" style="margin:0;color:var(--muted);font-size:.85rem">時間内に提出されませんでした</p>`
+          }`;
+      }
+      $("card-me").innerHTML = card(me, true, result === "win");
+      $("card-them").innerHTML = card(them, false, result === "lose");
+      $("card-me").classList.toggle("is-winner", result === "win");
+      $("card-them").classList.toggle("is-winner", result === "lose");
+
+      // スコアのカウントアップと棒グラフ
+      async function reveal() {
+        await wait(reducedMotion ? 0 : 1100);
+        document.querySelectorAll(".meter span").forEach((el) => (el.style.width = `${el.dataset.w}%`));
+        document.querySelectorAll(".total b[data-to]").forEach((el) => {
+          const to = Number(el.dataset.to);
+          if (!to) return;
+          const start = performance.now();
+          const dur = reducedMotion ? 0 : 1200;
+          (function tick(now) {
+            const t = dur ? Math.min(1, (now - start) / dur) : 1;
+            el.textContent = (to * (1 - Math.pow(1 - t, 3))).toFixed(1);
+            if (t < 1) requestAnimationFrame(tick);
+          })(start);
+        });
+      }
+      playWipeOut();
+      reveal();
+
+      const lobbyQuery = { code, name: me.name, role };
+      $("rematch").addEventListener("click", (e) => wipeTo("lobby.html", lobbyQuery, e.currentTarget));
+      $("home").addEventListener("click", (e) => wipeTo("index.html", {}, e.currentTarget));
+      $("share").addEventListener("click", () => toast("SNSへのシェアはモックです"));
+    </script>
+  </body>
+</html>

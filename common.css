@@ -1,0 +1,471 @@
+/* mock/ のモック画面で共通のスタイル */
+:root {
+  --ground: #f5f6f8;
+  --grid: #e6e8ec;
+  --ink: #0b1b2b;
+  --muted: #5b6573;
+  --line: #dfe2e7;
+  --pink: #ff2d87;
+  --pink-soft: #ff72b9;
+  --cyan: #00b4fc;
+  --yellow: #fddb13;
+  --discord: #5865f2;
+  --round: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "Yu Gothic", sans-serif;
+  --body: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", system-ui, sans-serif;
+  --latin: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100svh;
+  overflow-x: hidden;
+  color: var(--ink);
+  font-family: var(--body);
+  background-color: var(--ground);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+
+.deco {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.back {
+  position: absolute;
+  z-index: 2;
+  top: 1.5rem;
+  left: clamp(1rem, 4vw, 3rem);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font-family: var(--body);
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.back:hover {
+  color: var(--pink);
+}
+
+.page {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  padding: 5rem 16px 3rem;
+}
+
+.card {
+  width: min(100%, 27rem);
+  padding: clamp(1.75rem, 5vw, 2.5rem);
+  background: #fff;
+  border-radius: 1.75rem;
+  box-shadow:
+    0 1px 0 rgb(11 27 43 / 0.04),
+    0 30px 60px -30px rgb(11 27 43 / 0.35);
+  display: grid;
+  gap: 1.25rem;
+}
+
+.card-logo {
+  display: block;
+  width: min(100%, 15rem);
+  height: auto;
+  margin: 0 auto 0.25rem;
+}
+
+.card h1 {
+  margin: 0;
+  text-align: center;
+  font-family: var(--round);
+  font-weight: 900;
+  font-size: clamp(1.5rem, 4.5vw, 1.8rem);
+  letter-spacing: 0.02em;
+}
+
+.sub {
+  margin: -0.6rem 0 0.4rem;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+/* ボタン */
+.pill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 1rem 1.25rem;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  font-family: var(--body);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--ink);
+  background: #fff;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.pill:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+
+.pill:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.pill:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.pill-pink {
+  border-color: var(--pink);
+  color: #fff;
+  background: var(--pink);
+  box-shadow:
+    0 0 0 5px rgb(255 45 135 / 0.16),
+    0 12px 26px -10px rgb(255 45 135 / 0.6);
+}
+
+/* 押せないときは半透明にせず淡いピンクにする（後ろが透けないように） */
+.pill-pink:disabled {
+  opacity: 1;
+  border-color: #ffb8d6;
+  background: #ffb8d6;
+  box-shadow: none;
+}
+
+/* 入力欄 */
+.field {
+  display: grid;
+  gap: 0.4rem;
+  text-align: left;
+}
+
+.field label {
+  font-weight: 700;
+  font-size: 0.88rem;
+}
+
+.field input {
+  width: 100%;
+  padding: 0.85rem 1.1rem;
+  border: 2px solid var(--line);
+  border-radius: 0.9rem;
+  font: inherit;
+  font-size: 1rem;
+  color: var(--ink);
+  background: #fff;
+}
+
+.field input:focus {
+  border-color: var(--ink);
+  outline: none;
+}
+
+.field .hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.field .error {
+  margin: 0;
+  color: #d4145a;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.code-input {
+  font-family: var(--mono) !important;
+  font-weight: 700;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+/* 読み込み中 */
+.spinner {
+  width: 1.1rem;
+  height: 1.1rem;
+  border: 2.5px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 通知 */
+.toast {
+  position: fixed;
+  z-index: 20;
+  left: 50%;
+  bottom: 2rem;
+  transform: translateX(-50%);
+  padding: 0.75rem 1.25rem;
+  border-radius: 999px;
+  background: var(--ink);
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* ダイアログ */
+.dialog {
+  width: min(100% - 32px, 25rem);
+  padding: 0;
+  border: 0;
+  border-radius: 1.5rem;
+  background: transparent;
+}
+
+.dialog::backdrop {
+  background: rgb(11 27 43 / 0.45);
+  backdrop-filter: blur(3px);
+}
+
+.dialog .card {
+  width: 100%;
+  box-shadow: none;
+}
+
+.dialog-actions {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 0.75rem;
+}
+
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible {
+  outline: 3px solid var(--cyan);
+  outline-offset: 4px;
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+  .pill {
+    transition: none;
+  }
+  .spinner {
+    animation-duration: 2s;
+  }
+}
+
+/* 規約・ポリシーなどの文書ページ */
+.doc-page {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 50rem);
+  margin: 0 auto;
+  padding: 5rem 16px 4rem;
+}
+
+.doc {
+  padding: clamp(1.5rem, 5vw, 3.25rem);
+  background: #fff;
+  border-radius: 1.75rem;
+  box-shadow: 0 30px 60px -34px rgb(11 27 43 / 0.35);
+  line-height: 1.9;
+}
+
+.doc-head {
+  display: grid;
+  gap: 0.5rem;
+  padding-bottom: 1.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid var(--ink);
+}
+
+.doc-head .eyebrow {
+  margin: 0;
+  font-family: var(--latin);
+  font-style: italic;
+  font-size: 0.78rem;
+  letter-spacing: 0.25em;
+  color: var(--pink);
+}
+
+.doc h1 {
+  margin: 0;
+  font-family: var(--round);
+  font-weight: 900;
+  font-size: clamp(1.7rem, 5vw, 2.4rem);
+  line-height: 1.35;
+}
+
+.doc-meta {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.doc-draft {
+  margin: 0 0 1.75rem;
+  padding: 0.8rem 1rem;
+  border-radius: 0.9rem;
+  background: #fff8d6;
+  font-size: 0.85rem;
+  line-height: 1.7;
+}
+
+.doc-toc {
+  margin: 0 0 2rem;
+  padding: 1rem 1.25rem;
+  border-radius: 1rem;
+  background: var(--ground);
+}
+
+.doc-toc summary {
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.doc-toc ol {
+  margin: 0.6rem 0 0;
+  padding-left: 1.4rem;
+  columns: 2 14rem;
+  font-size: 0.9rem;
+}
+
+.doc-toc a {
+  color: var(--ink);
+}
+
+.doc section {
+  scroll-margin-top: 1.5rem;
+}
+
+.doc section {
+  margin-top: 2rem;
+}
+
+.doc h2 {
+  margin: 0 0 0.6rem;
+  padding-left: 0.75rem;
+  border-left: 4px solid var(--pink-soft);
+  font-size: 1.1rem;
+  line-height: 1.5;
+}
+
+.doc p,
+.doc li {
+  font-size: 0.95rem;
+}
+
+.doc p {
+  margin: 0.5rem 0 0;
+}
+
+.doc ol,
+.doc ul {
+  margin: 0.5rem 0 0;
+  padding-left: 1.5rem;
+}
+
+.doc table {
+  width: 100%;
+  margin-top: 0.75rem;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  line-height: 1.7;
+}
+
+.doc th,
+.doc td {
+  padding: 0.6rem 0.75rem;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.doc th {
+  width: 32%;
+  background: var(--ground);
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+.doc-foot {
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px dashed var(--line);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.doc-foot a {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.to-top {
+  position: fixed;
+  z-index: 5;
+  right: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  background: #fff;
+  color: var(--ink);
+  cursor: pointer;
+  box-shadow: 0 8px 20px -10px rgb(11 27 43 / 0.5);
+}
+
+@media (max-width: 560px) {
+  .doc th,
+  .doc td {
+    display: block;
+    width: 100%;
+  }
+  .doc th {
+    border-bottom: 0;
+  }
+}

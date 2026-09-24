@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="animic-favicon.svg" />
+    <title>ログイン | Animic</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@900&family=Zen+Kaku+Gothic+New:wght@500;700&family=Montserrat:ital,wght@1,500&family=JetBrains+Mono:wght@700&display=swap"
+    />
+    <link rel="stylesheet" href="common.css" />
+    <link rel="stylesheet" href="transition.css" />
+    <script>
+      // 前の画面から塗りつぶして来た場合、描画前に中身を隠す
+      try {
+        if (sessionStorage.getItem("animic-wipe")) document.documentElement.classList.add("wipe-pending");
+      } catch {}
+    </script>
+    <style>
+      .providers {
+        display: grid;
+        gap: 0.75rem;
+      }
+
+      .provider {
+        display: grid;
+        grid-template-columns: 1.5rem 1fr 1.5rem;
+        padding: 0.95rem 1.25rem;
+        font-size: 1rem;
+        letter-spacing: 0.03em;
+      }
+
+      .provider > svg,
+      .provider > .spinner {
+        width: 1.4rem;
+        height: 1.4rem;
+      }
+
+      .provider-discord {
+        border-color: var(--discord);
+        color: #fff;
+        background: var(--discord);
+      }
+
+      .provider-x {
+        border-color: #000;
+        color: #fff;
+        background: #000;
+      }
+
+      .divider {
+        display: flex;
+        align-items: center;
+        gap: 0.9rem;
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.82rem;
+      }
+
+      .divider::before,
+      .divider::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: var(--line);
+      }
+
+      .guest-note {
+        margin: -0.4rem 0 0;
+        text-align: center;
+        color: var(--muted);
+        font-size: 0.8rem;
+        line-height: 1.7;
+      }
+
+      .context {
+        margin: -0.4rem 0 0;
+        padding: 0.6rem 0.9rem;
+        border-radius: 0.8rem;
+        background: #fff0f7;
+        text-align: center;
+        font-size: 0.85rem;
+      }
+
+      .context code {
+        font-family: var(--mono);
+        letter-spacing: 0.12em;
+      }
+
+      .terms {
+        margin: 0.25rem 0 0;
+        padding-top: 1rem;
+        border-top: 1px dashed var(--line);
+        text-align: center;
+        color: var(--muted);
+        font-size: 0.75rem;
+        line-height: 1.7;
+      }
+
+      .terms a {
+        color: var(--ink);
+      }
+
+      .welcome {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 1rem;
+        border-radius: 1rem;
+        background: var(--ground);
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+
+      .welcome svg {
+        width: 1.4rem;
+        height: 1.4rem;
+        flex: none;
+        color: var(--ink);
+      }
+
+      .welcome b {
+        display: block;
+        color: var(--ink);
+      }
+
+      /* ステップの切り替え: 今のカードが左へ抜け、次のカードが右から入る */
+      .step-out {
+        animation: step-out 0.28s ease-in forwards;
+      }
+
+      .step-in {
+        animation: step-in 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.15) both;
+      }
+
+      .step-in.is-back {
+        animation-name: step-in-back;
+      }
+
+      .step-out.is-back {
+        animation-name: step-out-back;
+      }
+
+      @keyframes step-out {
+        to {
+          opacity: 0;
+          transform: translateX(-2.5rem) rotate(-2deg);
+        }
+      }
+
+      @keyframes step-in {
+        from {
+          opacity: 0;
+          transform: translateX(2.5rem) rotate(2deg);
+        }
+      }
+
+      @keyframes step-out-back {
+        to {
+          opacity: 0;
+          transform: translateX(2.5rem) rotate(2deg);
+        }
+      }
+
+      @keyframes step-in-back {
+        from {
+          opacity: 0;
+          transform: translateX(-2.5rem) rotate(-2deg);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .step-out,
+        .step-in {
+          animation: none;
+        }
+      }
+
+      .link-button {
+        justify-self: center;
+        padding: 0;
+        border: 0;
+        background: none;
+        color: var(--muted);
+        font: inherit;
+        font-size: 0.85rem;
+        text-decoration: underline;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <svg class="deco" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <defs>
+        <pattern id="dots" width="16" height="16" patternUnits="userSpaceOnUse">
+          <circle cx="2" cy="2" r="1.6" fill="#c3c8d0" />
+        </pattern>
+      </defs>
+      <rect x="0" y="80" width="130" height="190" fill="url(#dots)" opacity="0.8" />
+      <rect x="1440" y="600" width="140" height="160" fill="url(#dots)" opacity="0.8" />
+      <path d="M0 180 L90 100 L100 104 L6 190 Z" fill="#ff72b9" />
+      <path d="M1380 120 L1470 40 L1476 44 L1386 124 Z" fill="#00b4fc" />
+      <path d="M1440 170 L1500 130 L1504 134 L1446 176 Z" fill="#fddb13" />
+      <path d="M1150 900 L1250 810 L1250 840 L1180 900 Z" fill="#ff72b9" />
+      <path d="M420 860 L480 810 L482 840 Z" fill="#00b4fc" />
+      <path d="M1180 300 L1220 280 L1205 330 Z" fill="#ff72b9" />
+      <path d="M1215 360 L1235 340 L1250 372 Z" fill="#00b4fc" />
+      <g stroke="#c3c8d0" stroke-width="2">
+        <path d="M1320 460 v30 M1305 475 h30" />
+        <path d="M260 420 v36 M242 438 h36" />
+      </g>
+      <g stroke="#cfd4db" stroke-width="1.5">
+        <line x1="1480" y1="330" x2="1600" y2="240" />
+        <line x1="180" y1="640" x2="260" y2="580" />
+      </g>
+    </svg>
+
+    <a class="back" href="index.html">
+      <svg width="10" height="16" viewBox="0 0 12 20" aria-hidden="true">
+        <path d="M10 2 L2 10 L10 18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+      トップへ戻る
+    </a>
+
+    <main class="page">
+      <!-- ステップ1: ログイン方法を選ぶ -->
+      <section class="card" id="step-method" aria-labelledby="login-title">
+        <img class="card-logo" src="animic-logo.svg" alt="Animic" width="2078" height="607" />
+        <h1 id="login-title">ログインしてはじめよう</h1>
+        <p class="sub">ログインすると戦績や生成履歴が残ります。</p>
+        <p class="context" id="context" hidden></p>
+
+        <div class="providers">
+          <button class="pill provider" type="button" data-provider="Google" data-name="ねこぜ">
+            <svg viewBox="0 0 48 48" aria-hidden="true">
+              <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z" />
+              <path fill="#FF3D00" d="m6.306 14.691 6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z" />
+              <path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238A11.91 11.91 0 0 1 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z" />
+              <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 0 1-4.087 5.571l.003-.002 6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z" />
+            </svg>
+            <span>Googleでログイン</span>
+          </button>
+          <button class="pill provider provider-discord" type="button" data-provider="Discord" data-name="ぴくせる侍">
+            <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
+              <path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z" />
+            </svg>
+            <span>Discordでログイン</span>
+          </button>
+          <button class="pill provider provider-x" type="button" data-provider="X" data-name="プロンプト職人">
+            <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
+              <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z" />
+            </svg>
+            <span>Xでログイン</span>
+          </button>
+        </div>
+
+        <p class="divider">または</p>
+
+        <button class="pill pill-pink" type="button" id="guest">
+          ログインせずに進む
+          <svg width="10" height="16" viewBox="0 0 12 20" aria-hidden="true">
+            <path d="M2 2 L10 10 L2 18" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+        <p class="guest-note">表示名を決めるだけで遊べます。<br />戦績はこの端末にだけ保存されます。</p>
+
+        <p class="terms">
+          続行すると、<a href="terms.html">利用規約</a>と<a href="privacy.html">プライバシーポリシー</a>に同意したものとみなします。
+        </p>
+      </section>
+
+      <!-- ステップ2: 表示名を決める -->
+      <section class="card" id="step-name" aria-labelledby="name-title" hidden>
+        <img class="card-logo" src="animic-logo.svg" alt="Animic" width="2078" height="607" />
+        <h1 id="name-title">表示名を決めよう</h1>
+        <p class="sub">対戦相手に表示される名前です。</p>
+        <div class="welcome" id="welcome" hidden></div>
+        <form class="field" id="name-form" novalidate>
+          <label for="display-name">表示名</label>
+          <input id="display-name" maxlength="20" autocomplete="nickname" placeholder="例：ねこぜ" required />
+          <p class="hint">20文字まで。あとから変更できます。</p>
+        </form>
+        <button class="pill pill-pink" type="submit" form="name-form" id="name-submit" disabled>ルームを作る</button>
+        <button class="link-button" type="button" id="change-method">ログイン方法を選び直す</button>
+      </section>
+    </main>
+
+
+    <script src="common.js"></script>
+    <script>
+      playWipeOut();
+      const q = params();
+      const code = q.get("code");
+      const joining = q.get("next") === "join" && isValidCode(code || "");
+      let provider = null;
+
+      const $ = (id) => document.getElementById(id);
+      if (joining) {
+        $("context").hidden = false;
+        $("context").innerHTML = `ルーム <code>${code}</code> に参加します`;
+        $("name-submit").textContent = "ルームに参加";
+      }
+
+      // カードを入れ替える（back: 前のステップへ戻るとき）
+      async function swapStep(from, to, back = false) {
+        if (!reducedMotion) {
+          from.classList.toggle("is-back", back);
+          from.classList.add("step-out");
+          await wait(280);
+          from.classList.remove("step-out", "is-back");
+        }
+        from.hidden = true;
+        to.hidden = false;
+        if (!reducedMotion) {
+          to.classList.toggle("is-back", back);
+          to.classList.add("step-in");
+          to.addEventListener("animationend", () => to.classList.remove("step-in", "is-back"), { once: true });
+        }
+      }
+
+      async function showNameStep(name) {
+        const input = $("display-name");
+        input.value = name || "";
+        $("name-submit").disabled = !input.value.trim();
+        await swapStep($("step-method"), $("step-name"));
+        input.focus();
+      }
+
+      document.querySelectorAll(".provider").forEach((button) => {
+        button.addEventListener("click", async () => {
+          document.querySelectorAll(".provider, #guest").forEach((b) => (b.disabled = true));
+          const icon = button.querySelector("svg");
+          const label = button.querySelector("span");
+          const original = label.textContent;
+          const spinner = Object.assign(document.createElement("span"), { className: "spinner" });
+          icon.replaceWith(spinner);
+          label.textContent = `${button.dataset.provider}に接続中…`;
+          await wait(1100);
+          spinner.replaceWith(icon);
+          label.textContent = original;
+          document.querySelectorAll(".provider, #guest").forEach((b) => (b.disabled = false));
+
+          provider = button.dataset.provider;
+          const text = document.createElement("div");
+          text.innerHTML = `<b>${provider}でログインしました</b>アカウント名を表示名に入れています。`;
+          $("welcome").replaceChildren(icon.cloneNode(true), text);
+          $("welcome").hidden = false;
+          showNameStep(button.dataset.name);
+        });
+      });
+
+      $("guest").addEventListener("click", () => {
+        provider = null;
+        $("welcome").hidden = true;
+        showNameStep("");
+      });
+
+      $("display-name").addEventListener("input", (event) => {
+        $("name-submit").disabled = !event.target.value.trim();
+      });
+
+      $("change-method").addEventListener("click", () => swapStep($("step-name"), $("step-method"), true));
+
+      $("name-form").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const name = $("display-name").value.trim();
+        if (!name) return;
+        const submit = $("name-submit");
+        submit.disabled = true;
+        const query = { name, code: joining ? code : randomCode(), role: joining ? "guest" : "host", via: provider };
+        buildRoomTo(query, joining
+          ? { label: "ルームに参加しています", done: "ルームに入りました！", sub: `${name} さんとして参加` }
+          : { label: "ルームを作っています", done: "ルームができました！", sub: "このコードを相手に伝えよう" });
+      });
+    </script>
+  </body>
+</html>
