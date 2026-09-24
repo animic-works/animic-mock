@@ -76,7 +76,7 @@
         border-bottom: 2px dashed var(--line);
       }
 
-      .players-head h2 {
+      #players-title {
         margin: 0;
         font-family: var(--display);
         font-weight: 400;
@@ -617,10 +617,9 @@
     </header>
 
     <main class="lobby">
-      <!-- プレイヤー（ルームコードと招待を含む） -->
+      <!-- 上にルームコードと招待、その下にプレイヤー -->
       <section class="card-box" aria-labelledby="players-title" data-enter>
         <div class="players-head">
-          <h2 id="players-title">プレイヤー <span class="count" id="member-count" aria-live="polite">1<small> / 8</small></span></h2>
           <div class="room-card">
             <span class="room-label">ルームコード</span>
             <div class="code" id="code"></div>
@@ -630,6 +629,7 @@
             </button>
           </div>
         </div>
+          <h2 id="players-title">プレイヤー <span class="count" id="member-count" aria-live="polite">1<small> / 8</small></span></h2>
         <ul class="players" id="players"></ul>
       </section>
 
