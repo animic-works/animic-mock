@@ -22,16 +22,9 @@
     <style>
       :root {
         --display: "Dela Gothic One", "Zen Maru Gothic", sans-serif;
-      }
-
-      /* 背景: トップと同じ角度（約18°）の淡いピンクの面と3色の線 */
-      .deco {
-        position: fixed;
-        inset: 0;
-        z-index: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
+        /* カードの縁と影: 黒い縁ではなく、淡い縁とやわらかい影にする */
+        --edge: #dfe2e7;
+        --lift: 0 12px 32px -20px rgb(11 27 43 / 0.35);
       }
 
       /* ---------- 上部 ---------- */
@@ -75,47 +68,33 @@
         align-items: start;
       }
 
-      /* ---------- 1. ルーム: 見出しとルームコード ---------- */
-      .room {
-        grid-column: 1 / -1;
+      /* プレイヤーのカードの上部: 人数と、ルームコード・招待 */
+      .players-head {
         display: flex;
         flex-wrap: wrap;
         align-items: end;
         justify-content: space-between;
-        gap: 1.25rem 2rem;
+        gap: 1rem 1.5rem;
+        padding-bottom: 1.1rem;
+        border-bottom: 2px dashed var(--line);
       }
 
-      .headline {
+      .players-head h2 {
         margin: 0;
         font-family: var(--display);
         font-weight: 400;
-        font-size: clamp(2rem, 4.6vw, 3.3rem);
-        line-height: 1.25;
-        transform: rotate(-3deg) skewX(-6deg);
-        transform-origin: left center;
-      }
-
-      .headline em {
-        position: relative;
-        font-style: normal;
-        white-space: nowrap;
-      }
-
-      .headline em::after {
-        content: "";
-        position: absolute;
-        left: -0.1em;
-        right: -0.2em;
-        bottom: -0.06em;
-        height: 0.1em;
-        border-radius: 1em;
-        background: var(--pink-soft);
-        transform: rotate(-2deg);
+        font-size: 1.3rem;
       }
 
       .room-card {
         display: grid;
-        gap: 0.7rem;
+        grid-template-columns: auto auto;
+        align-items: end;
+        gap: 0.4rem 0.75rem;
+      }
+
+      .room-card .room-label {
+        grid-column: 1 / -1;
       }
 
       .room-label {
@@ -126,8 +105,8 @@
 
       .code {
         display: grid;
-        grid-template-columns: repeat(8, 2.6rem);
-        gap: 0.35rem;
+        grid-template-columns: repeat(8, 2.2rem);
+        gap: 0.3rem;
       }
 
       .code span {
@@ -136,23 +115,10 @@
         aspect-ratio: 3 / 4;
         border-radius: 0.6rem;
         background: #fff;
-        border: 2.5px solid var(--ink);
-        box-shadow: 0 4px 0 var(--ink);
+        border: 2px solid var(--edge);
         font-family: var(--mono);
         font-weight: 700;
-        font-size: 1.4rem;
-      }
-
-      .code span:nth-child(odd) {
-        rotate: -2deg;
-      }
-
-      .code span:nth-child(even) {
-        rotate: 2deg;
-      }
-
-      .room-card .btn-s {
-        width: 100%;
+        font-size: 1.2rem;
       }
 
       .btn-s {
@@ -188,9 +154,9 @@
       .card-box {
         padding: clamp(1.1rem, 2.5vw, 1.5rem);
         background: #fff;
-        border: 2.5px solid var(--ink);
+        border: 2px solid var(--edge);
         border-radius: 1.6rem;
-        box-shadow: 0 8px 0 var(--ink);
+        box-shadow: var(--lift);
         display: grid;
         gap: 1rem;
       }
@@ -236,22 +202,16 @@
         align-content: start;
         gap: 0.3rem;
         padding: 1.05rem 0.5rem 0.8rem;
-        border: 2.5px solid var(--ink);
+        border: 2px solid var(--edge);
         border-radius: 1.1rem;
         background: #fff;
-        box-shadow: 0 5px 0 var(--ink);
         text-align: center;
         min-height: 9.2rem;
-        rotate: -1.5deg;
-      }
-
-      .player:nth-child(even) {
-        rotate: 1.5deg;
       }
 
       .player.is-me {
         border-color: var(--pink);
-        box-shadow: 0 5px 0 var(--pink);
+        box-shadow: 0 0 0 3px rgb(255 45 135 / 0.12);
       }
 
       .player .avatar {
@@ -307,7 +267,6 @@
         left: 50%;
         padding: 0.12rem 0.55rem;
         border-radius: 999px;
-        border: 2px solid var(--ink);
         background: var(--yellow);
         font-size: 0.66rem;
         font-weight: 700;
@@ -331,7 +290,6 @@
         font: inherit;
         font-size: 0.8rem;
         font-weight: 700;
-        rotate: 0deg;
         cursor: pointer;
         width: 100%;
       }
@@ -363,7 +321,7 @@
 
       @keyframes joined {
         from {
-          transform: scale(0.8) rotate(-6deg);
+          transform: scale(0.85);
           opacity: 0;
         }
       }
@@ -511,7 +469,7 @@
         place-items: center;
         width: 2.1rem;
         aspect-ratio: 3 / 4;
-        border: 2px solid var(--ink);
+        border: 2px solid var(--edge);
         border-radius: 0.5rem;
         font-family: var(--mono);
         font-weight: 700;
@@ -529,7 +487,7 @@
         width: 9.5rem;
         height: 9.5rem;
         padding: 0.6rem;
-        border: 2.5px solid var(--ink);
+        border: 2px solid var(--edge);
         border-radius: 1rem;
         background: #fff;
         image-rendering: pixelated;
@@ -593,15 +551,9 @@
           grid-template-columns: minmax(0, 1fr);
           padding-bottom: calc(9rem + env(safe-area-inset-bottom, 0px));
         }
-        .deco {
-          -webkit-mask-image: linear-gradient(to bottom, transparent 40%, #000 80%);
-          mask-image: linear-gradient(to bottom, transparent 40%, #000 80%);
-        }
-        .room {
-          align-items: stretch;
-        }
         .room-card {
           width: 100%;
+          grid-template-columns: minmax(0, 1fr);
         }
         .code {
           grid-template-columns: repeat(8, minmax(0, 1fr));
@@ -623,7 +575,8 @@
           gap: 0.9rem;
           padding: 0.75rem 16px calc(0.75rem + env(safe-area-inset-bottom, 0px));
           background: #fff;
-          border-top: 2.5px solid var(--ink);
+          border-top: 1px solid var(--edge);
+          box-shadow: 0 -12px 30px -22px rgb(11 27 43 / 0.45);
         }
         .go-status {
           font-size: 0.8rem;
@@ -658,44 +611,29 @@
     </style>
   </head>
   <body>
-    <svg class="deco" viewBox="0 0 1600 900" preserveAspectRatio="xMaxYMid slice" aria-hidden="true">
-      <path d="M1250 900 L1542 0 H1600 V900 Z" fill="#ffe4f1" />
-      <path d="M1198 900 L1490 0 H1506 L1214 900 Z" fill="#00b4fc" />
-      <path d="M1150 900 L1234 640 H1246 L1162 900 Z" fill="#fddb13" />
-      <path d="M1340 330 L1447 0 H1455 L1348 330 Z" fill="#ff72b9" />
-      <path d="M0 150 L60 -35 H72 L12 150 Z" fill="#ff72b9" />
-      <path d="M40 210 L148 -120 H164 L56 210 Z" fill="#00b4fc" />
-    </svg>
-
     <header class="bar">
       <a href="index.html"><img src="animic-logo.svg" alt="Animic トップ" width="2078" height="607" /></a>
       <button class="leave" type="button" id="leave">退出</button>
     </header>
 
     <main class="lobby">
-      <!-- 1. ルーム: 状況の見出しと、ルームコード・招待 -->
-      <section class="room" aria-label="ルーム" data-enter>
-        <h1 class="headline" id="headline">メンバーを<em>集めよう！</em></h1>
-        <div class="room-card">
-          <span class="room-label">ルームコード</span>
-          <div class="code" id="code"></div>
-          <button class="btn-s pink" type="button" id="invite">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M19 8v6M22 11h-6" /></svg>
-            招待する
-          </button>
-        </div>
-      </section>
-
-      <!-- 2. プレイヤー -->
+      <!-- プレイヤー（ルームコードと招待を含む） -->
       <section class="card-box" aria-labelledby="players-title" data-enter>
-        <div class="box-head">
-          <h2 id="players-title">プレイヤー</h2>
-          <span class="count" id="member-count" aria-live="polite">1<small> / 8</small></span>
+        <div class="players-head">
+          <h2 id="players-title">プレイヤー <span class="count" id="member-count" aria-live="polite">1<small> / 8</small></span></h2>
+          <div class="room-card">
+            <span class="room-label">ルームコード</span>
+            <div class="code" id="code"></div>
+            <button class="btn-s pink" type="button" id="invite">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M19 8v6M22 11h-6" /></svg>
+              招待する
+            </button>
+          </div>
         </div>
         <ul class="players" id="players"></ul>
       </section>
 
-      <!-- 3. ルールと開始（1枚にまとめる） -->
+      <!-- ルールと開始 -->
       <section class="card-box go-card" aria-labelledby="rules-title" data-enter="fade">
         <div class="box-head">
           <h2 id="rules-title">ルール</h2>
@@ -888,9 +826,7 @@
         const count = players.length;
         const enough = count >= 2;
         const readyCount = players.filter((p) => p.ready).length;
-        const allReady = enough && readyCount === count;
         $("member-count").innerHTML = `${count}<small> / ${MAX}</small>`;
-        $("headline").innerHTML = !enough ? "メンバーを<em>集めよう！</em>" : allReady ? "準備OK！<em>はじめよう</em>" : "準備ができたら<em>はじめよう</em>";
 
         // ルール: ホストは選択肢、ゲストは決まった内容の文章
         $("rules-edit").hidden = !isHost;
@@ -901,12 +837,12 @@
         $("view-grace").textContent = `${val("grace")}秒`;
 
         // 開始: ホストは「対戦をはじめる」だけ、ゲストは「準備完了」だけ
-        $("go-status").innerHTML = enough ? `準備OK <b>${readyCount} / ${count}</b>人` : "あと1人以上で開始できます";
+        $("go-status").innerHTML = `準備OK <b>${readyCount} / ${count}</b>人`;
         $("start").hidden = !isHost;
         $("start").disabled = !enough;
         $("ready").hidden = isHost;
         $("ready").textContent = me.ready ? "準備完了を取り消す" : "準備完了にする";
-        $("note").textContent = isHost ? (enough && !allReady ? "準備完了を待たずに開始できます" : "") : "ホストが開始するのを待っています";
+        $("note").textContent = isHost ? "" : "ホストが開始します";
       }
       render();
 
