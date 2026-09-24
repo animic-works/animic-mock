@@ -455,10 +455,6 @@
         padding-top: clamp(5rem, 10vh, 7rem);
       }
 
-      html.is-scroll .credits-body {
-        padding-top: 0;
-      }
-
       html.is-scroll .steps {
         height: min(30rem, 62vh);
       }
@@ -863,6 +859,7 @@
       /* ---------- ギャラリー ---------- */
       .gallery {
         display: grid;
+        grid-template-rows: 1fr auto;
       }
 
       .gallery-body {
@@ -970,105 +967,19 @@
         color: #9aa3ae;
       }
 
-      /* ---------- クレジット ---------- */
-      .credits {
-        display: grid;
-        grid-template-rows: 1fr auto;
+      /* 高さの低い画面では、ギャラリーとフッターの余白を詰めて1画面に収める */
+      @media (min-width: 901px) and (max-height: 800px) {
+        .gallery-body {
+          gap: 1.1rem;
+          padding-top: 5.5rem;
+          padding-bottom: 1rem;
+        }
+        .gallery .footer {
+          padding-block: 1rem;
+        }
       }
 
-      .credits-body {
-        display: grid;
-        align-content: center;
-        gap: clamp(1.5rem, 4vh, 2.5rem);
-        padding: clamp(6.5rem, 15vh, 8.5rem) clamp(2.5rem, 6vw, 6.5rem) clamp(1.5rem, 4vh, 2.5rem);
-      }
-
-      .credits-grid {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-        align-items: start;
-        gap: clamp(1.5rem, 4vw, 4rem);
-      }
-
-      .staff {
-        display: grid;
-        gap: clamp(0.8rem, 2.4vh, 1.4rem);
-        margin: 0;
-      }
-
-      .staff div {
-        display: grid;
-        grid-template-columns: 11em minmax(0, 1fr);
-        align-items: baseline;
-        gap: 1rem;
-      }
-
-      .staff dt,
-      .credits-box dt {
-        font-size: 0.82rem;
-        font-weight: 700;
-        color: var(--pink);
-      }
-
-      .staff dd {
-        margin: 0;
-        font-family: var(--round);
-        font-weight: 900;
-        font-size: clamp(1.05rem, 1.6vw, 1.3rem);
-      }
-
-      .credits-side {
-        display: grid;
-        gap: clamp(1rem, 3vh, 1.75rem);
-      }
-
-      .credits-box {
-        padding: clamp(1.25rem, 3vw, 2rem);
-        background: #fff;
-        border: 2.5px solid var(--ink);
-        border-radius: 1.5rem;
-        box-shadow: 0 8px 0 var(--ink);
-      }
-
-      .box-label {
-        margin: 0;
-        text-align: center;
-        font-family: var(--latin);
-        font-style: italic;
-        font-weight: 500;
-        font-size: 0.72rem;
-        letter-spacing: 0.28em;
-        color: var(--pink);
-      }
-
-      .box-title {
-        margin: 0.3rem 0 1rem;
-        text-align: center;
-        font-family: var(--round);
-        font-weight: 900;
-        font-size: clamp(1.15rem, 1.8vw, 1.4rem);
-      }
-
-      .credits-box dl {
-        display: grid;
-        gap: 0.7rem;
-        margin: 0;
-      }
-
-      .credits-box dl div {
-        display: grid;
-        grid-template-columns: 7.5em minmax(0, 1fr);
-        align-items: baseline;
-        gap: 0.9rem;
-      }
-
-      .credits-box dd {
-        margin: 0;
-        font-weight: 700;
-        font-size: 0.92rem;
-        line-height: 1.7;
-      }
-
+      /* ---------- footer ---------- */
       .copyright {
         width: 100%;
         text-align: center;
@@ -1076,34 +987,6 @@
         color: #9aa3ae;
       }
 
-      /* 高さの低い画面では、クレジットの余白を詰めて1画面に収める */
-      @media (min-width: 901px) and (max-height: 800px) {
-        .credits-body {
-          gap: 1.1rem;
-          padding-top: 5.5rem;
-          padding-bottom: 1rem;
-        }
-        .credits .section-head h2 {
-          font-size: 2rem;
-        }
-        .staff {
-          gap: 0.55rem;
-        }
-        .credits-box {
-          padding: 1rem 1.5rem;
-        }
-        .box-title {
-          margin-bottom: 0.6rem;
-        }
-        .credits-box dl {
-          gap: 0.4rem;
-        }
-        .credits .footer {
-          padding-block: 1rem;
-        }
-      }
-
-      /* ---------- footer ---------- */
       .footer {
         display: flex;
         flex-wrap: wrap;
@@ -1394,28 +1277,6 @@
         .score-card h3 {
           align-self: end;
         }
-        .credits-grid {
-          grid-template-columns: minmax(0, 1fr);
-        }
-        .credits-body {
-          padding-top: 5.5rem;
-        }
-        /* 役割を名前の上に置き、2列に並べる */
-        .credits-grid > .staff {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-          gap: 0.9rem 1rem;
-        }
-        .staff div {
-          grid-template-columns: minmax(0, 1fr);
-          gap: 0.1rem;
-        }
-        .staff dd {
-          font-size: 1rem;
-        }
-        .credits-box dl div {
-          grid-template-columns: minmax(0, 1fr);
-          gap: 0.1rem;
-        }
         /* ギャラリーは横にスワイプして見る */
         .gallery-grid {
           grid-template-columns: none;
@@ -1704,42 +1565,6 @@
         </ul>
         <p class="gallery-note" data-reveal style="--r: 5">※ 画像と対戦結果はモックです</p>
       </div>
-    </section>
-
-    <section class="screen credits" id="credits" data-nav="credits" aria-labelledby="credits-title">
-      <div class="credits-body">
-        <div class="section-head" data-reveal style="--r: 0">
-          <p class="eyebrow">CREDITS</p>
-          <h2 id="credits-title">クレジット</h2>
-        </div>
-        <div class="credits-grid">
-          <dl class="staff" data-reveal style="--r: 1">
-            <div><dt>企画・ディレクション</dt><dd>高瀬 ユウ</dd></div>
-            <div><dt>ゲームデザイン</dt><dd>真白 ことり</dd></div>
-            <div><dt>ロゴ・UIデザイン</dt><dd>朝霧 レイ</dd></div>
-            <div><dt>お題イラスト</dt><dd>Animic イラストチーム</dd></div>
-            <div><dt>フロントエンド</dt><dd>桐生 ハルト</dd></div>
-            <div><dt>サーバー・インフラ</dt><dd>久遠 ミナト</dd></div>
-            <div><dt>AI採点</dt><dd>柊 ソラ ／ 採点ラボ</dd></div>
-          </dl>
-          <div class="credits-side" data-reveal style="--r: 2">
-            <div class="credits-box">
-              <p class="box-label">POWERED BY</p>
-              <p class="box-title">使用している技術</p>
-              <dl>
-                <div><dt>画像生成</dt><dd>NovelAI</dd></div>
-                <div><dt>再現度の評価</dt><dd>CCIP ／ WD14 tagger v3 ／ DreamSim<br />SigLIP 2 ／ DINOv2 ／ Depth Anything V2</dd></div>
-                <div><dt>アプリ</dt><dd>TanStack Start</dd></div>
-                <div><dt>基盤</dt><dd>Cloudflare Workers ／ D1 ／ Durable Objects</dd></div>
-              </dl>
-            </div>
-            <div class="staff staff-extra">
-              <div><dt>スペシャルサンクス</dt><dd>遊んでくれたすべてのプレイヤー</dd></div>
-            </div>
-          </div>
-        </div>
-        <p class="gallery-note" data-reveal style="--r: 3">※ クレジットの氏名はモックです</p>
-      </div>
       <footer class="footer">
         <img src="animic-logo.svg" alt="Animic" width="2078" height="607" />
         <nav class="legal" aria-label="規約">
@@ -1749,6 +1574,7 @@
         <small class="copyright">© 2026 Animic</small>
       </footer>
     </section>
+
     </main>
 
     <dialog class="dialog" id="join-dialog" aria-labelledby="join-title">
@@ -1875,7 +1701,7 @@
 
         function moveIndicator() {
           const link = navLinks.find((a) => a.getAttribute("aria-current") === "page");
-          // ヘッダーに対応する項目がない画面（クレジット）では、下線をその場で消す
+          // ヘッダーに対応する項目がない画面では、下線をその場で消す
           indicator.style.opacity = link ? 1 : 0;
           if (!link) return;
           indicator.style.left = `${link.offsetLeft}px`;
