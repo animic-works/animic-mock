@@ -402,7 +402,7 @@
         cursor: default;
       }
 
-      /* 難易度の説明は挿絵の下の中央に置き、ピンクで強調する */
+      /* 難易度の説明は挿絵の上の中央に置き、ピンクで強調する */
       .level-desc {
         justify-self: center;
         display: flex;
@@ -480,16 +480,49 @@
         gap: 0.7rem;
       }
 
-      .go-status {
+      /* 準備の状況: プレイヤーの見出しの行の右端に置く（全員そろったら緑） */
+      .players-title-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem 1rem;
+      }
+
+      .ready-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
         margin: 0;
+        padding: 0.3rem 0.85rem;
+        border-radius: 999px;
+        background: var(--ground);
+        font-size: 0.82rem;
         font-weight: 700;
         white-space: nowrap;
       }
 
-      .go-status b {
+      .ready-status::before {
+        content: "";
+        width: 0.55rem;
+        height: 0.55rem;
+        border-radius: 50%;
+        background: #c9ced6;
+      }
+
+      .ready-status b {
         font-family: var(--display);
         font-weight: 400;
-        font-size: 1.15rem;
+        font-size: 1rem;
+      }
+
+      .ready-status.is-all {
+        background: #dcfce7;
+        color: #15803d;
+      }
+
+      .ready-status.is-all::before {
+        background: #22c55e;
       }
 
       .go .note {
@@ -621,18 +654,19 @@
           left: 0;
           right: 0;
           bottom: 0;
-          grid-template-columns: auto minmax(0, 1fr);
+          grid-template-columns: minmax(0, 1fr);
           align-items: center;
-          gap: 0.9rem;
+          gap: 0.4rem;
           padding: 0.75rem 16px calc(0.75rem + env(safe-area-inset-bottom, 0px));
           background: #fff;
           border-top: 1px solid var(--edge);
           box-shadow: 0 -12px 30px -22px rgb(11 27 43 / 0.45);
         }
-        .go-status {
-          font-size: 0.8rem;
-        }
         .go .note {
+          display: none;
+        }
+        /* 開始ボタンは画面下に固定するので、ルールのカードの区切り線は出さない */
+        .go-card .divider {
           display: none;
         }
         .go .pill {
@@ -681,7 +715,10 @@
             </button>
           </div>
         </div>
+        <div class="players-title-row">
           <h2 id="players-title">プレイヤー <span class="count" id="member-count" aria-live="polite">1<small> / 8</small></span></h2>
+          <p class="ready-status" id="go-status" aria-live="polite"></p>
+        </div>
         <ul class="players" id="players"></ul>
       </section>
 
@@ -703,8 +740,8 @@
             </dd>
           </div>
           <div class="wide">
-            <figure class="level-art" data-level-art><figcaption>挿絵（仮）</figcaption></figure>
             <p class="level-desc" data-level-desc></p>
+            <figure class="level-art" data-level-art><figcaption>挿絵（仮）</figcaption></figure>
           </div>
           <div>
             <dt>制限時間</dt>
@@ -731,15 +768,14 @@
         <dl class="rules" id="rules-view" hidden>
           <div><dt>難易度</dt><dd class="summary" id="view-level"></dd></div>
           <div class="wide">
-            <figure class="level-art" data-level-art><figcaption>挿絵（仮）</figcaption></figure>
             <p class="level-desc" data-level-desc></p>
+            <figure class="level-art" data-level-art><figcaption>挿絵（仮）</figcaption></figure>
           </div>
           <div><dt>制限時間</dt><dd class="summary" id="view-time"></dd></div>
           <div><dt>選択の猶予</dt><dd class="summary" id="view-grace"></dd></div>
         </dl>
         <div class="divider" aria-hidden="true"></div>
         <div class="go">
-          <p class="go-status" id="go-status"></p>
           <button class="pill pill-pink" type="button" id="start" disabled>対戦をはじめる</button>
           <button class="pill" type="button" id="ready" hidden>準備完了にする</button>
           <p class="note" id="note"></p>
@@ -913,6 +949,7 @@
 
         // 開始: ホストは「対戦をはじめる」だけ、ゲストは「準備完了」だけ
         $("go-status").innerHTML = `準備OK <b>${readyCount} / ${count}</b>人`;
+        $("go-status").classList.toggle("is-all", count >= 2 && readyCount === count);
         $("start").hidden = !isHost;
         $("start").disabled = !enough;
         $("ready").hidden = isHost;
