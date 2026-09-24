@@ -338,7 +338,7 @@
 
       .rules > div {
         display: grid;
-        grid-template-columns: 5.4rem minmax(0, 1fr);
+        grid-template-columns: 6.4rem minmax(0, 1fr);
         align-items: center;
         gap: 0.75rem;
       }
@@ -761,12 +761,13 @@
             </dd>
           </div>
           <div>
-            <dt>選択の猶予</dt>
+            <dt>生成可能回数</dt>
             <dd>
-              <div class="seg" role="radiogroup" aria-label="選択の猶予">
-                <input type="radio" name="grace" id="g-10" value="10" /><label for="g-10">10秒</label>
-                <input type="radio" name="grace" id="g-15" value="15" checked /><label for="g-15">15秒</label>
-                <input type="radio" name="grace" id="g-30" value="30" /><label for="g-30">30秒</label>
+              <div class="seg" role="radiogroup" aria-label="生成可能回数">
+                <input type="radio" name="limit" id="n-3" value="3" /><label for="n-3">3回</label>
+                <input type="radio" name="limit" id="n-5" value="5" checked /><label for="n-5">5回</label>
+                <input type="radio" name="limit" id="n-10" value="10" /><label for="n-10">10回</label>
+                <input type="radio" name="limit" id="n-0" value="0" /><label for="n-0">無制限</label>
               </div>
             </dd>
           </div>
@@ -781,7 +782,7 @@
             </figure>
           </div>
           <div><dt>制限時間</dt><dd class="summary" id="view-time"></dd></div>
-          <div><dt>選択の猶予</dt><dd class="summary" id="view-grace"></dd></div>
+          <div><dt>生成可能回数</dt><dd class="summary" id="view-limit"></dd></div>
         </dl>
         <div class="divider" aria-hidden="true"></div>
         <div class="go">
@@ -954,7 +955,7 @@
         const val = (name) => document.querySelector(`[name=${name}]:checked`).value;
         $("view-level").textContent = val("level");
         $("view-time").textContent = `${val("time")}秒`;
-        $("view-grace").textContent = `${val("grace")}秒`;
+        $("view-limit").textContent = val("limit") === "0" ? "無制限" : `${val("limit")}回`;
 
         // 開始: ホストは「対戦をはじめる」だけ、ゲストは「準備完了」だけ
         $("go-status").innerHTML = `準備OK <b>${readyCount} / ${count}</b>人`;
@@ -998,8 +999,8 @@
       async function startCountdown() {
         const level = document.querySelector("[name=level]:checked").value;
         const time = document.querySelector("[name=time]:checked").value;
-        const grace = document.querySelector("[name=grace]:checked").value;
-        $("countdown-label").textContent = `${level}・${time}秒・猶予${grace}秒`;
+        const limit = document.querySelector("[name=limit]:checked").value;
+        $("countdown-label").textContent = `${level}・${time}秒・${limit === "0" ? "生成回数は無制限" : `生成${limit}回まで`}`;
         $("countdown").hidden = false;
         for (const n of [3, 2, 1]) {
           const el = $("countdown-num");
@@ -1015,7 +1016,7 @@
         await wait(700);
         // 対戦画面は今のところ1対1のため、最初の相手を渡す
         const opponent = players.find((p) => p !== me);
-        wipeTo("play.html", { code, level, time, grace, name: me.name, opp: opponent?.name || "ぴよ丸", role: isHost ? "host" : "guest" });
+        wipeTo("play.html", { code, level, time, limit, name: me.name, opp: opponent?.name || "ぴよ丸", role: isHost ? "host" : "guest" });
       }
 
       // 退出
