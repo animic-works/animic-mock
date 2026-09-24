@@ -95,17 +95,6 @@
         transform-origin: left center;
       }
 
-      .headline small {
-        display: block;
-        margin-bottom: 0.2rem;
-        font-family: var(--latin);
-        font-style: italic;
-        font-size: 0.8rem;
-        letter-spacing: 0.3em;
-        color: var(--pink);
-        transform: none;
-      }
-
       .headline em {
         position: relative;
         font-style: normal;
@@ -130,9 +119,6 @@
       }
 
       .room-label {
-        display: flex;
-        align-items: baseline;
-        justify-content: space-between;
         font-size: 0.8rem;
         font-weight: 700;
         color: var(--muted);
@@ -165,9 +151,8 @@
         rotate: 2deg;
       }
 
-      .room-actions {
-        display: flex;
-        gap: 0.5rem;
+      .room-card .btn-s {
+        width: 100%;
       }
 
       .btn-s {
@@ -193,7 +178,6 @@
       }
 
       .btn-s.pink {
-        flex: 1;
         border-color: var(--pink);
         background: var(--pink);
         color: #fff;
@@ -338,15 +322,18 @@
       }
 
       .player.is-empty {
-        border: 2.5px dashed #cfd4db;
-        background: rgb(255 255 255 / 0.5);
+        border: 2.5px dashed var(--pink-soft);
+        background: rgb(255 255 255 / 0.6);
         box-shadow: none;
         justify-content: center;
         align-content: center;
-        color: #b5bcc6;
+        color: var(--pink);
+        font: inherit;
         font-size: 0.8rem;
         font-weight: 700;
         rotate: 0deg;
+        cursor: pointer;
+        width: 100%;
       }
 
       .player.is-empty .plus {
@@ -355,18 +342,13 @@
         width: 2.6rem;
         height: 2.6rem;
         border-radius: 50%;
-        border: 2px dashed #cfd4db;
+        border: 2px dashed var(--pink-soft);
         font-size: 1.3rem;
-      }
-
-      .player.is-next {
-        border-color: var(--pink-soft);
-        color: var(--pink);
-      }
-
-      .player.is-next .plus {
-        border-color: var(--pink-soft);
         animation: waiting 1.4s ease-in-out infinite;
+      }
+
+      .players li {
+        display: grid;
       }
 
       @keyframes waiting {
@@ -387,25 +369,32 @@
       }
 
       /* ---------- 3. ルールと開始 ---------- */
-      .side {
+      .rules {
         display: grid;
-        gap: clamp(1.25rem, 3vw, 1.75rem);
+        gap: 0.7rem;
+        margin: 0;
       }
 
-      .rule {
+      .rules > div {
         display: grid;
-        gap: 0.5rem;
+        grid-template-columns: 5.4rem minmax(0, 1fr);
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .rules dt {
+        font-size: 0.85rem;
+        font-weight: 700;
+      }
+
+      .rules dd {
         margin: 0;
-        padding: 0;
-        border: 0;
         min-width: 0;
       }
 
-      .rule legend {
-        padding: 0;
-        margin-bottom: 0.5rem;
-        font-size: 0.85rem;
-        font-weight: 700;
+      .rules .summary {
+        font-family: var(--round);
+        font-weight: 900;
       }
 
       .seg {
@@ -453,8 +442,8 @@
       }
 
       .level-desc {
-        margin: 0;
-        font-size: 0.8rem;
+        margin: 0.35rem 0 0;
+        font-size: 0.78rem;
         color: var(--muted);
       }
 
@@ -471,16 +460,10 @@
         letter-spacing: 0.1em;
       }
 
-      .rule-row {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-        gap: 1rem;
-      }
-
-      .host-note {
-        margin: 0;
-        font-size: 0.78rem;
-        color: var(--muted);
+      .divider {
+        height: 0;
+        margin: 0.2rem 0;
+        border-top: 2px dashed var(--line);
       }
 
       .go {
@@ -489,28 +472,15 @@
       }
 
       .go-status {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 0.75rem;
         margin: 0;
         font-weight: 700;
+        white-space: nowrap;
       }
 
-      .go-status .dots {
-        display: flex;
-        gap: 0.25rem;
-      }
-
-      .go-status .dots i {
-        width: 0.6rem;
-        height: 0.6rem;
-        border-radius: 50%;
-        background: #d3d7dd;
-      }
-
-      .go-status .dots i.on {
-        background: #22c55e;
+      .go-status b {
+        font-family: var(--display);
+        font-weight: 400;
+        font-size: 1.15rem;
       }
 
       .go .note {
@@ -520,15 +490,44 @@
         color: var(--muted);
       }
 
+      .go .note:empty {
+        display: none;
+      }
+
       /* ---------- QRコード ---------- */
       .qr-card {
         justify-items: center;
         text-align: center;
       }
 
+      .invite-code {
+        display: flex;
+        gap: 0.3rem;
+        justify-content: center;
+      }
+
+      .invite-code span {
+        display: grid;
+        place-items: center;
+        width: 2.1rem;
+        aspect-ratio: 3 / 4;
+        border: 2px solid var(--ink);
+        border-radius: 0.5rem;
+        font-family: var(--mono);
+        font-weight: 700;
+        font-size: 1.1rem;
+      }
+
+      .invite-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 0.5rem;
+        width: 100%;
+      }
+
       .qr-card canvas {
-        width: 11rem;
-        height: 11rem;
+        width: 9.5rem;
+        height: 9.5rem;
         padding: 0.6rem;
         border: 2.5px solid var(--ink);
         border-radius: 1rem;
@@ -619,13 +618,15 @@
           left: 0;
           right: 0;
           bottom: 0;
-          grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+          grid-template-columns: auto minmax(0, 1fr);
+          align-items: center;
+          gap: 0.9rem;
           padding: 0.75rem 16px calc(0.75rem + env(safe-area-inset-bottom, 0px));
           background: #fff;
           border-top: 2.5px solid var(--ink);
         }
         .go-status {
-          grid-column: 1 / -1;
+          font-size: 0.8rem;
         }
         .go .note {
           display: none;
@@ -634,32 +635,19 @@
           padding-inline: 0.5rem;
           font-size: 0.95rem;
         }
-        .go-card {
-          padding-block: 0;
-          border: 0;
-          box-shadow: none;
-          background: none;
-        }
-        .go-card .box-head {
-          display: none;
-        }
+
       }
 
       @media (max-width: 560px) {
         .players {
           grid-template-columns: repeat(2, minmax(0, 1fr));
         }
-        .rule-row {
-          grid-template-columns: minmax(0, 1fr);
-        }
-        .room-actions .btn-s {
-          flex: 1;
-        }
+
       }
 
       @media (prefers-reduced-motion: reduce) {
         .countdown-num,
-        .player.is-next .plus,
+        .player.is-empty .plus,
         .player.is-joined {
           animation: none;
         }
@@ -685,22 +673,16 @@
     </header>
 
     <main class="lobby">
-      <!-- 1. ルーム -->
+      <!-- 1. ルーム: 状況の見出しと、ルームコード・招待 -->
       <section class="room" aria-label="ルーム" data-enter>
-        <h1 class="headline" id="headline"><small>LOBBY</small>メンバーを<em>集めよう！</em></h1>
+        <h1 class="headline" id="headline">メンバーを<em>集めよう！</em></h1>
         <div class="room-card">
-          <div class="room-label"><span>ルームコード</span><span>相手に伝えてね</span></div>
+          <span class="room-label">ルームコード</span>
           <div class="code" id="code"></div>
-          <div class="room-actions">
-            <button class="btn-s pink" type="button" id="copy">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7" /><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7" /></svg>
-              招待リンクをコピー
-            </button>
-            <button class="btn-s" type="button" id="open-qr">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4" /></svg>
-              QRコード
-            </button>
-          </div>
+          <button class="btn-s pink" type="button" id="invite">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M19 8v6M22 11h-6" /></svg>
+            招待する
+          </button>
         </div>
       </section>
 
@@ -713,59 +695,72 @@
         <ul class="players" id="players"></ul>
       </section>
 
-      <!-- 3. ルールと開始 -->
-      <div class="side">
-        <section class="card-box" aria-labelledby="rules-title" data-enter>
-          <div class="box-head">
-            <h2 id="rules-title">ルール</h2>
+      <!-- 3. ルールと開始（1枚にまとめる） -->
+      <section class="card-box go-card" aria-labelledby="rules-title" data-enter="fade">
+        <div class="box-head">
+          <h2 id="rules-title">ルール</h2>
+        </div>
+        <!-- ホスト: 選択肢で決める -->
+        <dl class="rules" id="rules-edit">
+          <div>
+            <dt>難易度</dt>
+            <dd>
+              <div class="seg level" role="radiogroup" aria-label="難易度">
+                <input type="radio" name="level" id="lv-easy" value="かんたん" checked /><label for="lv-easy">かんたん</label>
+                <input type="radio" name="level" id="lv-normal" value="ふつう" /><label for="lv-normal">ふつう</label>
+                <input type="radio" name="level" id="lv-hard" value="むずかしい" /><label for="lv-hard">むずかしい</label>
+              </div>
+              <p class="level-desc" id="level-desc"></p>
+            </dd>
           </div>
-          <fieldset class="rule">
-            <legend>難易度</legend>
-            <div class="seg level">
-              <input type="radio" name="level" id="lv-easy" value="かんたん" checked /><label for="lv-easy">かんたん</label>
-              <input type="radio" name="level" id="lv-normal" value="ふつう" /><label for="lv-normal">ふつう</label>
-              <input type="radio" name="level" id="lv-hard" value="むずかしい" /><label for="lv-hard">むずかしい</label>
-            </div>
-            <p class="level-desc" id="level-desc"></p>
-          </fieldset>
-          <div class="rule-row">
-            <fieldset class="rule">
-              <legend>制限時間</legend>
-              <div class="seg">
+          <div>
+            <dt>制限時間</dt>
+            <dd>
+              <div class="seg" role="radiogroup" aria-label="制限時間">
                 <input type="radio" name="time" id="t-60" value="60" /><label for="t-60">60秒</label>
                 <input type="radio" name="time" id="t-90" value="90" checked /><label for="t-90">90秒</label>
                 <input type="radio" name="time" id="t-120" value="120" /><label for="t-120">120秒</label>
               </div>
-            </fieldset>
-            <fieldset class="rule">
-              <legend>選択の猶予</legend>
-              <div class="seg">
+            </dd>
+          </div>
+          <div>
+            <dt>選択の猶予</dt>
+            <dd>
+              <div class="seg" role="radiogroup" aria-label="選択の猶予">
                 <input type="radio" name="grace" id="g-10" value="10" /><label for="g-10">10秒</label>
                 <input type="radio" name="grace" id="g-15" value="15" checked /><label for="g-15">15秒</label>
                 <input type="radio" name="grace" id="g-30" value="30" /><label for="g-30">30秒</label>
               </div>
-            </fieldset>
+            </dd>
           </div>
-          <p class="host-note" id="host-note"></p>
-        </section>
-
-        <section class="card-box go-card" aria-label="対戦をはじめる" data-enter="fade">
-          <div class="go">
-            <p class="go-status"><span id="go-text">参加者を待っています</span><span class="dots" id="go-dots" aria-hidden="true"></span></p>
-            <button class="pill" type="button" id="ready">準備完了にする</button>
-            <button class="pill pill-pink" type="button" id="start" disabled>対戦をはじめる</button>
-            <p class="note" id="note">2人以上そろうと開始できます</p>
-          </div>
-        </section>
-      </div>
+        </dl>
+        <!-- ゲスト: ホストが決めた内容を文章で見せる -->
+        <dl class="rules" id="rules-view" hidden>
+          <div><dt>難易度</dt><dd class="summary" id="view-level"></dd></div>
+          <div><dt>制限時間</dt><dd class="summary" id="view-time"></dd></div>
+          <div><dt>選択の猶予</dt><dd class="summary" id="view-grace"></dd></div>
+        </dl>
+        <div class="divider" aria-hidden="true"></div>
+        <div class="go">
+          <p class="go-status" id="go-status"></p>
+          <button class="pill pill-pink" type="button" id="start" disabled>対戦をはじめる</button>
+          <button class="pill" type="button" id="ready" hidden>準備完了にする</button>
+          <p class="note" id="note"></p>
+        </div>
+      </section>
     </main>
 
-    <dialog class="dialog" id="qr-dialog" aria-labelledby="qr-title">
+    <dialog class="dialog" id="invite-dialog" aria-labelledby="invite-title">
       <form class="card qr-card" method="dialog">
-        <h1 id="qr-title">QRコードで招待</h1>
-        <p class="sub">スマホのカメラで読み取ると、このルームに入れます。（QRコードはモックです）</p>
+        <h1 id="invite-title">友だちを招待</h1>
+        <p class="sub">リンクを送るか、コードを伝えるか、QRコードを読み取ってもらおう。</p>
+        <div class="invite-row">
+          <input class="url" id="room-url" readonly aria-label="ルームURL" />
+          <button class="btn-s pink" type="button" id="copy">リンクをコピー</button>
+        </div>
+        <div class="invite-code" id="invite-code" aria-hidden="true"></div>
         <canvas id="qr" width="21" height="21" aria-label="ルームURLのQRコード（モック）"></canvas>
-        <input class="url" id="room-url" readonly aria-label="ルームURL" />
+        <p class="sub" style="margin:0">QRコードはモックです</p>
         <button class="pill" value="close">閉じる</button>
       </form>
     </dialog>
@@ -807,12 +802,15 @@
       ];
       const isHost = q.get("role") !== "guest";
       const me = { name: q.get("name") || "ゲスト", ready: false, isMe: true };
+      // ホストは開始の操作をするので、準備完了の操作はせず準備OKとして数える
+      if (isHost) me.ready = true;
       const players = isHost ? [me] : [{ name: "ホストさん", ready: true }, me];
       const host = players[0];
       // モック: あとから参加してくる人
       const POOL = ["ぴよ丸", "ぴくせる侍", "プロンプト職人", "もちもち"];
 
       $("code").innerHTML = [...code].map((ch) => `<span>${ch}</span>`).join("");
+      $("invite-code").innerHTML = [...code].map((ch) => `<span>${ch}</span>`).join("");
       $("code").setAttribute("aria-label", `ルームコード ${code}`);
       $("room-url").value = roomUrl;
       playWipeOut();
@@ -826,7 +824,8 @@
         }
       }
       $("copy").addEventListener("click", () => copy(roomUrl, "招待リンクをコピーしました"));
-      $("open-qr").addEventListener("click", () => $("qr-dialog").showModal());
+      const openInvite = () => $("invite-dialog").showModal();
+      $("invite").addEventListener("click", openInvite);
 
       // QRっぽい模様（モック）
       (() => {
@@ -852,7 +851,7 @@
       };
       function renderLevel() {
         const level = document.querySelector("[name=level]:checked").value;
-        $("level-desc").innerHTML = `お題：${LEVELS[level]}`;
+        $("level-desc").innerHTML = LEVELS[level];
       }
       document.querySelectorAll("[name=level]").forEach((i) => i.addEventListener("change", renderLevel));
       renderLevel();
@@ -861,11 +860,10 @@
       const shown = new Set(players);
       function renderPlayers() {
         const cells = [];
-        for (let i = 0; i < MAX; i++) {
+        for (let i = 0; i < Math.min(MAX, players.length + 1); i++) {
           const p = players[i];
           if (!p) {
-            const next = i === players.length;
-            cells.push(`<li class="player is-empty${next ? " is-next" : ""}"><span class="plus" aria-hidden="true">+</span>${next ? "参加を待っています" : "空き"}</li>`);
+            cells.push(`<li><button type="button" class="player is-empty" data-invite><span class="plus" aria-hidden="true">+</span>招待する</button></li>`);
             continue;
           }
           const [bg, fg] = COLORS[i % COLORS.length];
@@ -881,6 +879,9 @@
         }
         $("players").innerHTML = cells.join("");
       }
+      $("players").addEventListener("click", (event) => {
+        if (event.target.closest("[data-invite]")) openInvite();
+      });
 
       function render() {
         renderPlayers();
@@ -889,23 +890,23 @@
         const readyCount = players.filter((p) => p.ready).length;
         const allReady = enough && readyCount === count;
         $("member-count").innerHTML = `${count}<small> / ${MAX}</small>`;
-        $("headline").innerHTML = enough
-          ? `<small>LOBBY</small>${count}人<em>そろった！</em>`
-          : `<small>LOBBY</small>メンバーを<em>集めよう！</em>`;
+        $("headline").innerHTML = !enough ? "メンバーを<em>集めよう！</em>" : allReady ? "準備OK！<em>はじめよう</em>" : "準備ができたら<em>はじめよう</em>";
 
-        // 開始の状況は1か所にまとめる（準備完了は任意）
-        $("go-text").textContent = !enough ? "参加者を待っています" : `準備OK ${readyCount} / ${count}人`;
-        $("go-dots").innerHTML = players.map((p) => `<i class="${p.ready ? "on" : ""}"></i>`).join("");
-        $("ready").textContent = me.ready ? "準備完了を取り消す" : "準備完了にする";
-        document.querySelectorAll("[name=level], [name=time], [name=grace]").forEach((i) => (i.disabled = !isHost));
-        $("host-note").textContent = isHost ? "ルールはホストのあなたが決めます。" : "ルールはホストが決めます。";
+        // ルール: ホストは選択肢、ゲストは決まった内容の文章
+        $("rules-edit").hidden = !isHost;
+        $("rules-view").hidden = isHost;
+        const val = (name) => document.querySelector(`[name=${name}]:checked`).value;
+        $("view-level").textContent = val("level");
+        $("view-time").textContent = `${val("time")}秒`;
+        $("view-grace").textContent = `${val("grace")}秒`;
+
+        // 開始: ホストは「対戦をはじめる」だけ、ゲストは「準備完了」だけ
+        $("go-status").innerHTML = enough ? `準備OK <b>${readyCount} / ${count}</b>人` : "あと1人以上で開始できます";
         $("start").hidden = !isHost;
         $("start").disabled = !enough;
-        $("note").textContent = isHost
-          ? enough
-            ? allReady ? "全員の準備ができました" : "準備完了を待たずに開始することもできます"
-            : "2人以上そろうと開始できます"
-          : "ホストが開始するのを待っています";
+        $("ready").hidden = isHost;
+        $("ready").textContent = me.ready ? "準備完了を取り消す" : "準備完了にする";
+        $("note").textContent = isHost ? (enough && !allReady ? "準備完了を待たずに開始できます" : "") : "ホストが開始するのを待っています";
       }
       render();
 
