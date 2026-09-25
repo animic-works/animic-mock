@@ -61,7 +61,7 @@ function createWipe(state, content = "") {
   wipe.setAttribute("aria-hidden", "true");
   wipe.innerHTML =
     '<span class="wipe-band"></span><span class="wipe-band"></span><span class="wipe-band"></span>' +
-    '<img class="wipe-logo" src="animic-favicon.svg" alt="" />' +
+    '<img class="wipe-logo" src="images/animic-favicon.svg" alt="" />' +
     content;
   document.body.append(wipe);
   return wipe;
