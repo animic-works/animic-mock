@@ -56,6 +56,14 @@
         cursor: pointer;
       }
 
+      /* スマホのアプリバー・コードのチップ・下部バーの準備状況は、スマホだけで出す */
+      .bar-room,
+      .code-chip,
+      .go-status,
+      .leave svg {
+        display: none;
+      }
+
       .lobby {
         position: relative;
         z-index: 1;
@@ -681,12 +689,331 @@
 
       }
 
+      /* ---------- スマホ: アプリ風の画面 ---------- */
       @media (max-width: 560px) {
-        .players {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-          grid-template-rows: repeat(4, minmax(9.2rem, auto));
+        /* 上部のアプリバー: ロゴ・ルームコード・退出を1行に */
+        .bar {
+          position: sticky;
+          top: 0;
+          display: grid;
+          grid-template-columns: auto minmax(0, 1fr) auto;
+          gap: 0.5rem;
+          min-height: calc(56px + env(safe-area-inset-top, 0px));
+          padding: env(safe-area-inset-top, 0px) 16px 0;
+          background: rgb(255 255 255 / 0.92);
+          border-bottom: 1px solid var(--edge);
+          backdrop-filter: blur(10px);
+        }
+        .bar img {
+          width: 5.6rem;
+        }
+        .bar-room {
+          justify-self: center;
+          display: inline-flex;
+          align-items: center;
+          gap: 0.45rem;
+          min-height: 40px;
+          padding: 0 0.85rem;
+          border: 0;
+          border-radius: 999px;
+          background: var(--ground);
+          color: var(--ink);
+          font: inherit;
+          cursor: pointer;
+        }
+        .bar-room-label {
+          white-space: nowrap;
+          font-size: 0.68rem;
+          font-weight: 700;
+          color: var(--muted);
+        }
+        .bar-room-code {
+          font-family: var(--mono);
+          font-weight: 700;
+          font-size: 0.9rem;
+          letter-spacing: 0.08em;
+        }
+        .leave {
+          display: grid;
+          place-items: center;
+          width: 44px;
+          height: 44px;
+          margin-right: -6px;
+          padding: 0;
+          border: 0;
+          background: none;
+        }
+        .leave svg {
+          display: block;
+        }
+        .leave-label {
+          position: absolute;
+          width: 1px;
+          height: 1px;
+          overflow: hidden;
+          clip-path: inset(50%);
         }
 
+        .lobby {
+          gap: 12px;
+          padding: 12px 16px calc(7rem + env(safe-area-inset-bottom, 0px));
+        }
+        .card-box {
+          gap: 0.9rem;
+          padding: 16px;
+          border-radius: 20px;
+        }
+        .box-head h2,
+        #players-title,
+        .count,
+        .room-label {
+          font-size: 1.1rem;
+        }
+
+        /* ルームコード: 8マスの代わりに、タップでコピーできる1行のチップと招待ボタン */
+        .players-head {
+          padding-bottom: 1rem;
+        }
+        .room-card {
+          grid-template-columns: minmax(0, 1fr) auto;
+          align-items: stretch;
+          gap: 0.5rem;
+        }
+        .room-card .code {
+          display: none;
+        }
+        .code-chip {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 0.5rem;
+          min-width: 0;
+          min-height: 52px;
+          padding: 0 0.8rem;
+          border: 2px dashed var(--line);
+          border-radius: 14px;
+          background: var(--ground);
+          color: var(--ink);
+          font: inherit;
+          cursor: pointer;
+        }
+        .code-chip:active {
+          background: #eceef2;
+        }
+        .code-chip-text {
+          font-family: var(--mono);
+          font-weight: 700;
+          font-size: clamp(1rem, 5.4vw, 1.35rem);
+          letter-spacing: 0.12em;
+          white-space: nowrap;
+          overflow: hidden;
+        }
+        .code-chip svg {
+          flex: none;
+          color: var(--muted);
+        }
+        .room-card .btn-s {
+          min-height: 52px;
+          padding: 0 1rem;
+          border-radius: 14px;
+          font-size: 0.9rem;
+        }
+
+        /* プレイヤー: アバター・名前・準備状況を並べた一覧の行 */
+        .players-title-row {
+          flex-wrap: nowrap;
+        }
+        .players {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          padding: 0;
+        }
+        .player {
+          display: grid;
+          grid-template-columns: 44px minmax(0, 1fr) auto;
+          grid-template-areas:
+            "avatar name tag"
+            "avatar ready tag";
+          justify-items: start;
+          align-items: center;
+          gap: 0.1rem 0.8rem;
+          min-height: 64px;
+          padding: 10px 12px;
+          border-width: 1.5px;
+          border-radius: 16px;
+          text-align: left;
+        }
+        .player.is-me {
+          background: #fff7fb;
+          box-shadow: none;
+        }
+        .player .avatar {
+          grid-area: avatar;
+          width: 44px;
+          height: 44px;
+          font-size: 1.1rem;
+        }
+        .player .name {
+          grid-area: name;
+          align-self: end;
+          font-size: 1rem;
+        }
+        .player .name small {
+          white-space: nowrap;
+          font-size: 0.72rem;
+          color: var(--muted);
+        }
+        .player .ready {
+          grid-area: ready;
+          align-self: start;
+          margin: 0;
+        }
+        .player .tag {
+          position: static;
+          grid-area: tag;
+          padding: 0.25rem 0.7rem;
+          font-size: 0.72rem;
+          translate: none;
+        }
+        .player.is-empty {
+          grid-template-areas: "avatar name name";
+          min-height: 60px;
+          border-width: 2px;
+          font-size: 0.95rem;
+        }
+        .player.is-empty .plus {
+          grid-area: avatar;
+          width: 44px;
+          height: 44px;
+        }
+
+        /* ルール: 見出しを上、選択肢を下に。選択肢は48px以上の高さで押しやすく */
+        #rules-edit > div {
+          grid-template-columns: minmax(0, 1fr);
+          gap: 0.45rem;
+        }
+        #rules-edit {
+          gap: 1rem;
+        }
+        .rules dt {
+          font-size: 0.8rem;
+          color: var(--muted);
+        }
+        .seg {
+          padding: 4px;
+        }
+        .seg label {
+          display: grid;
+          place-items: center;
+          min-height: 40px;
+          padding: 0 0.2rem;
+          font-size: 0.9rem;
+        }
+        .level-art {
+          width: min(100%, 12rem);
+          margin-top: 0.2rem;
+        }
+        #rules-view > div:not(.wide) {
+          grid-template-columns: minmax(0, 1fr) auto;
+          min-height: 44px;
+          border-bottom: 1px solid var(--edge);
+        }
+        #rules-view > div:last-child {
+          border-bottom: 0;
+        }
+
+        /* 下部のアクションバー: 準備状況と開始ボタンを横に並べる */
+        .players-title-row .ready-status {
+          display: none;
+        }
+        .go {
+          grid-template-columns: auto minmax(0, 1fr);
+          gap: 0.75rem;
+          padding: 12px 16px max(12px, env(safe-area-inset-bottom, 0px));
+          border-top: 0;
+          border-radius: 20px 20px 0 0;
+          box-shadow: 0 -10px 30px -18px rgb(11 27 43 / 0.4);
+        }
+        .go-status {
+          display: grid;
+          justify-items: center;
+          gap: 0.05rem;
+          margin: 0;
+          min-width: 4.5rem;
+          padding: 0.35rem 0.7rem;
+          border-radius: 14px;
+          background: var(--ground);
+          font-size: 0.68rem;
+          font-weight: 700;
+          color: var(--muted);
+          line-height: 1.3;
+        }
+        .go-status b {
+          font-family: var(--display);
+          font-weight: 400;
+          font-size: 1.05rem;
+          color: var(--ink);
+        }
+        .go-status.is-all {
+          background: #dcfce7;
+          color: #15803d;
+        }
+        .go-status.is-all b {
+          color: #15803d;
+        }
+        .go .pill {
+          min-height: 56px;
+          padding-block: 0;
+          font-size: 1rem;
+        }
+        .go .pill-pink:not(:disabled) {
+          box-shadow: 0 10px 22px -10px rgb(255 45 135 / 0.7);
+        }
+
+        /* 通知は下部のアクションバーの上に出す */
+        .toast {
+          bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+          max-width: calc(100% - 32px);
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        /* ダイアログは画面下からのシート */
+        .dialog {
+          width: 100%;
+          max-width: 100%;
+          max-height: 90svh;
+          margin: auto 0 0;
+          border-radius: 20px 20px 0 0;
+        }
+        .dialog .card {
+          padding: 1.5rem 16px max(16px, env(safe-area-inset-bottom, 0px));
+          border-radius: 20px 20px 0 0;
+        }
+        .dialog .card::before {
+          content: "";
+          justify-self: center;
+          width: 40px;
+          height: 5px;
+          margin: -0.6rem 0 -0.4rem;
+          border-radius: 999px;
+          background: var(--line);
+        }
+        .dialog .pill {
+          min-height: 52px;
+          padding-block: 0;
+        }
+      }
+
+      /* 幅の狭いスマホ: コードのチップと招待ボタンを縦に積む */
+      @media (max-width: 359px) {
+        .room-card {
+          grid-template-columns: minmax(0, 1fr);
+        }
+        .bar-room-label {
+          display: none;
+        }
       }
 
       @media (prefers-reduced-motion: reduce) {
@@ -704,7 +1031,15 @@
   <body>
     <header class="bar">
       <a href="index.html"><img src="images/animic-logo.svg" alt="Animic トップ" width="2078" height="607" /></a>
-      <button class="leave" type="button" id="leave">退出</button>
+      <!-- スマホだけ: アプリバーの中央にルームコード（タップでコピー） -->
+      <button class="bar-room" type="button" id="bar-room" aria-label="ルームコードをコピー">
+        <span class="bar-room-label">ルーム</span>
+        <span class="bar-room-code" id="bar-code"></span>
+      </button>
+      <button class="leave" type="button" id="leave" aria-label="退出">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><path d="M16 17l5-5-5-5" /><path d="M21 12H9" /></svg>
+        <span class="leave-label">退出</span>
+      </button>
     </header>
 
     <main class="lobby">
@@ -714,6 +1049,11 @@
           <div class="room-card">
             <span class="room-label">ルームコード</span>
             <div class="code" id="code"></div>
+            <!-- スマホだけ: 1行のコードをタップでコピー -->
+            <button class="code-chip" type="button" id="code-chip" aria-label="ルームコードをコピー">
+              <span class="code-chip-text" id="code-chip-text"></span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
+            </button>
             <button class="btn-s pink" type="button" id="invite">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M19 8v6M22 11h-6" /></svg>
               招待する
@@ -786,6 +1126,7 @@
         </dl>
         <div class="divider" aria-hidden="true"></div>
         <div class="go">
+          <p class="go-status" id="go-status-bar" aria-hidden="true"></p>
           <button class="pill pill-pink" type="button" id="start" disabled>対戦をはじめる</button>
           <button class="pill" type="button" id="ready" hidden>準備完了にする</button>
           <p class="note" id="note"></p>
@@ -855,6 +1196,8 @@
       $("code").innerHTML = [...code].map((ch) => `<span>${ch}</span>`).join("");
       $("invite-code").innerHTML = [...code].map((ch) => `<span>${ch}</span>`).join("");
       $("code").setAttribute("aria-label", `ルームコード ${code}`);
+      $("bar-code").textContent = code;
+      $("code-chip-text").textContent = code;
       $("room-url").value = roomUrl;
       playWipeOut();
 
@@ -867,6 +1210,8 @@
         }
       }
       $("copy").addEventListener("click", () => copy(roomUrl, "招待リンクをコピーしました"));
+      $("bar-room").addEventListener("click", () => copy(code, "ルームコードをコピーしました"));
+      $("code-chip").addEventListener("click", () => copy(code, "ルームコードをコピーしました"));
       const openInvite = () => $("invite-dialog").showModal();
       $("invite").addEventListener("click", openInvite);
 
@@ -959,6 +1304,9 @@
         // 開始: ホストは「対戦をはじめる」だけ、ゲストは「準備完了」だけ
         $("go-status").innerHTML = `準備OK <b>${readyCount} / ${count}</b>人`;
         $("go-status").classList.toggle("is-all", count >= 2 && readyCount === count);
+        // スマホの下部バーにも同じ準備状況を出す
+        $("go-status-bar").innerHTML = `準備OK<b>${readyCount}/${count}</b>`;
+        $("go-status-bar").classList.toggle("is-all", count >= 2 && readyCount === count);
         $("start").hidden = !isHost;
         $("start").disabled = !enough;
         $("ready").hidden = isHost;
