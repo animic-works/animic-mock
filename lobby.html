@@ -64,6 +64,24 @@
         display: none;
       }
 
+      /* PC（2カラム）: 退出はヘッダーではなく、プレイヤーのカードの下に左寄せで置く */
+      main .leave-pc {
+        display: none;
+      }
+      @media (min-width: 821px) {
+        .bar .leave {
+          display: none;
+        }
+        .col-players {
+          display: grid;
+          gap: 1rem;
+        }
+        main .leave-pc {
+          display: inline-block;
+          justify-self: start;
+        }
+      }
+
       .lobby {
         position: relative;
         z-index: 1;
@@ -410,72 +428,117 @@
         cursor: default;
       }
 
-      /* 難易度の説明は、挿絵の画像の上端の中央に前面のレイヤーとして重ね、ピンクで強調する */
-      .level-desc {
+      /* 挿絵の文字: 画像の下端に、濃い色のすりガラスの帯を敷いて白文字を重ねる（白背景の絵でも読めるように）。
+         帯の上端はマスクでぼかして、絵になじませる。英字の小見出し → 難易度の説明（見出しフォント）→ EXTRA の順 */
+      .level-cap {
         position: absolute;
         z-index: 1;
-        top: 0.6rem;
-        left: 50%;
-        display: flex;
-        align-items: center;
-        gap: 0.2rem;
-        margin: 0;
-        padding: 0.3rem 0.8rem;
-        border-radius: 999px;
-        background: #fff0f7;
-        box-shadow: 0 4px 12px -6px rgb(11 27 43 / 0.35);
-        color: var(--pink);
-        font-size: 0.74rem;
-        font-weight: 700;
-        white-space: nowrap;
-        translate: -50% 0;
+        inset: auto 0 0;
+        display: grid;
+        gap: 0.35rem;
+        padding: 4rem 1rem 1rem;
+        background: linear-gradient(to top, rgb(11 27 43 / 0.9), rgb(11 27 43 / 0.72) 40%, rgb(11 27 43 / 0.45));
+        -webkit-backdrop-filter: blur(14px);
+        backdrop-filter: blur(14px);
+        /* 上に向かって緩やかなカーブで消えるように、段階的に薄くする */
+        -webkit-mask-image: linear-gradient(to top, #000 32%, rgb(0 0 0 / 0.78) 50%, rgb(0 0 0 / 0.42) 70%, rgb(0 0 0 / 0.14) 88%, transparent);
+        mask-image: linear-gradient(to top, #000 32%, rgb(0 0 0 / 0.78) 50%, rgb(0 0 0 / 0.42) 70%, rgb(0 0 0 / 0.14) 88%, transparent);
+        color: #fff;
       }
 
-      .level-desc b {
-        margin-left: 0.4rem;
-        padding: 0.05rem 0.4rem;
-        border-radius: 0.3rem;
-        background: var(--ink);
-        color: var(--yellow);
+      /* 左上の小さなタグ（結果画面のお題タグと同じ見た目） */
+      .level-tag {
+        position: absolute;
+        z-index: 1;
+        top: 0.75rem;
+        left: 0.75rem;
+        padding: 0.25rem 0.7rem;
+        border-radius: 999px;
+        background: rgb(11 27 43 / 0.72);
+        -webkit-backdrop-filter: blur(8px);
+        backdrop-filter: blur(8px);
+        color: #fff;
         font-family: var(--latin);
         font-style: italic;
         font-weight: 500;
         font-size: 0.62rem;
-        letter-spacing: 0.1em;
+        letter-spacing: 0.22em;
       }
 
-      /* 難易度の挿絵（仮置き）: 挿絵はすべて縦長（3:4）。幅を抑えて中央に置く */
-      .level-art {
-        position: relative;
+      /* 難易度の英語: 白い輪郭線だけの大きな文字で、帯の主役にする */
+      .level-word {
         display: flex;
-        justify-self: center;
-        width: min(100%, 14rem);
-        margin: 0.6rem auto 0;
-        aspect-ratio: 3 / 4;
+        align-items: center;
+        gap: 0.6rem;
+        font-family: var(--display);
+        font-size: clamp(1.7rem, 9cqi, 2.2rem); /* 枠の幅の9%。デスクトップで約2.1rem */
+        line-height: 1;
+        letter-spacing: 0.04em;
+        color: transparent;
+        -webkit-text-stroke: 1.5px rgb(255 255 255 / 0.85);
+        paint-order: stroke fill;
+      }
+
+      /* EXTRA は黄色いステッカー風に、少し傾けて英語の横に添える */
+      .level-word b {
+        padding: 0.18rem 0.65rem;
+        border-radius: 999px;
+        background: var(--yellow);
+        color: var(--ink);
+        -webkit-text-stroke: 0;
+        font-family: var(--latin);
+        font-style: italic;
+        font-weight: 500;
+        font-size: 0.72rem;
+        letter-spacing: 0.15em;
+        rotate: -4deg;
+      }
+
+      /* 日本語の説明: 白文字にピンクの落ち影。条件は「・」ではなく細い線で区切る */
+      .level-desc {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        margin: 0;
+        font-family: var(--round);
+        font-weight: 900;
+        font-size: clamp(1.05rem, 5.4cqi, 1.3rem);
+        line-height: 1.3;
+        text-shadow: 0 2px 0 var(--pink);
+      }
+
+      .level-desc span + span {
+        margin-left: 0.7rem;
+        padding-left: 0.7rem;
+        border-left: 2px solid rgb(255 255 255 / 0.5);
+      }
+
+      /* 難易度の挿絵: ルール欄の幅いっぱいの正方形にする。サンプル画像は縦長（832×1216）なので、
+         顔が入るように上寄りで切り取る。横に広い画面では高さを 24rem までに抑えて横長の帯にする */
+      .level-art {
+        container-type: inline-size; /* 文字の大きさを枠の幅に連動させるため */
+        position: relative;
+        width: 100%;
+        max-height: 24rem;
+        margin: 0;
+        aspect-ratio: 1;
         overflow: hidden;
         border: 2px solid var(--edge);
         border-radius: 1rem;
         background: var(--ground);
       }
 
-      /* 仮の絵は正方形なので、縦長の枠に合わせて左右を切り取る */
-      .level-art svg {
+      .level-art img {
         display: block;
-        flex: 1;
-        min-width: 0;
+        width: 100%;
         height: 100%;
+        object-fit: cover;
+        object-position: 50% 15%;
       }
 
-      .level-art figcaption {
-        position: absolute;
-        right: 0.5rem;
-        bottom: 0.5rem;
-        padding: 0.12rem 0.55rem;
-        border-radius: 999px;
-        background: rgb(255 255 255 / 0.9);
-        font-size: 0.68rem;
-        font-weight: 700;
-        color: var(--muted);
+      /* 選んでいない難易度の絵は隠す */
+      .level-art img[hidden] {
+        display: none;
       }
 
       .rules .wide {
@@ -911,7 +974,6 @@
           font-size: 0.9rem;
         }
         .level-art {
-          width: min(100%, 12rem);
           margin-top: 0.2rem;
         }
         #rules-view > div:not(.wide) {
@@ -1006,6 +1068,41 @@
         }
       }
 
+      /* 開始の確認: 準備中の人の一覧 */
+      .waiting {
+        display: grid;
+        gap: 0.4rem;
+        max-height: 12rem;
+        margin: 0;
+        padding: 0;
+        overflow-y: auto;
+        list-style: none;
+      }
+      .waiting li {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0.45rem 0.75rem 0.45rem 0.45rem;
+        border-radius: 999px;
+        background: var(--ground);
+        font-weight: 700;
+      }
+      .waiting .avatar {
+        display: grid;
+        place-items: center;
+        width: 2rem;
+        height: 2rem;
+        border-radius: 50%;
+        background: var(--c);
+        color: var(--on);
+        font-size: 0.9rem;
+      }
+      .waiting small {
+        margin-left: auto;
+        color: var(--muted);
+        font-size: 0.8rem;
+      }
+
       /* 幅の狭いスマホ: コードのチップと招待ボタンを縦に積む */
       @media (max-width: 359px) {
         .room-card {
@@ -1044,65 +1141,34 @@
 
     <main class="lobby">
       <!-- 上にルームコードと招待、その下にプレイヤー -->
-      <section class="card-box" aria-labelledby="players-title" data-enter>
-        <div class="players-head">
-          <div class="room-card">
-            <span class="room-label">ルームコード</span>
-            <div class="code" id="code"></div>
-            <!-- スマホだけ: 1行のコードをタップでコピー -->
-            <button class="code-chip" type="button" id="code-chip" aria-label="ルームコードをコピー">
-              <span class="code-chip-text" id="code-chip-text"></span>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
-            </button>
-            <button class="btn-s pink" type="button" id="invite">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M19 8v6M22 11h-6" /></svg>
-              招待する
-            </button>
+      <!-- PCでは、退出をこのカードのすぐ下に左寄せで置く -->
+      <div class="col-players">
+        <section class="card-box" aria-labelledby="players-title" data-enter>
+          <div class="players-head">
+            <div class="room-card">
+              <span class="room-label">ルームコード</span>
+              <div class="code" id="code"></div>
+              <!-- スマホだけ: 1行のコードをタップでコピー -->
+              <button class="code-chip" type="button" id="code-chip" aria-label="ルームコードをコピー">
+                <span class="code-chip-text" id="code-chip-text"></span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
+              </button>
+              <button class="btn-s pink" type="button" id="invite">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M19 8v6M22 11h-6" /></svg>
+                招待する
+              </button>
+            </div>
           </div>
-        </div>
-        <div class="players-title-row">
-          <h2 id="players-title">プレイヤー <span class="count" id="member-count" aria-live="polite">1<small> / 8</small></span></h2>
-          <p class="ready-status" id="go-status" aria-live="polite"></p>
-        </div>
-        <ul class="players" id="players"></ul>
-      </section>
+          <div class="players-title-row">
+            <h2 id="players-title">プレイヤー <span class="count" id="member-count" aria-live="polite">1<small> / 8</small></span></h2>
+            <p class="ready-status" id="go-status" aria-live="polite"></p>
+          </div>
+          <ul class="players" id="players"></ul>
+        </section>
+        <button class="leave leave-pc" type="button">退出</button>
+      </div>
 
       <!-- ルールと開始 -->
-      /* 開始の確認: 準備中の人の一覧 */
-      .waiting {
-        display: grid;
-        gap: 0.4rem;
-        max-height: 12rem;
-        margin: 0;
-        padding: 0;
-        overflow-y: auto;
-        list-style: none;
-      }
-      .waiting li {
-        display: flex;
-        align-items: center;
-        gap: 0.6rem;
-        padding: 0.45rem 0.75rem 0.45rem 0.45rem;
-        border-radius: 999px;
-        background: var(--ground);
-        font-weight: 700;
-      }
-      .waiting .avatar {
-        display: grid;
-        place-items: center;
-        width: 2rem;
-        height: 2rem;
-        border-radius: 50%;
-        background: var(--c);
-        color: var(--on);
-        font-size: 0.9rem;
-      }
-      .waiting small {
-        margin-left: auto;
-        color: var(--muted);
-        font-size: 0.8rem;
-      }
-
       <section class="card-box go-card" aria-labelledby="rules-title" data-enter="fade">
         <div class="box-head">
           <h2 id="rules-title">ルール</h2>
@@ -1121,8 +1187,11 @@
           </div>
           <div class="wide">
             <figure class="level-art" data-level-art>
-              <p class="level-desc" data-level-desc></p>
-              <figcaption>お題のイメージ</figcaption>
+              <span class="level-tag">TOPIC IMAGE</span>
+              <figcaption class="level-cap">
+                <span class="level-word" data-level-word></span>
+                <p class="level-desc" data-level-desc></p>
+              </figcaption>
             </figure>
           </div>
           <div>
@@ -1152,8 +1221,11 @@
           <div><dt>難易度</dt><dd class="summary" id="view-level"></dd></div>
           <div class="wide">
             <figure class="level-art" data-level-art>
-              <p class="level-desc" data-level-desc></p>
-              <figcaption>お題のイメージ</figcaption>
+              <span class="level-tag">TOPIC IMAGE</span>
+              <figcaption class="level-cap">
+                <span class="level-word" data-level-word></span>
+                <p class="level-desc" data-level-desc></p>
+              </figcaption>
             </figure>
           </div>
           <div><dt>制限時間</dt><dd class="summary" id="view-time"></dd></div>
@@ -1194,6 +1266,18 @@
       </form>
     </dialog>
 
+    <dialog class="dialog" id="start-dialog" aria-labelledby="start-title">
+      <form class="card" method="dialog">
+        <h1 id="start-title">全員の準備がまだです</h1>
+        <p class="sub" id="start-sub"></p>
+        <ul class="waiting" id="waiting"></ul>
+        <div class="dialog-actions">
+          <button class="pill" value="cancel">待つ</button>
+          <button class="pill pill-pink" value="start">このままはじめる</button>
+        </div>
+      </form>
+    </dialog>
+
     <div class="countdown" id="countdown" hidden>
       <p class="countdown-label" id="countdown-label">かんたん・90秒</p>
       <div class="countdown-num" id="countdown-num">3</div>
@@ -1201,7 +1285,6 @@
     </div>
 
     <script src="common.js"></script>
-    <script src="art.js"></script>
     <script>
       const $ = (id) => document.getElementById(id);
       const q = params();
@@ -1266,42 +1349,31 @@
         }
       })();
 
-    <dialog class="dialog" id="start-dialog" aria-labelledby="start-title">
-      <form class="card" method="dialog">
-        <h1 id="start-title">全員の準備がまだです</h1>
-        <p class="sub" id="start-sub"></p>
-        <ul class="waiting" id="waiting"></ul>
-        <div class="dialog-actions">
-          <button class="pill" value="cancel">待つ</button>
-          <button class="pill pill-pink" value="start">このままはじめる</button>
-        </div>
-      </form>
-    </dialog>
-
-      // 難易度の説明は、選んでいるものだけを表示する
+      // 難易度の英語と説明。選んでいるものだけを挿絵の上に表示する
       const LEVELS = {
-        かんたん: "白背景・1キャラクター",
-        ふつう: "背景あり・1キャラクター",
-        むずかしい: "背景あり・2キャラクター<b>EXTRA</b>",
+        かんたん: { en: "EASY", desc: ["白背景", "1キャラクター"] },
+        ふつう: { en: "NORMAL", desc: ["背景あり", "1キャラクター"] },
+        むずかしい: { en: "HARD", desc: ["背景あり", "2キャラクター"], extra: true },
       };
-      // 挿絵（仮置き）: お題の条件に合わせて、背景の有無とキャラクターの人数を変える
+      // 挿絵: お題の条件（背景の有無・キャラクターの人数）に合わせたサンプル画像
       const LEVEL_ART = {
-        かんたん: [{ ...ART_TOPIC, bg: "white" }],
-        ふつう: [{ ...ART_TOPIC, bg: "room" }],
-        むずかしい: [
-          { ...ART_TOPIC, bg: "sky" },
-          { hair: "blonde", style: "bob", eyes: "red", outfit: "hoodie", face: "wink", bg: "sky" },
-        ],
+        かんたん: "images/sample-solo-white-bg.png",
+        ふつう: "images/sample-solo-with-bg.png",
+        むずかしい: "images/sample-duo-with-bg.png",
       };
+      // 3枚とも最初から置いておき、選んでいる難易度の絵だけを見せる（切り替えのたびに読み込み待ちにならないように）
+      document.querySelectorAll("[data-level-art]").forEach((fig) => {
+        const imgs = Object.entries(LEVEL_ART).map(
+          ([level, src]) => `<img src="${src}" alt="${level}のお題のイメージ" width="832" height="1216" data-level="${level}" decoding="async" hidden />`,
+        );
+        fig.insertAdjacentHTML("afterbegin", imgs.join(""));
+      });
       function renderLevel() {
         const level = document.querySelector("[name=level]:checked").value;
-        document.querySelectorAll("[data-level-desc]").forEach((el) => (el.innerHTML = LEVELS[level]));
-        const arts = LEVEL_ART[level];
-        document.querySelectorAll("[data-level-art]").forEach((fig) => {
-          fig.querySelectorAll("svg").forEach((svg) => svg.remove());
-          const svgs = arts.map((f) => artSvg(f, `${level}のお題のイメージ`).replace("<svg ", '<svg preserveAspectRatio="xMidYMid slice" '));
-          fig.insertAdjacentHTML("afterbegin", svgs.join(""));
-        });
+        const lv = LEVELS[level];
+        document.querySelectorAll("[data-level-word]").forEach((el) => (el.innerHTML = `${lv.en}${lv.extra ? "<b>EXTRA</b>" : ""}`));
+        document.querySelectorAll("[data-level-desc]").forEach((el) => (el.innerHTML = lv.desc.map((t) => `<span>${t}</span>`).join("")));
+        document.querySelectorAll("[data-level-art] img").forEach((img) => (img.hidden = img.dataset.level !== level));
       }
       document.querySelectorAll("[name=level]").forEach((i) => i.addEventListener("change", renderLevel));
       renderLevel();
@@ -1429,7 +1501,7 @@
       }
 
       // 退出
-      $("leave").addEventListener("click", () => $("leave-dialog").showModal());
+      document.querySelectorAll(".leave").forEach((b) => b.addEventListener("click", () => $("leave-dialog").showModal()));
       $("leave-dialog").addEventListener("close", () => {
         if ($("leave-dialog").returnValue === "leave") go("index.html");
       });
