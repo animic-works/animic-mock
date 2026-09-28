@@ -22,6 +22,8 @@
     <style>
       :root {
         --display: "Dela Gothic One", "Zen Maru Gothic", sans-serif;
+        --bar-h: 4.75rem;
+        --track-h: 6px;
       }
 
       /* ---------- 上部: ルーム情報と残り時間 ---------- */
@@ -33,7 +35,8 @@
         grid-template-columns: 1fr auto 1fr;
         align-items: center;
         gap: 1rem;
-        padding: 0.7rem clamp(1rem, 4vw, 3rem);
+        height: var(--bar-h);
+        padding: 0 clamp(1rem, 4vw, 3rem);
         background: rgb(245 246 248 / 0.9);
         backdrop-filter: blur(8px);
       }
@@ -107,15 +110,11 @@
         }
       }
 
-      .bar-right {
-        justify-self: end;
-      }
-
       .time-track {
         position: sticky;
         top: 0;
         z-index: 5;
-        height: 6px;
+        height: var(--track-h);
         background: #e6e8ec;
       }
 
@@ -128,18 +127,27 @@
         transition: transform 0.25s linear;
       }
 
-      /* 生成終了後の案内 */
+      /* 生成終了後の案内: 画面の上に浮かせる（レイアウトを動かさない） */
       .phase {
+        position: fixed;
+        z-index: 12;
+        top: calc(var(--bar-h) + var(--track-h) + 0.75rem);
+        left: 50%;
         display: flex;
         flex-wrap: wrap;
         align-items: center;
         justify-content: center;
-        gap: 0.4rem 1rem;
+        gap: 0.3rem 0.8rem;
         margin: 0;
-        padding: 0.7rem 16px;
+        padding: 0.6rem 1.25rem;
+        border-radius: 999px;
         background: var(--yellow);
+        box-shadow: 0 8px 20px -10px rgb(11 27 43 / 0.5);
         font-weight: 700;
+        font-size: 0.9rem;
         text-align: center;
+        white-space: nowrap;
+        translate: -50% 0;
       }
 
       .phase b {
@@ -148,58 +156,387 @@
         font-size: 1.2rem;
       }
 
-      /* ---------- 本体 ---------- */
+      /* ---------- 本体: NovelAI 風の2カラムを1画面に収める ----------
+         左: プロンプト入力（下に「生成する」）
+         右: 選んでいる画像（左）とお題（右）を並べて比較。その下に履歴のサムネイルと提出 */
       .play {
         position: relative;
         z-index: 1;
-        width: min(100%, 76rem);
+        width: 100%;
+        height: max(calc(100svh - var(--bar-h) - var(--track-h)), 38rem);
         margin: 0 auto;
-        padding: clamp(1rem, 3vw, 1.75rem) 16px 3rem;
+        padding: 1rem 16px 1.25rem;
         display: grid;
-        grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.3fr);
-        gap: 1.25rem;
-        align-items: start;
-      }
-
-      .col {
-        display: grid;
-        gap: 1.25rem;
+        grid-template-columns: clamp(19rem, 24vw, 24rem) minmax(0, 1fr);
+        grid-template-rows: minmax(0, 1fr);
+        grid-template-areas: "compose stage";
+        gap: 1rem;
       }
 
       .panel {
-        padding: clamp(1rem, 2.5vw, 1.4rem);
+        min-height: 0;
+        padding: 1rem 1.1rem;
         background: #fff;
         border: 2.5px solid var(--ink);
         border-radius: 1.5rem;
         box-shadow: 0 6px 0 var(--ink);
         display: grid;
-        gap: 0.9rem;
+        align-content: start;
+        gap: 0.75rem;
       }
 
       .panel-head {
         display: flex;
         align-items: center;
-        justify-content: space-between;
         gap: 0.75rem;
+        min-width: 0;
       }
 
       .panel-head h2 {
         margin: 0;
         font-family: var(--round);
         font-weight: 900;
-        font-size: 1.15rem;
+        font-size: 1.1rem;
+        white-space: nowrap;
       }
 
       .panel-head small {
+        margin-left: auto;
         color: var(--muted);
         font-size: 0.8rem;
+        text-align: right;
       }
 
-      /* お題 */
+      /* 対戦状況: ヘッダーの右上に、自分 VS 相手を小さくまとめる */
+      .hud {
+        justify-self: end;
+        display: flex;
+        align-items: center;
+        gap: 0.7rem;
+        min-width: 0;
+        padding: 0.3rem 0.35rem;
+        background: #fff;
+        border: 2px solid var(--ink);
+        border-radius: 999px;
+        box-shadow: 0 3px 0 var(--ink);
+      }
+
+      .versus {
+        display: contents;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .player {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        min-width: 0;
+      }
+
+      .player.opp {
+        flex-direction: row-reverse;
+        text-align: right;
+      }
+
+      .vs {
+        font-family: var(--display);
+        font-size: 0.85rem;
+        letter-spacing: 0.1em;
+        color: var(--pink);
+      }
+
+      .avatar {
+        display: grid;
+        place-items: center;
+        flex: none;
+        width: 2rem;
+        height: 2rem;
+        border-radius: 50%;
+        color: #fff;
+        font-family: var(--round);
+        font-weight: 900;
+        font-size: 0.9rem;
+      }
+
+      .player-name {
+        min-width: 0;
+        font-weight: 700;
+        font-size: 0.85rem;
+        line-height: 1.2;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .player-name small {
+        display: block;
+        font-weight: 500;
+        font-size: 0.66rem;
+        color: var(--muted);
+      }
+
+      .state {
+        flex: none;
+        padding: 0.2rem 0.55rem;
+        border-radius: 999px;
+        background: var(--ground);
+        font-size: 0.66rem;
+        font-weight: 700;
+        color: var(--muted);
+        white-space: nowrap;
+      }
+
+      .state.is-done {
+        background: #dcfce7;
+        color: #15803d;
+      }
+
+      .state.is-working {
+        background: #fff0f7;
+        color: var(--pink);
+      }
+
+      /* 左: プロンプト入力 */
+      .compose {
+        grid-area: compose;
+        grid-template-rows: auto auto minmax(0, 1fr) auto;
+        align-content: stretch;
+      }
+
+      .seg {
+        display: grid;
+        grid-auto-flow: column;
+        margin-left: auto;
+        padding: 0.2rem;
+        border-radius: 999px;
+        background: var(--ground);
+      }
+
+      .seg button {
+        padding: 0.35rem 0.9rem;
+        border: 0;
+        border-radius: 999px;
+        background: none;
+        font: inherit;
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: var(--muted);
+        cursor: pointer;
+      }
+
+      .seg button[aria-pressed="true"] {
+        background: #fff;
+        color: var(--ink);
+        box-shadow: 0 2px 8px rgb(11 27 43 / 0.12);
+      }
+
+      .prompt {
+        width: 100%;
+        min-height: 7.5rem;
+        padding: 0.8rem 0.95rem;
+        border: 2px solid var(--line);
+        border-radius: 1rem;
+        font: inherit;
+        font-size: 0.98rem;
+        line-height: 1.6;
+        color: var(--ink);
+        resize: vertical;
+      }
+
+      .prompt:focus {
+        border-color: var(--ink);
+        outline: none;
+      }
+
+      .prompt.is-tags {
+        font-family: var(--mono);
+        font-size: 0.9rem;
+      }
+
+      .prompt:disabled {
+        background: var(--ground);
+        color: var(--muted);
+      }
+
+      /* よく使う表現: 種類ごとに折り返して並べ、入りきらなければ縦にスクロール */
+      .chips {
+        display: grid;
+        align-content: start;
+        gap: 0.55rem;
+        min-height: 0;
+        padding-right: 0.2rem;
+        overflow-y: auto;
+        scrollbar-width: thin;
+      }
+
+      .chip-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.35rem;
+      }
+
+      .chip-row > span {
+        width: 3.2rem;
+        flex: none;
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: var(--muted);
+      }
+
+      .chips button {
+        padding: 0.28rem 0.65rem;
+        border: 1.5px solid var(--line);
+        border-radius: 999px;
+        background: #fff;
+        font: inherit;
+        font-size: 0.78rem;
+        color: var(--ink);
+        white-space: nowrap;
+        cursor: pointer;
+        transition:
+          border-color 0.15s,
+          background 0.15s;
+      }
+
+      .chips button:hover:not(:disabled) {
+        border-color: var(--pink);
+        background: #fff0f7;
+      }
+
+      .chips button:disabled {
+        opacity: 0.5;
+        cursor: default;
+      }
+
+      .compose-foot {
+        display: grid;
+        gap: 0.5rem;
+      }
+
+      .count {
+        font-size: 0.85rem;
+        color: var(--muted);
+        white-space: nowrap;
+      }
+
+      .count b {
+        font-family: var(--display);
+        font-weight: 400;
+        font-size: 1.3rem;
+        color: var(--ink);
+      }
+
+      /* 中央: 選んでいる画像とお題を並べる */
+      .stage {
+        grid-area: stage;
+        grid-template-rows: auto minmax(0, 1fr) auto auto;
+        align-content: stretch;
+      }
+
+      .compare {
+        container-type: size; /* 2枚の正方形を、枠の幅と高さの小さいほうに合わせるため */
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 1rem;
+        min-height: 0;
+      }
+
+      /* 画像とラベルをひとまとまりにして、枠の縦方向の中央に置く */
+      .compare-item {
+        display: grid;
+        grid-template-rows: auto auto;
+        align-content: center;
+        justify-items: center;
+        gap: 0.5rem;
+        min-height: 0;
+      }
+
+      .compare-item > .stage-view,
+      .compare-item > .topic-img {
+        width: min(100%, calc(100cqh - 2.2rem)); /* 下のラベルのぶんを引く */
+        aspect-ratio: 1;
+      }
+
+      .compare-label {
+        margin: 0;
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-align: center;
+      }
+
+      .compare-label small {
+        margin-left: 0.4rem;
+        font-weight: 500;
+        color: var(--muted);
+      }
+
+      .stage-view {
+        position: relative;
+        display: grid;
+        place-items: center;
+        border: 2px solid var(--line);
+        border-radius: 1rem;
+        background: var(--ground);
+        overflow: hidden;
+      }
+
+      .stage-shot {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        background: #fff;
+      }
+
+      .stage-shot svg {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+
+      .stage-empty {
+        display: grid;
+        justify-items: center;
+        gap: 0.6rem;
+        margin: 0;
+        padding: 1rem;
+        text-align: center;
+        font-size: 0.85rem;
+        font-weight: 700;
+        line-height: 1.6;
+        color: var(--muted);
+      }
+
+      .stage-no {
+        position: absolute;
+        left: 0.6rem;
+        top: 0.6rem;
+        padding: 0.15rem 0.6rem;
+        border-radius: 999px;
+        background: rgb(11 27 43 / 0.75);
+        color: #fff;
+        font-family: var(--mono);
+        font-size: 0.75rem;
+      }
+
+      .stage-view.is-pending {
+        background:
+          linear-gradient(110deg, transparent 30%, rgb(255 255 255 / 0.7) 50%, transparent 70%) 0 0 / 250% 100%,
+          var(--ground);
+        animation: shimmer 1.2s linear infinite;
+      }
+
+      @keyframes shimmer {
+        to {
+          background-position: -250% 0, 0 0;
+        }
+      }
+
       .topic-img {
         position: relative;
         margin: 0;
-        aspect-ratio: 1;
         border-radius: 1rem;
         overflow: hidden;
         border: 2px solid var(--line);
@@ -226,224 +563,72 @@
         letter-spacing: 0.2em;
       }
 
-      .topic-note {
-        margin: 0;
-        font-size: 0.82rem;
-        color: var(--muted);
-      }
-
-      /* 対戦相手の状況 */
-      .versus {
-        display: grid;
-        gap: 0.6rem;
-        margin: 0;
-        padding: 0;
-        list-style: none;
-      }
-
-      .player {
-        display: grid;
-        grid-template-columns: 2.4rem 1fr auto;
-        align-items: center;
-        gap: 0.7rem;
-        padding: 0.6rem 0.75rem;
-        border-radius: 1rem;
-        background: var(--ground);
-      }
-
-      .avatar {
-        display: grid;
-        place-items: center;
-        width: 2.4rem;
-        height: 2.4rem;
-        border-radius: 50%;
-        color: #fff;
-        font-family: var(--round);
-        font-weight: 900;
-      }
-
-      .player-name {
-        min-width: 0;
-        font-weight: 700;
-        font-size: 0.92rem;
-        overflow-wrap: anywhere;
-      }
-
-      .player-name small {
-        display: block;
-        font-weight: 500;
-        font-size: 0.75rem;
-        color: var(--muted);
-      }
-
-      .state {
-        padding: 0.25rem 0.65rem;
-        border-radius: 999px;
-        background: #fff;
-        font-size: 0.72rem;
-        font-weight: 700;
-        color: var(--muted);
-        white-space: nowrap;
-      }
-
-      .state.is-done {
-        background: #dcfce7;
-        color: #15803d;
-      }
-
-      .state.is-working {
-        background: #fff0f7;
-        color: var(--pink);
-      }
-
-      /* プロンプト入力 */
-      .seg {
-        display: grid;
-        grid-auto-flow: column;
-        padding: 0.2rem;
-        border-radius: 999px;
-        background: var(--ground);
-      }
-
-      .seg button {
-        padding: 0.35rem 0.9rem;
-        border: 0;
-        border-radius: 999px;
-        background: none;
-        font: inherit;
-        font-size: 0.8rem;
-        font-weight: 700;
-        color: var(--muted);
-        cursor: pointer;
-      }
-
-      .seg button[aria-pressed="true"] {
-        background: #fff;
-        color: var(--ink);
-        box-shadow: 0 2px 8px rgb(11 27 43 / 0.12);
-      }
-
-      .prompt {
-        width: 100%;
-        min-height: 6.5rem;
-        padding: 0.9rem 1rem;
-        border: 2px solid var(--line);
-        border-radius: 1rem;
-        font: inherit;
-        font-size: 1rem;
-        line-height: 1.7;
-        color: var(--ink);
-        resize: vertical;
-      }
-
-      .prompt:focus {
-        border-color: var(--ink);
-        outline: none;
-      }
-
-      .prompt.is-tags {
-        font-family: var(--mono);
-        font-size: 0.9rem;
-      }
-
-      .prompt:disabled {
-        background: var(--ground);
-        color: var(--muted);
-      }
-
-      .chips {
-        display: grid;
-        gap: 0.5rem;
-      }
-
-      .chip-row {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 0.35rem;
-      }
-
-      .chip-row > span {
-        width: 3.4rem;
-        font-size: 0.72rem;
-        font-weight: 700;
-        color: var(--muted);
-      }
-
-      .chips button {
-        padding: 0.3rem 0.7rem;
-        border: 1.5px solid var(--line);
-        border-radius: 999px;
-        background: #fff;
-        font: inherit;
-        font-size: 0.8rem;
-        color: var(--ink);
-        cursor: pointer;
-        transition:
-          border-color 0.15s,
-          background 0.15s;
-      }
-
-      .chips button:hover:not(:disabled) {
-        border-color: var(--pink);
-        background: #fff0f7;
-      }
-
-      .chips button:disabled {
-        opacity: 0.5;
-        cursor: default;
-      }
-
-      .compose-foot {
+      .submit-row {
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 1rem;
       }
 
-      .count {
-        font-size: 0.85rem;
-        color: var(--muted);
-      }
-
-      .count b {
-        font-family: var(--display);
-        font-weight: 400;
-        font-size: 1.3rem;
-        color: var(--ink);
-      }
-
-      .compose-foot .pill {
-        width: auto;
-        min-width: 12rem;
-      }
-
-      /* 生成した画像 */
-      .shots {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
-        gap: 0.75rem;
+      .submit-note {
         margin: 0;
-        padding: 0;
-        list-style: none;
+        font-size: 0.8rem;
+        color: var(--muted);
       }
 
-      .shots .empty {
-        grid-column: 1 / -1;
-        padding: 1.5rem;
-        border: 2px dashed var(--line);
-        border-radius: 1rem;
-        text-align: center;
-        font-size: 0.85rem;
+      .submit-row .pill {
+        width: auto;
+        min-width: 14rem;
+      }
+
+      /* 履歴: 画像の下に横並びのサムネイル（新しいものが左） */
+      .history {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr);
+        align-items: center;
+        gap: 0.75rem;
+        padding-top: 0.6rem;
+        border-top: 2px dashed var(--line);
+      }
+
+      .history-title {
+        margin: 0;
+        font-family: var(--round);
+        font-weight: 900;
+        font-size: 0.9rem;
+      }
+
+      .shots {
+        display: flex;
+        gap: 0.6rem;
+        min-height: 5rem;
+        margin: 0;
+        padding: 0.2rem;
+        list-style: none;
+        overflow-x: auto;
+        overscroll-behavior-x: contain;
+        scrollbar-width: thin;
+      }
+
+      .shots:empty::before {
+        content: "生成した画像がここに並びます";
+        align-self: center;
+        font-size: 0.78rem;
         color: var(--muted);
+      }
+
+      .shots > li {
+        flex: none;
       }
 
       .shot {
         position: relative;
-        aspect-ratio: 1;
+        display: block;
+        width: 4.6rem;
+        height: 4.6rem;
         padding: 0;
         border: 3px solid transparent;
-        border-radius: 1rem;
+        border-radius: 0.9rem;
         overflow: hidden;
         background: var(--ground);
         cursor: pointer;
@@ -473,29 +658,29 @@
 
       .shot[aria-pressed="true"] {
         border-color: var(--pink);
-        box-shadow: 0 0 0 4px rgb(255 45 135 / 0.25);
+        box-shadow: 0 0 0 3px rgb(255 45 135 / 0.3);
       }
 
       .shot .no {
         position: absolute;
-        left: 0.4rem;
-        top: 0.4rem;
-        padding: 0.1rem 0.5rem;
+        left: 0.3rem;
+        bottom: 0.3rem;
+        padding: 0.05rem 0.4rem;
         border-radius: 999px;
         background: rgb(11 27 43 / 0.75);
         color: #fff;
         font-family: var(--mono);
-        font-size: 0.7rem;
+        font-size: 0.62rem;
       }
 
       .shot .check {
         position: absolute;
-        right: 0.4rem;
-        top: 0.4rem;
+        right: 0.3rem;
+        top: 0.3rem;
         display: none;
         place-items: center;
-        width: 1.6rem;
-        height: 1.6rem;
+        width: 1.3rem;
+        height: 1.3rem;
         border-radius: 50%;
         background: var(--pink);
         color: #fff;
@@ -508,12 +693,8 @@
       .shot.is-pending {
         display: grid;
         place-items: center;
-        align-content: center;
-        gap: 0.5rem;
         cursor: default;
         color: var(--muted);
-        font-size: 0.78rem;
-        font-weight: 700;
         background:
           linear-gradient(110deg, transparent 30%, rgb(255 255 255 / 0.7) 50%, transparent 70%) 0 0 / 250% 100%,
           var(--ground);
@@ -522,37 +703,13 @@
           shimmer 1.2s linear infinite;
       }
 
-      @keyframes shimmer {
-        to {
-          background-position: -250% 0, 0 0;
-        }
-      }
-
       .shot.is-failed {
         display: grid;
         place-items: center;
         cursor: default;
         color: #d4145a;
-        font-size: 0.78rem;
+        font-size: 0.68rem;
         font-weight: 700;
-      }
-
-      .submit-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 1rem;
-      }
-
-      .submit-row p {
-        margin: 0;
-        font-size: 0.8rem;
-        color: var(--muted);
-      }
-
-      .submit-row .pill {
-        width: auto;
-        min-width: 14rem;
       }
 
       /* 提出確認・待機・採点 */
@@ -602,21 +759,8 @@
         border-width: 4px;
       }
 
-      @media (max-width: 860px) {
-        .play {
-          grid-template-columns: minmax(0, 1fr);
-        }
-        .col-topic {
-          grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-          align-items: start;
-        }
-        .bar {
-          grid-template-columns: 1fr auto;
-        }
-        .bar-right {
-          display: none;
-        }
-        .bar-left .chip-level {
+      @media (max-width: 1200px) {
+        .hud .player-name small {
           display: none;
         }
       }
@@ -628,26 +772,119 @@
 
       .topic-zoom .topic-img {
         width: 100%;
+        aspect-ratio: 1;
       }
 
-      /* ---------- スマホ: アプリ風の画面 ----------
-         上: アプリバー・残り時間・お題と対戦状況の帯（ずっと見える）
-         中: 生成した画像の横スクロール列 → プロンプト入力
-         下: 「生成する」「提出する」を固定したアクションバー */
-      @media (max-width: 560px) {
+      /* ---------- タブレット以下: 同じ部品を縦に積んで1画面に収める ----------
+         上: 対戦状況
+         中: 選んでいる画像とお題を横に並べ、その下に履歴と提出
+         下: プロンプト入力（入力欄の右に「生成する」） */
+      @media (max-width: 860px) {
         :root {
-          --bar-h: calc(56px + env(safe-area-inset-top));
-          --track-h: 4px;
-          /* 下のアクションバーの高さ（上の余白・注記・ボタン・下の余白） */
-          --dock-h: calc(88px + max(12px, env(safe-area-inset-bottom)));
+          --bar-h: 7.4rem; /* 2行ぶん */
         }
-
-        /* アプリバー */
         .bar {
           grid-template-columns: minmax(0, 1fr) auto;
-          gap: 0.75rem;
-          height: var(--bar-h);
-          padding: env(safe-area-inset-top) 16px 0;
+          grid-template-rows: auto auto;
+          grid-template-areas:
+            "left timer"
+            "hud hud";
+          align-content: center;
+          row-gap: 0.45rem;
+        }
+        .bar-left {
+          grid-area: left;
+        }
+        .timer {
+          grid-area: timer;
+        }
+        .bar-left .chip-level {
+          display: none;
+        }
+        .hud {
+          grid-area: hud;
+          justify-self: stretch;
+          justify-content: space-between;
+        }
+        .play {
+          grid-template-columns: minmax(0, 1fr);
+          grid-template-rows: minmax(0, 1fr) auto;
+          grid-template-areas:
+            "stage"
+            "compose";
+        }
+        .shots {
+          min-height: 4.6rem;
+        }
+        .shot {
+          width: 4.2rem;
+          height: 4.2rem;
+        }
+        .compose {
+          grid-template-columns: minmax(0, 1fr) auto;
+          grid-template-rows: auto auto auto;
+          grid-template-areas:
+            "head head"
+            "prompt foot"
+            "chips chips";
+          align-items: stretch;
+        }
+        .compose .panel-head {
+          grid-area: head;
+        }
+        .prompt {
+          grid-area: prompt;
+          min-height: 4.2rem;
+          max-height: 6rem;
+          resize: none;
+        }
+        .compose-foot {
+          grid-area: foot;
+          align-content: center;
+          justify-items: center;
+        }
+        .compose-foot .pill {
+          width: auto;
+          min-width: 9rem;
+          height: 100%;
+          padding-block: 0;
+        }
+        .count {
+          font-size: 0.72rem;
+        }
+        .count b {
+          font-size: 1rem;
+        }
+        .chips {
+          grid-area: chips;
+          display: flex;
+          gap: 0.9rem;
+          padding-bottom: 0.2rem;
+          overflow-x: auto;
+          overflow-y: hidden;
+          overscroll-behavior-x: contain;
+        }
+        .chip-row {
+          flex: none;
+          flex-wrap: nowrap;
+        }
+        .chip-row > span {
+          width: auto;
+          margin-right: 0.15rem;
+        }
+      }
+
+      /* ---------- スマホ: さらに詰める ---------- */
+      @media (max-width: 560px) {
+        :root {
+          --bar-h: calc(98px + env(safe-area-inset-top)); /* アプリバー + 対戦状況の行 */
+          --track-h: 4px;
+        }
+
+        .bar {
+          column-gap: 0.75rem;
+          row-gap: 0.35rem;
+          padding: env(safe-area-inset-top) 12px 0;
           background: #fff;
           backdrop-filter: none;
         }
@@ -674,120 +911,48 @@
         }
         .time-track {
           top: var(--bar-h);
-          height: var(--track-h);
         }
-
-        /* 生成終了後の案内は、提出ボタンのすぐ上に出す */
         .phase {
-          position: fixed;
-          z-index: 12;
-          left: 0;
-          right: 0;
-          bottom: var(--dock-h);
-          gap: 0.1rem 0.6rem;
-          padding: 0.55rem 16px 1.3rem;
-          margin-bottom: -0.8rem;
-          border-radius: 20px 20px 0 0;
-          font-size: 0.82rem;
+          width: calc(100% - 32px);
+          padding: 0.5rem 1rem;
+          border-radius: 16px;
+          font-size: 0.8rem;
           line-height: 1.5;
+          white-space: normal;
         }
         .phase b {
           font-size: 1.05rem;
         }
 
         .play {
-          gap: 12px;
-          padding: 0 16px calc(var(--dock-h) + 1.5rem);
+          padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+          gap: 10px;
         }
-        .col {
-          gap: 12px;
-        }
-        /* 画面下に固定したボタンを含むので、登場は位置を動かさずフェードだけにする */
+        /* 1画面に固定するので、登場は位置を動かさずフェードだけにする */
         .is-entering .play [data-enter] {
           animation-name: fade-in;
         }
-
-        /* お題と対戦状況: 2つのパネルを1本の帯にまとめて、上に固定する */
-        .col-topic {
-          position: sticky;
-          z-index: 4;
-          top: calc(var(--bar-h) + var(--track-h));
-          display: grid;
-          grid-template-columns: 5.5rem minmax(0, 1fr);
-          grid-template-areas:
-            "img head"
-            "img vs";
-          align-content: start;
-          gap: 0.35rem 0.8rem;
-          margin: 0 -16px;
-          padding: 0.6rem 16px 0.7rem;
-          background: #fff;
-          border-bottom: 2px solid var(--ink);
-          border-radius: 0 0 20px 20px;
-          box-shadow: 0 10px 20px -16px rgb(11 27 43 / 0.5);
-        }
-        .col-topic .panel {
-          display: contents;
-        }
-        .col-topic .panel-head {
-          grid-area: head;
-          justify-content: flex-start;
-          gap: 0.5rem;
-          min-width: 0;
-        }
-        .col-topic .panel-head h2 {
-          font-size: 0.95rem;
-        }
-        .col-topic .panel-head small {
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-          font-size: 0.72rem;
-        }
-        .col-topic .topic-img {
-          grid-area: img;
-          align-self: start;
-          width: 100%;
-          border-radius: 12px;
+        .panel {
+          padding: 0.7rem 0.8rem;
           border-width: 2px;
-          cursor: zoom-in;
+          border-radius: 18px;
+          box-shadow: 0 4px 0 var(--ink);
+          gap: 0.5rem;
         }
-        .col-topic .topic-img figcaption {
-          left: 0.25rem;
-          top: 0.25rem;
-          padding: 0.05rem 0.4rem;
-          font-size: 0.5rem;
-          letter-spacing: 0.12em;
+        .panel-head h2 {
+          font-size: 0.92rem;
         }
-        /* 拡大できることを示す虫めがね */
-        .col-topic .topic-img::after {
-          content: "";
-          position: absolute;
-          right: 0.25rem;
-          bottom: 0.25rem;
-          width: 1.35rem;
-          height: 1.35rem;
-          border-radius: 50%;
-          background: var(--ink)
-            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6'/%3E%3Cpath d='m15 15 5 5'/%3E%3C/svg%3E")
-            center / 0.75rem no-repeat;
-        }
-        .topic-note,
-        .col-topic [aria-labelledby="versus-title"] .panel-head {
-          display: none;
+        .panel-head small {
+          font-size: 0.7rem;
         }
 
-        /* 対戦状況は1人1行の小さなチップにする */
-        .versus {
-          grid-area: vs;
-          align-content: start;
-          gap: 0.3rem;
+        .hud {
+          gap: 0.4rem;
+          padding: 0.2rem 0.3rem;
+          box-shadow: 0 2px 0 var(--ink);
         }
         .player {
-          grid-template-columns: 1.6rem minmax(0, 1fr) auto;
-          gap: 0.45rem;
-          padding: 0.2rem 0.25rem 0.2rem 0.2rem;
-          border-radius: 999px;
+          gap: 0.35rem;
         }
         .avatar {
           width: 1.6rem;
@@ -795,124 +960,127 @@
           font-size: 0.75rem;
         }
         .player-name {
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-          font-size: 0.8rem;
-        }
-        /* 自分の生成回数は下のバーに出るので、相手の分だけ残す */
-        .player:first-child .player-name small {
-          display: none;
-        }
-        .player-name small {
-          display: inline;
-          margin-left: 0.3rem;
-          font-size: 0.68rem;
+          font-size: 0.76rem;
         }
         .state {
-          padding: 0.2rem 0.55rem;
+          padding: 0.15rem 0.45rem;
+          font-size: 0.6rem;
+        }
+        .vs {
+          font-size: 0.75rem;
+        }
+
+        .compare {
+          gap: 10px;
+        }
+        .compare-item > .stage-view,
+        .compare-item > .topic-img {
+          width: min(100%, calc(100cqh - 1.8rem));
+          border-radius: 12px;
+        }
+        .compare-label {
+          font-size: 0.74rem;
+        }
+        .compare-label small {
+          display: block;
+          margin: 0;
           font-size: 0.66rem;
         }
-
-        /* パネルはスマホ向けに詰める */
-        .col .panel {
-          gap: 0.7rem;
-          padding: 0.9rem;
-          border-width: 2px;
-          border-radius: 20px;
-          box-shadow: 0 4px 0 var(--ink);
+        .stage-empty {
+          font-size: 0.74rem;
         }
-        .panel-head h2 {
-          font-size: 1rem;
+        .topic-img {
+          cursor: zoom-in;
+        }
+        .topic-img figcaption {
+          left: 0.35rem;
+          top: 0.35rem;
+          padding: 0.05rem 0.45rem;
+          font-size: 0.55rem;
+          letter-spacing: 0.12em;
+        }
+        /* 拡大できることを示す虫めがね */
+        .compare .topic-img::after {
+          content: "";
+          position: absolute;
+          right: 0.35rem;
+          bottom: 0.35rem;
+          width: 1.35rem;
+          height: 1.35rem;
+          border-radius: 50%;
+          background: var(--ink)
+            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6'/%3E%3Cpath d='m15 15 5 5'/%3E%3C/svg%3E")
+            center / 0.75rem no-repeat;
+        }
+        .submit-row {
+          gap: 0.6rem;
+        }
+        .submit-note {
+          font-size: 0.72rem;
+        }
+        .submit-row .pill {
+          min-width: 9.5rem;
+          min-height: 2.9rem;
+          padding: 0 1rem;
+          font-size: 0.92rem;
+          white-space: nowrap;
         }
 
-        /* 生成した画像を、お題のすぐ下に横スクロールで並べる */
-        .col [aria-labelledby="shots-title"] {
-          order: -1;
+        .history {
+          gap: 0.5rem;
+          padding-top: 0.4rem;
+        }
+        .history-title {
+          font-size: 0.8rem;
         }
         .shots {
-          grid-template-columns: none;
-          grid-auto-flow: column;
-          grid-auto-columns: 6.5rem;
-          gap: 0.6rem;
-          margin: 0 -0.9rem;
-          padding: 0.2rem 0.9rem 0.4rem;
-          overflow-x: auto;
-          overscroll-behavior-x: contain;
-          scroll-snap-type: x proximity;
-          scroll-padding-inline: 0.9rem;
-          scrollbar-width: none;
-        }
-        .shots::-webkit-scrollbar {
-          display: none;
-        }
-        .shots > li {
-          scroll-snap-align: start;
-        }
-        .shots .empty {
-          grid-column: auto;
-          width: calc(100vw - 32px - 1.8rem - 4px);
-          padding: 0.7rem;
-          font-size: 0.78rem;
+          min-height: 3.9rem;
+          gap: 0.45rem;
         }
         .shot {
-          width: 100%;
-          border-radius: 14px;
+          width: 3.4rem;
+          height: 3.4rem;
+          border-radius: 12px;
         }
         .shot:hover:not(:disabled) {
           transform: none;
         }
 
-        /* プロンプト入力 */
         .seg button {
-          min-height: 2.5rem;
-          padding: 0.35rem 1rem;
+          padding: 0.3rem 0.7rem;
+          font-size: 0.72rem;
         }
         .prompt {
-          min-height: 5.5rem;
-          padding: 0.75rem 0.9rem;
-          font-size: 1rem;
-          resize: none;
-        }
-        .prompt.is-tags {
+          min-height: 3.4rem;
+          max-height: 4.6rem;
+          padding: 0.55rem 0.75rem;
           font-size: 0.95rem;
         }
-        /* よく使う表現は、種類ごとに1行の横スクロールにする */
-        .chips {
-          gap: 0.2rem;
-          margin: 0 -0.9rem;
-        }
-        .chip-row {
-          flex-wrap: nowrap;
-          gap: 0.35rem;
+        .compose-foot .pill {
+          min-width: 6.5rem;
           padding: 0 0.9rem;
-          overflow-x: auto;
-          overscroll-behavior-x: contain;
+          font-size: 0.9rem;
+          letter-spacing: 0.02em;
+          white-space: nowrap;
+        }
+        /* 生成は紺、提出はピンクにして、押すボタンの違いが分かるようにする */
+        #generate {
+          border-color: var(--ink);
+          background: var(--ink);
+        }
+        #generate:disabled {
+          border-color: #c9ced6;
+          background: #c9ced6;
+        }
+        .chips {
           scrollbar-width: none;
         }
-        .chip-row::-webkit-scrollbar {
+        .chips::-webkit-scrollbar {
           display: none;
         }
-        .chip-row > span {
-          position: sticky;
-          left: 0;
-          z-index: 1;
-          flex: none;
-          align-self: stretch;
-          display: flex;
-          align-items: center;
-          width: auto;
-          min-width: 4.4rem;
-          margin-left: -0.9rem;
-          padding-left: 0.9rem;
-          background: linear-gradient(90deg, #fff 85%, rgb(255 255 255 / 0));
-        }
         .chips button {
-          flex: none;
-          min-height: 2.75rem;
-          padding: 0.3rem 0.85rem;
-          font-size: 0.85rem;
-          white-space: nowrap;
+          min-height: 2.2rem;
+          font-size: 0.8rem;
         }
         .chips button:hover:not(:disabled) {
           border-color: var(--line);
@@ -922,80 +1090,12 @@
           border-color: var(--pink);
           background: #fff0f7;
         }
-
-        /* 下のアクションバー: 生成（左）と提出（右）を並べる。
-           2つは別のパネルにあるので、それぞれ画面に固定して左右に置く */
-        .compose-foot,
-        .submit-row {
-          position: fixed;
-          z-index: 10;
-          bottom: 0;
-          display: grid;
-          grid-template-rows: 1.1rem 3.25rem;
-          align-items: center;
-          gap: 0.4rem;
-          padding: 0.75rem 16px max(12px, env(safe-area-inset-bottom));
-        }
-        .compose-foot {
-          left: 0;
-          right: 0;
-          grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-          column-gap: 10px;
-          background: #fff;
-          border-radius: 20px 20px 0 0;
-          box-shadow:
-            0 -1px 0 rgb(11 27 43 / 0.08),
-            0 -12px 28px -14px rgb(11 27 43 / 0.35);
-        }
-        .submit-row {
-          z-index: 11;
-          right: 0;
-          width: calc(50% - 5px);
-          padding-left: 0;
-          grid-template-columns: minmax(0, 1fr);
-        }
-        .count,
-        .submit-row p {
-          font-size: 0.72rem;
-          text-align: center;
-          line-height: 1;
-          white-space: nowrap;
-        }
-        .count b {
-          font-size: 0.95rem;
-        }
-        .compose-foot .pill,
-        .submit-row .pill {
-          grid-row: 2;
-          width: 100%;
-          min-width: 0;
-          height: 3.25rem;
-          padding: 0 0.75rem;
-          font-size: 0.98rem;
-          letter-spacing: 0.02em;
-          white-space: nowrap;
-        }
-        .compose-foot .pill {
-          grid-column: 1;
-        }
         .pill:hover:not(:disabled) {
           transform: none;
         }
-        /* 生成は紺、提出はピンクにして、押すボタンの違いが分かるようにする */
-        #generate {
-          border-color: var(--ink);
-          background: var(--ink);
-          box-shadow: 0 10px 22px -12px rgb(11 27 43 / 0.7);
-        }
-        #generate:disabled {
-          border-color: #c9ced6;
-          background: #c9ced6;
-          box-shadow: none;
-        }
 
-        /* 通知はアクションバーに隠れないよう上に出す */
         .toast {
-          bottom: calc(var(--dock-h) + 0.75rem);
+          bottom: 5.5rem;
         }
 
         /* 提出確認は画面下から出るシートにする */
@@ -1014,7 +1114,8 @@
       @media (prefers-reduced-motion: reduce) {
         .timer.is-hurry .timer-num,
         .shot,
-        .shot.is-pending {
+        .shot.is-pending,
+        .stage-view.is-pending {
           animation: none;
         }
       }
@@ -1031,66 +1132,63 @@
         <span class="timer-label" id="timer-label">TIME LEFT</span>
         <span class="timer-num" id="timer-num">1:30</span>
       </div>
-      <div class="bar-right">
-        <span class="chip" id="opp-chip"></span>
+      <!-- 右上: 対戦状況（自分 VS 相手）を小さくまとめる -->
+      <div class="hud" aria-label="対戦状況">
+        <ul class="versus" id="versus"></ul>
       </div>
     </header>
     <div class="time-track" aria-hidden="true"><span id="time-bar"></span></div>
     <p class="phase" id="phase" role="status" hidden></p>
 
     <main class="play">
-      <div class="col col-topic">
-        <section class="panel" aria-labelledby="topic-title" data-enter>
-          <div class="panel-head">
-            <h2 id="topic-title">お題</h2>
-            <small id="topic-rule">白背景・1キャラクター</small>
+      <!-- 左: プロンプト入力。下に「生成する」 -->
+      <section class="panel compose" aria-labelledby="prompt-title" data-enter>
+        <div class="panel-head">
+          <h2 id="prompt-title">プロンプト</h2>
+          <div class="seg" role="group" aria-label="入力方法">
+            <button type="button" id="mode-text" aria-pressed="true">文章</button>
+            <button type="button" id="mode-tag" aria-pressed="false">タグ</button>
           </div>
-          <figure class="topic-img" id="topic-img"><figcaption>THEME</figcaption></figure>
-          <p class="topic-note">このイラストにいちばん近い1枚を作ろう。</p>
-        </section>
+        </div>
+        <textarea class="prompt" id="prompt" aria-label="プロンプト" placeholder="例：ピンクの髪でツインテールの女の子、青い目、セーラー服、笑顔、白背景"></textarea>
+        <div class="chips" id="chips" aria-label="よく使う表現"></div>
+        <div class="compose-foot">
+          <span class="count">生成 <b id="gen-count">0</b><span id="gen-limit"></span> 回</span>
+          <button class="pill pill-pink" type="button" id="generate">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z" /><path d="M19 17v4M17 19h4" /></svg>
+            生成する
+          </button>
+        </div>
+      </section>
 
-        <section class="panel" aria-labelledby="versus-title" data-enter>
-          <div class="panel-head">
-            <h2 id="versus-title">対戦状況</h2>
-          </div>
-          <ul class="versus" id="versus"></ul>
-        </section>
-      </div>
-
-      <div class="col">
-        <section class="panel" aria-labelledby="prompt-title" data-enter>
-          <div class="panel-head">
-            <h2 id="prompt-title">プロンプト</h2>
-            <div class="seg" role="group" aria-label="入力方法">
-              <button type="button" id="mode-text" aria-pressed="true">文章</button>
-              <button type="button" id="mode-tag" aria-pressed="false">タグ</button>
+      <!-- 中央: 選んでいる画像（左）とお題（右）を並べて比べる。下に提出 -->
+      <section class="panel stage" aria-labelledby="stage-title" data-enter>
+        <div class="panel-head">
+          <h2 id="stage-title">あなたの画像とお題</h2>
+          <small id="submit-hint">画像を1枚選んでください</small>
+        </div>
+        <div class="compare">
+          <div class="compare-item">
+            <div class="stage-view" id="stage-view">
+              <p class="stage-empty">まだ画像がありません。<br />プロンプトを入力して「生成する」を押そう。</p>
             </div>
+            <p class="compare-label" id="mine-label">あなたの画像</p>
           </div>
-          <textarea class="prompt" id="prompt" aria-label="プロンプト" placeholder="例：ピンクの髪でツインテールの女の子、青い目、セーラー服、笑顔、白背景"></textarea>
-          <div class="chips" id="chips" aria-label="よく使う表現"></div>
-          <div class="compose-foot">
-            <span class="count">生成 <b id="gen-count">0</b><span id="gen-limit"></span> 回</span>
-            <button class="pill pill-pink" type="button" id="generate">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z" /><path d="M19 17v4M17 19h4" /></svg>
-              生成する
-            </button>
+          <div class="compare-item">
+            <figure class="topic-img" id="topic-img"><figcaption>THEME</figcaption></figure>
+            <p class="compare-label">お題<small id="topic-rule">白背景・1キャラクター</small></p>
           </div>
-        </section>
-
-        <section class="panel" aria-labelledby="shots-title" data-enter>
-          <div class="panel-head">
-            <h2 id="shots-title">生成した画像</h2>
-            <small>1枚選んで提出</small>
-          </div>
-          <ol class="shots" id="shots">
-            <li class="empty" id="empty">まだ画像がありません。プロンプトを入力して「生成する」を押そう。</li>
-          </ol>
-          <div class="submit-row">
-            <p>提出後は変更できません。</p>
-            <button class="pill pill-pink" type="button" id="submit" disabled>この1枚で提出</button>
-          </div>
-        </section>
-      </div>
+        </div>
+        <!-- 履歴: 生成した順（新しいものが左）。クリックで上の画像を切り替える -->
+        <div class="history" aria-labelledby="shots-title">
+          <h3 class="history-title" id="shots-title">履歴</h3>
+          <ol class="shots" id="shots"></ol>
+        </div>
+        <div class="submit-row">
+          <p class="submit-note">お題にいちばん近い1枚を提出。提出後は変更できません。</p>
+          <button class="pill pill-pink" type="button" id="submit" disabled>この1枚で提出</button>
+        </div>
+      </section>
     </main>
 
     <dialog class="dialog" id="confirm">
@@ -1208,15 +1306,14 @@
 
       // ---------- 対戦状況 ----------
       function renderVersus() {
-        const row = (p, isMe, gens, stateText, stateClass) => `<li class="player">
+        const row = (p, cls, isMe, gens, stateText, stateClass) => `<li class="player ${cls}">
           <span class="avatar" style="background:${p.color}">${escapeHtml([...p.name][0])}</span>
           <span class="player-name">${escapeHtml(p.name)}<small>${isMe ? "あなた・" : ""}成功した生成 ${gens}回</small></span>
           <span class="state ${stateClass}">${stateText}</span>
         </li>`;
         const myState = mine.submitted ? ["提出済み", "is-done"] : pending > 0 ? ["生成中", "is-working"] : ["考え中", ""];
         const oppState = opp.submitted ? ["提出済み", "is-done"] : opp.working ? ["生成中", "is-working"] : ["考え中", ""];
-        $("versus").innerHTML = row(me, true, success, ...myState) + row(opp, false, opp.gens, ...oppState);
-        $("opp-chip").textContent = `${opp.name}：${opp.submitted ? "提出済み" : `生成 ${opp.gens}回`}`;
+        $("versus").innerHTML = row(me, "me", true, success, ...myState) + `<li class="vs" aria-hidden="true">VS</li>` + row(opp, "opp", false, opp.gens, ...oppState);
       }
 
       // ---------- 生成と提出 ----------
@@ -1237,8 +1334,30 @@
         $("prompt").disabled = !canGenerate;
         $("chips").querySelectorAll("button").forEach((b) => (b.disabled = !canGenerate));
         $("submit").disabled = !selected || Boolean(mine.submitted) || phase === "done";
+        $("submit-hint").textContent = mine.submitted ? `#${mine.submitted.no} を提出しました` : selected ? `#${selected.no} を提出します` : "画像を1枚選んでください";
         $("gen-count").textContent = success;
         renderVersus();
+      }
+
+      // ステージに1枚を大きく出し、その1枚を提出候補にする
+      function showShot(shot) {
+        selected = shot;
+        const view = $("stage-view");
+        view.classList.remove("is-pending");
+        view.innerHTML = `<div class="stage-shot">${artSvg(shot.features, `${shot.no}回目の画像`)}<span class="stage-no">#${shot.no}</span></div>`;
+        $("mine-label").innerHTML = `あなたの画像<small>#${shot.no}</small>`;
+        $("shots").querySelectorAll(".shot").forEach((b) => b.setAttribute("aria-pressed", String(Number(b.dataset.no) === shot.no)));
+        updateControls();
+      }
+
+      // まだ何も選んでいないときのステージ表示（生成中はきらめかせる）
+      function showStageIdle() {
+        if (selected) return;
+        const view = $("stage-view");
+        view.classList.toggle("is-pending", pending > 0);
+        view.innerHTML = pending > 0
+          ? `<p class="stage-empty"><span class="spinner" aria-hidden="true"></span>生成中…</p>`
+          : `<p class="stage-empty">まだ画像がありません。<br />プロンプトを入力して「生成する」を押そう。</p>`;
       }
 
       $("generate").addEventListener("click", async () => {
@@ -1251,16 +1370,18 @@
         attempts += 1;
         pending += 1;
         const no = attempts;
-        $("empty")?.remove();
         const li = document.createElement("li");
-        li.innerHTML = `<div class="shot is-pending"><span class="spinner" aria-hidden="true"></span>生成中…</div>`;
+        li.innerHTML = `<div class="shot is-pending" aria-label="生成中"><span class="spinner" aria-hidden="true"></span></div>`;
         $("shots").prepend(li);
+        showStageIdle();
         updateControls();
         await wait(1800 + Math.random() * 1600);
         pending -= 1;
         // モック: まれに生成に失敗する（失敗は生成回数に数えない）
         if (Math.random() < 0.08) {
-          li.innerHTML = `<div class="shot is-failed">生成に失敗しました</div>`;
+          li.innerHTML = `<div class="shot is-failed">失敗</div>`;
+          toast("生成に失敗しました");
+          showStageIdle();
           updateControls();
           return;
         }
@@ -1269,14 +1390,14 @@
         const sim = artSimilarity(features, `${code}-${no}`);
         const shot = { no, features, sim };
         shots.push(shot);
-        li.innerHTML = `<button type="button" class="shot" aria-pressed="false" aria-label="${no}回目の画像">${artSvg(features, `${no}回目の画像`)}<span class="no">#${no}</span><span class="check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7" /></svg></span></button>`;
-        li.querySelector("button").addEventListener("click", (event) => {
+        li.innerHTML = `<button type="button" class="shot" data-no="${no}" aria-pressed="false" aria-label="${no}回目の画像">${artSvg(features, `${no}回目の画像`)}<span class="no">#${no}</span><span class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7" /></svg></span></button>`;
+        li.querySelector("button").addEventListener("click", () => {
           if (mine.submitted || phase === "done") return;
-          selected = shot;
-          $("shots").querySelectorAll(".shot").forEach((b) => b.setAttribute("aria-pressed", String(b === event.currentTarget)));
-          updateControls();
+          showShot(shot);
         });
-        updateControls();
+        // できあがった画像はすぐステージに出す（提出前なら）
+        if (!mine.submitted && phase !== "done") showShot(shot);
+        else updateControls();
       });
 
       $("submit").addEventListener("click", () => {
