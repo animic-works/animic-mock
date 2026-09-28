@@ -1068,6 +1068,41 @@
       </section>
 
       <!-- ルールと開始 -->
+      /* 開始の確認: 準備中の人の一覧 */
+      .waiting {
+        display: grid;
+        gap: 0.4rem;
+        max-height: 12rem;
+        margin: 0;
+        padding: 0;
+        overflow-y: auto;
+        list-style: none;
+      }
+      .waiting li {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0.45rem 0.75rem 0.45rem 0.45rem;
+        border-radius: 999px;
+        background: var(--ground);
+        font-weight: 700;
+      }
+      .waiting .avatar {
+        display: grid;
+        place-items: center;
+        width: 2rem;
+        height: 2rem;
+        border-radius: 50%;
+        background: var(--c);
+        color: var(--on);
+        font-size: 0.9rem;
+      }
+      .waiting small {
+        margin-left: auto;
+        color: var(--muted);
+        font-size: 0.8rem;
+      }
+
       <section class="card-box go-card" aria-labelledby="rules-title" data-enter="fade">
         <div class="box-head">
           <h2 id="rules-title">ルール</h2>
@@ -1231,6 +1266,18 @@
         }
       })();
 
+    <dialog class="dialog" id="start-dialog" aria-labelledby="start-title">
+      <form class="card" method="dialog">
+        <h1 id="start-title">全員の準備がまだです</h1>
+        <p class="sub" id="start-sub"></p>
+        <ul class="waiting" id="waiting"></ul>
+        <div class="dialog-actions">
+          <button class="pill" value="cancel">待つ</button>
+          <button class="pill pill-pink" value="start">このままはじめる</button>
+        </div>
+      </form>
+    </dialog>
+
       // 難易度の説明は、選んでいるものだけを表示する
       const LEVELS = {
         かんたん: "白背景・1キャラクター",
@@ -1341,7 +1388,22 @@
         }
       });
 
-      $("start").addEventListener("click", startCountdown);
+      // 準備中の人がいるときは、そのまま始めてよいか確認する
+      $("start").addEventListener("click", () => {
+        const waiting = players.filter((p) => !p.ready);
+        if (!waiting.length) return startCountdown();
+        $("start-sub").textContent = `準備中の人が${waiting.length}人います。このまま対戦をはじめますか？`;
+        $("waiting").innerHTML = waiting
+          .map((p) => {
+            const [bg, fg] = COLORS[players.indexOf(p) % COLORS.length];
+            return `<li style="--c:${bg};--on:${fg}"><span class="avatar" aria-hidden="true">${escapeHtml([...p.name][0])}</span>${escapeHtml(p.name)}<small>準備中</small></li>`;
+          })
+          .join("");
+        $("start-dialog").showModal();
+      });
+      $("start-dialog").addEventListener("close", () => {
+        if ($("start-dialog").returnValue === "start") startCountdown();
+      });
 
       async function startCountdown() {
         const level = document.querySelector("[name=level]:checked").value;
