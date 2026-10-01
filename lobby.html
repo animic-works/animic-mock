@@ -1495,9 +1495,20 @@
         $("countdown-num").style.fontSize = "clamp(3.5rem, 16vw, 7rem)";
         $("countdown-sub").textContent = "お題を公開します";
         await wait(700);
-        // 対戦画面は今のところ1対1のため、最初の相手を渡す
+        // 結果画面は今のところ1対1のため、最初の相手も別に渡す
         const opponent = players.find((p) => p !== me);
-        wipeTo("play.html", { code, level, time, limit, name: me.name, opp: opponent?.name || "ぴよ丸", role: isHost ? "host" : "guest" });
+        // 対戦画面で全員の様子を出すため、参加者全員の名前と自分の席も渡す
+        wipeTo("play.html", {
+          code,
+          level,
+          time,
+          limit,
+          name: me.name,
+          opp: opponent?.name || "ぴよ丸",
+          players: JSON.stringify(players.map((p) => p.name)),
+          seat: players.indexOf(me),
+          role: isHost ? "host" : "guest",
+        });
       }
 
       // 退出
