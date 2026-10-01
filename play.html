@@ -4407,6 +4407,19 @@
         .compose .panel-title {
           display: none;
         }
+        /* 切り替えはアイコンだけにして幅を詰め、タブの行の右端にその分の余白を取る */
+        .compose .seg button {
+          gap: 0;
+          padding: 0.38rem 0.7rem;
+          font-size: 0;
+        }
+        .compose .seg button svg {
+          width: 14px;
+          height: 14px;
+        }
+        .compose > .ptabs {
+          padding-right: 5.6rem;
+        }
       }
 
       .grip,
