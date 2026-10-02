@@ -1133,3 +1133,16 @@ main .leave-pc {
     color: var(--muted);
   }
 }
+
+/* ログイン中に選んだアイコン（イラスト・画像） */
+.player .avatar.has-image {
+  background: #fff;
+}
+
+.player .avatar.has-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}

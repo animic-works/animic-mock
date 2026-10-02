@@ -18,7 +18,6 @@ const history = sample ? SAMPLE_HISTORY : getHistory();
 let filter = "all";
 
 const ord = (n) => (n === 1 ? "1st" : n === 2 ? "2nd" : n === 3 ? "3rd" : `${n}th`);
-const firstChar = (name) => [...new Intl.Segmenter("ja", { granularity: "grapheme" }).segment(name)][0]?.segment ?? "?";
 function when(at) {
   const diff = Date.now() - at;
   if (diff < 60 * 60e3) return "さっき";
@@ -28,7 +27,7 @@ function when(at) {
 }
 
 function renderProfile() {
-  $("profile-avatar").innerHTML = `${escapeHtml(firstChar(account.name))}<span class="account-badge">${PROVIDER_ICONS[account.provider] || ""}</span>`;
+  $("profile-avatar").innerHTML = `${accountAvatar(account, "profile-avatar")}<span class="account-badge">${PROVIDER_ICONS[account.provider] || ""}</span>`;
   $("profile-name").textContent = account.name;
   $("profile-sub").innerHTML = `<span class="acc-prov">${PROVIDER_ICONS[account.provider] || ""}</span>${escapeHtml(account.provider)}でログイン中`;
 }
@@ -137,4 +136,72 @@ $("start").addEventListener("click", (event) => start(event.currentTarget));
 $("matches").addEventListener("click", (event) => {
   const b = event.target.closest("[data-start]");
   if (b) start(b);
+});
+
+// ---------- アイコンの変更 ----------
+// イラストは生成画像のモックと同じ絵の顔まわりを切り出して、data URL で保存する
+const ICON_ARTS = [
+  "pink.twin.blue.sailor.smile.sky",
+  "blonde.long.red.hoodie.wink.white",
+  "black.bob.green.dress.calm.room",
+  "blue.twin.green.sailor.smile.white",
+  "silver.long.blue.dress.wink.sky",
+  "pink.bob.red.hoodie.calm.room",
+  "blonde.twin.blue.dress.smile.sky",
+  "black.long.red.sailor.wink.white",
+];
+const artIcon = (code) =>
+  `data:image/svg+xml;charset=utf-8,${encodeURIComponent(artSvg(artDecode(code)).replace('viewBox="0 0 200 200"', 'viewBox="35 35 130 130"'))}`;
+let draft = null; // ダイアログで選んでいるアイコン
+
+function renderIconDialog() {
+  $("icon-preview").innerHTML = accountAvatar({ ...account, icon: draft }, "profile-avatar");
+  $("icon-arts").innerHTML = ICON_ARTS.map((code) => {
+    const src = artIcon(code);
+    return `<button type="button" class="icon-opt" data-src="${escapeHtml(src)}" aria-pressed="${draft?.src === src}" aria-label="イラスト"><img src="${escapeHtml(src)}" alt="" /></button>`;
+  }).join("");
+  $("icon-colors").innerHTML = ICON_COLORS.map(
+    ([color, ink]) =>
+      `<button type="button" class="icon-opt is-color" data-color="${color}" data-ink="${ink}" style="background:${color};color:${ink}" aria-pressed="${!draft?.src && (draft?.color || ICON_COLORS[0][0]) === color}" aria-label="カラー ${color}">${escapeHtml(firstChar(account.name))}</button>`,
+  ).join("");
+}
+$("icon-open").addEventListener("click", () => {
+  draft = account.icon || null;
+  $("icon-note").textContent = "画像は中央を正方形に切り抜き、丸く表示します。";
+  renderIconDialog();
+  $("icon-dialog").showModal();
+});
+$("icon-dialog").addEventListener("click", (event) => {
+  if (event.target === $("icon-dialog")) return $("icon-dialog").close();
+  const opt = event.target.closest(".icon-opt");
+  if (!opt) return;
+  draft = opt.dataset.src ? { src: opt.dataset.src } : { color: opt.dataset.color, ink: opt.dataset.ink };
+  renderIconDialog();
+});
+
+// アップロードした画像は中央を正方形に切り抜き、192px に縮めて保存する（この端末の保存領域に収めるため）
+$("icon-file").addEventListener("change", async (event) => {
+  const file = event.target.files[0];
+  event.target.value = "";
+  if (!file) return;
+  if (!file.type.startsWith("image/")) return ($("icon-note").textContent = "画像のファイルを選んでください。");
+  try {
+    const bitmap = await createImageBitmap(file);
+    const side = Math.min(bitmap.width, bitmap.height);
+    const canvas = Object.assign(document.createElement("canvas"), { width: 192, height: 192 });
+    canvas.getContext("2d").drawImage(bitmap, (bitmap.width - side) / 2, (bitmap.height - side) / 2, side, side, 0, 0, 192, 192);
+    draft = { src: canvas.toDataURL("image/jpeg", 0.85) };
+    $("icon-note").textContent = "アップロードした画像を使います。";
+    renderIconDialog();
+  } catch {
+    $("icon-note").textContent = "この画像は読み込めませんでした。別の画像を選んでください。";
+  }
+});
+
+$("icon-save").addEventListener("click", () => {
+  account = { ...account, icon: draft };
+  if (!sample) setAccount(account);
+  renderProfile();
+  $("icon-dialog").close();
+  toast("アイコンを変更しました");
 });

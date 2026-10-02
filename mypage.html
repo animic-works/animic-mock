@@ -35,7 +35,10 @@
     <main class="mypage" id="main">
       <!-- ログイン中: プロフィール・成績・戦績 -->
       <section class="profile" id="profile" aria-labelledby="profile-name" hidden data-enter>
-        <span class="profile-avatar" id="profile-avatar" aria-hidden="true"></span>
+        <button class="avatar-btn" type="button" id="icon-open" aria-label="アイコンを変更" aria-haspopup="dialog">
+          <span id="profile-avatar"></span>
+          <span class="avatar-edit" aria-hidden="true"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z" /><circle cx="12" cy="13" r="3.5" /></svg></span>
+        </button>
         <div class="profile-body">
           <div class="profile-name-row" id="name-view">
             <h1 class="profile-name" id="profile-name"></h1>
@@ -76,6 +79,28 @@
         <a class="text-btn" href="index.html">トップへ戻る</a>
       </section>
     </main>
+
+    <!-- アイコンの変更: イラスト・カラー・画像のアップロードから選ぶ -->
+    <dialog class="dialog icon-dialog" id="icon-dialog" aria-labelledby="icon-title">
+      <form class="card" method="dialog">
+        <h1 id="icon-title">アイコンを変更</h1>
+        <div class="icon-preview" id="icon-preview" aria-hidden="true"></div>
+        <p class="icon-label">イラスト</p>
+        <div class="icon-grid" id="icon-arts" role="group" aria-label="イラスト"></div>
+        <p class="icon-label">カラー<small>頭文字を色の丸で表示</small></p>
+        <div class="icon-colors" id="icon-colors" role="group" aria-label="カラー"></div>
+        <label class="icon-upload">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5" /><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3" /></svg>
+          画像をアップロード
+          <input type="file" accept="image/*" id="icon-file" class="sr-only" />
+        </label>
+        <p class="icon-note" id="icon-note">画像は中央を正方形に切り抜き、丸く表示します。</p>
+        <div class="dialog-actions">
+          <button class="pill" value="cancel">やめる</button>
+          <button class="pill pill-pink" type="button" id="icon-save">保存</button>
+        </div>
+      </form>
+    </dialog>
 
     <script src="js/common.js"></script>
     <script src="js/art.js"></script>

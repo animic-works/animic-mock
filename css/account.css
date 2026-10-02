@@ -73,6 +73,22 @@
   box-shadow: 0 0 0 2.5px #fff, 0 0 0 4.5px var(--acc-pink-soft);
 }
 
+/* イラスト・画像のアイコン */
+.account-initial.has-image,
+.profile-avatar.has-image {
+  overflow: hidden;
+  background: #fff;
+}
+
+.account-initial img,
+.profile-avatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
 .account-initial.is-lg {
   flex: none;
   width: 2.75rem;

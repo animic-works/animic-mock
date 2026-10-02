@@ -108,7 +108,7 @@ function renderPlayers() {
     const tag = p === host ? `<span class="tag">ホスト</span>` : p.isMe ? `<span class="tag me">あなた</span>` : "";
     cells.push(`<li class="player${p.isMe ? " is-me" : ""}${joined}" style="--c:${bg};--on:${fg}">
       ${tag}
-      <span class="avatar" aria-hidden="true">${escapeHtml([...p.name][0])}${p.isMe && account ? `<span class="account-badge">${PROVIDER_ICONS[account.provider] || ""}</span>` : ""}</span>
+      <span class="avatar${p.isMe && account?.icon?.src ? " has-image" : ""}" aria-hidden="true"${p.isMe && account?.icon?.color ? ` style="background:${account.icon.color};color:${account.icon.ink}"` : ""}>${p.isMe && account?.icon?.src ? `<img src="${escapeHtml(account.icon.src)}" alt="" />` : escapeHtml([...p.name][0])}${p.isMe && account ? `<span class="account-badge">${PROVIDER_ICONS[account.provider] || ""}</span>` : ""}</span>
       <b class="name">${escapeHtml(p.name)}${p.isMe && p === host ? "<small>（あなた）</small>" : ""}</b>
       <span class="ready ${p.ready ? "is-on" : ""}">${p.ready ? "準備OK" : "準備中"}</span>
     </li>`);

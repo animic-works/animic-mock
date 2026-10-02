@@ -309,6 +309,24 @@ function saveHistory(entry) {
   writeStore(HISTORY_KEY, [entry, ...list].slice(0, 30));
 }
 
+// アイコン: account.icon は { color, ink }（頭文字を色の丸に）か { src }（イラスト・画像の data URL）。未設定はピンクの頭文字
+const ICON_COLORS = [
+  ["#ff2d87", "#fff"],
+  ["#00b4fc", "#fff"],
+  ["#fddb13", "#0b1b2b"],
+  ["#16b37e", "#fff"],
+  ["#7c5cff", "#fff"],
+  ["#ff7a45", "#fff"],
+  ["#0b1b2b", "#fff"],
+];
+const firstChar = (name) => [...new Intl.Segmenter("ja", { granularity: "grapheme" }).segment(String(name))][0]?.segment ?? "?";
+function accountAvatar(account, className = "account-initial") {
+  const icon = account.icon || {};
+  if (icon.src) return `<span class="${className} has-image"><img src="${escapeHtml(icon.src)}" alt="" /></span>`;
+  const style = icon.color ? ` style="background:${escapeHtml(icon.color)};color:${escapeHtml(icon.ink || "#fff")}"` : "";
+  return `<span class="${className}"${style}>${escapeHtml(firstChar(account.name))}</span>`;
+}
+
 // ログイン画面へ。戻り先（back）には今の画面を渡す
 function goLogin(next, extra = {}, trigger) {
   wipeTo("login.html", { next, back: location.pathname.split("/").pop() + location.search, ...extra }, trigger);
@@ -332,12 +350,12 @@ function mountAccount(slot, { compact = false } = {}) {
   const wins = list.filter((e) => e.rank === 1).length;
   slot.innerHTML = `
     <button class="account-avatar" type="button" aria-haspopup="true" aria-expanded="false" aria-label="アカウント（${escapeHtml(account.name)}）">
-      <span class="account-initial">${escapeHtml([...account.name][0] || "?")}</span>
+      ${accountAvatar(account)}
       <span class="account-badge">${PROVIDER_ICONS[account.provider] || ""}</span>
     </button>
     <div class="account-menu" role="menu" hidden>
       <div class="acc-head">
-        <span class="account-initial is-lg">${escapeHtml([...account.name][0] || "?")}</span>
+        ${accountAvatar(account, "account-initial is-lg")}
         <span><b>${escapeHtml(account.name)}</b><small><span class="acc-prov">${PROVIDER_ICONS[account.provider] || ""}</span>${escapeHtml(account.provider)}でログイン中</small></span>
       </div>
       <div class="acc-stats"><span><b>${list.length}</b>対戦</span><span><b>${wins}</b>勝</span></div>

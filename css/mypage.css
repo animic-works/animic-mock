@@ -503,8 +503,7 @@
   /* ログアウトは名前の下の行へ回し、名前に幅を残す */
   .profile .text-btn {
     flex-basis: 100%;
-    margin-left: calc(clamp(4rem, 10vw, 5.5rem) + 1rem);
-    padding: 0;
+    padding: 0 0 0 calc(clamp(4rem, 10vw, 5.5rem) + 1rem);
     text-align: left;
   }
   .stats {
@@ -531,5 +530,162 @@
 @media (prefers-reduced-motion: reduce) {
   .match {
     animation: none;
+  }
+}
+
+/* ---------- アイコンの変更 ---------- */
+.avatar-btn {
+  position: relative;
+  flex: none;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+}
+
+#profile-avatar {
+  position: relative;
+  display: block;
+}
+
+.avatar-btn:hover .profile-avatar {
+  filter: brightness(0.92);
+}
+
+/* 押すと変えられることを示す、左下のカメラ */
+.avatar-edit {
+  position: absolute;
+  left: -0.1rem;
+  bottom: -0.1rem;
+  display: grid;
+  place-items: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  border: 2.5px solid #fff;
+  border-radius: 50%;
+  background: var(--ink);
+  color: #fff;
+}
+
+.icon-dialog {
+  width: min(100% - 32px, 26rem);
+}
+
+.icon-dialog .card {
+  justify-items: stretch;
+  gap: 0.9rem;
+}
+
+.icon-dialog h1 {
+  font-size: 1.35rem;
+}
+
+.icon-preview {
+  justify-self: center;
+}
+
+.icon-preview .profile-avatar {
+  width: 5.5rem;
+  height: 5.5rem;
+  font-size: 2.3rem;
+}
+
+.icon-label {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin: 0.2rem 0 -0.4rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.icon-label small {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+
+.icon-grid,
+.icon-colors {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+
+.icon-colors {
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.45rem;
+}
+
+.icon-opt {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 1;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 50%;
+  background: var(--ground);
+  font-family: var(--round);
+  font-weight: 900;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.icon-opt:hover {
+  transform: scale(1.06);
+}
+
+.icon-opt img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* 選んでいるもの: 白いすき間とピンクの輪 */
+.icon-opt[aria-pressed="true"] {
+  box-shadow:
+    0 0 0 3px #fff,
+    0 0 0 6px var(--pink);
+}
+
+.icon-upload {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.3rem;
+  padding: 0.8rem 1rem;
+  border: 2px dashed var(--line);
+  border-radius: 999px;
+  color: var(--ink);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.icon-upload:hover {
+  border-color: var(--pink);
+  color: var(--pink);
+}
+
+.icon-upload:focus-within {
+  outline: 3px solid var(--cyan);
+  outline-offset: 3px;
+}
+
+.icon-note {
+  margin: -0.4rem 0 0;
+  color: var(--muted);
+  font-size: 0.75rem;
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .icon-opt {
+    transition: none;
   }
 }
