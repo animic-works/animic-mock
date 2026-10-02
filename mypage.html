@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <link rel="icon" type="image/svg+xml" href="images/animic-favicon.svg" />
+    <title>マイページ | Animic</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Maru+Gothic:wght@900&family=Zen+Kaku+Gothic+New:wght@500;700&family=Montserrat:ital,wght@1,500;1,800&family=JetBrains+Mono:wght@500;700&display=swap"
+    />
+    <link rel="stylesheet" href="css/common.css" />
+    <link rel="stylesheet" href="css/transition.css" />
+    <script>
+      // 前の画面から塗りつぶして来た場合、描画前に中身を隠す
+      try {
+        if (sessionStorage.getItem("animic-wipe")) document.documentElement.classList.add("wipe-pending");
+      } catch {}
+    </script>
+    <link rel="stylesheet" href="css/account.css" />
+    <link rel="stylesheet" href="css/mypage.css" />
+  </head>
+  <body>
+    <header class="bar">
+      <a class="bar-logo" href="index.html"><img src="images/animic-logo.svg" alt="Animic トップ" width="2078" height="607" /></a>
+      <p class="bar-title"><span class="eyebrow">My page</span><b>マイページ</b></p>
+      <button class="pill pill-pink bar-start" type="button" id="start">
+        <svg width="12" height="13" viewBox="0 0 26 28" aria-hidden="true"><path d="M3 2.5 L24 14 L3 25.5 Z" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round" /></svg>
+        対戦をはじめる
+      </button>
+    </header>
+
+    <main class="mypage" id="main">
+      <!-- ログイン中: プロフィール・成績・戦績 -->
+      <section class="profile" id="profile" aria-labelledby="profile-name" hidden data-enter>
+        <span class="profile-avatar" id="profile-avatar" aria-hidden="true"></span>
+        <div class="profile-body">
+          <div class="profile-name-row" id="name-view">
+            <h1 class="profile-name" id="profile-name"></h1>
+            <button class="icon-btn" type="button" id="name-edit" aria-label="表示名を変更">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z" /><path d="m13.5 6.5 4 4" /></svg>
+            </button>
+          </div>
+          <form class="name-form" id="name-form" hidden>
+            <label class="sr-only" for="name-input">表示名</label>
+            <input id="name-input" maxlength="20" autocomplete="nickname" required />
+            <button class="pill pill-pink" type="submit">保存</button>
+            <button class="pill" type="button" id="name-cancel">やめる</button>
+          </form>
+          <p class="profile-sub" id="profile-sub"></p>
+        </div>
+        <button class="text-btn" type="button" id="logout">ログアウト</button>
+      </section>
+
+      <section class="stats" id="stats" aria-label="成績" hidden data-enter></section>
+
+      <section class="history" id="history" aria-labelledby="history-title" hidden data-enter>
+        <div class="history-head">
+          <h2 id="history-title"><span class="eyebrow">Matches</span>戦績</h2>
+          <div class="filter" role="group" aria-label="表示する戦績">
+            <button type="button" data-filter="all" aria-pressed="true">すべて</button>
+            <button type="button" data-filter="win" aria-pressed="false">1位だけ</button>
+          </div>
+        </div>
+        <ol class="matches" id="matches"></ol>
+      </section>
+
+      <!-- ゲスト: ログインの案内 -->
+      <section class="card guest" id="guest" aria-labelledby="guest-title" hidden data-enter>
+        <span class="guest-ico" aria-hidden="true"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z" /><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3" /></svg></span>
+        <h1 id="guest-title">戦績を残そう</h1>
+        <p class="sub">マイページでは、これまでの順位・スコア・提出画像を見返せます。ログインしなくても遊べます。</p>
+        <button class="pill pill-pink" type="button" id="guest-login">ログインする</button>
+        <a class="text-btn" href="index.html">トップへ戻る</a>
+      </section>
+    </main>
+
+    <script src="js/common.js"></script>
+    <script src="js/art.js"></script>
+    <script src="js/mypage.js"></script>
+  </body>
+</html>

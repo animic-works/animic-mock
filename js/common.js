@@ -343,7 +343,10 @@ function mountAccount(slot, { compact = false } = {}) {
       <div class="acc-stats"><span><b>${list.length}</b>対戦</span><span><b>${wins}</b>勝</span></div>
       <p class="eyebrow acc-label">Recent</p>
       ${rows.length ? `<ol class="acc-history">${rows.join("")}</ol>` : `<p class="acc-empty">まだ戦績がありません。<br />対戦すると、ここに残ります。</p>`}
-      <button class="acc-logout" type="button" role="menuitem">ログアウト</button>
+      <div class="acc-foot">
+        <a class="acc-mypage" href="mypage.html" role="menuitem">マイページ<svg width="8" height="12" viewBox="0 0 12 20" aria-hidden="true"><path d="M2 2 L10 10 L2 18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" /></svg></a>
+        <button class="acc-logout" type="button" role="menuitem">ログアウト</button>
+      </div>
     </div>`;
   const button = slot.querySelector(".account-avatar");
   const menu = slot.querySelector(".account-menu");

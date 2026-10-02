@@ -1,0 +1,535 @@
+/* マイページ: プロフィール・成績・戦績 */
+:root {
+  --display: "Dela Gothic One", "Zen Maru Gothic", sans-serif;
+  --ease-out: cubic-bezier(0.2, 0.9, 0.3, 1);
+  --lift: 0 12px 32px -20px rgb(11 27 43 / 0.35);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.eyebrow {
+  display: block;
+  color: var(--pink);
+  font-family: var(--latin);
+  font-style: italic;
+  font-weight: 800;
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+/* 上のバー */
+.bar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  height: 4.5rem;
+  padding: 0 clamp(16px, 3vw, 2rem);
+  background: rgb(245 246 248 / 0.92);
+  backdrop-filter: blur(8px);
+}
+
+.bar-logo img {
+  display: block;
+  width: 7rem;
+  height: auto;
+}
+
+.bar-title {
+  display: grid;
+  gap: 0.1rem;
+  margin: 0;
+  line-height: 1;
+}
+
+.bar-title b {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 1.05rem;
+}
+
+.bar-start {
+  width: auto;
+  margin-left: auto;
+  padding: 0.6rem 1.2rem;
+  font-size: 0.9rem;
+  box-shadow: 0 8px 18px -8px rgb(255 45 135 / 0.7);
+}
+
+.mypage {
+  display: grid;
+  gap: 1.5rem;
+  width: min(100% - 32px, 60rem);
+  margin: 1rem auto 4rem;
+}
+
+/* プロフィール */
+.profile {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: clamp(1.25rem, 3vw, 1.75rem);
+  border: 2px solid var(--line);
+  border-radius: 1.75rem;
+  background:
+    radial-gradient(circle at 100% 0, rgb(255 114 185 / 0.18), transparent 45%),
+    #fff;
+  box-shadow: var(--lift);
+}
+
+.profile-avatar {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: clamp(4rem, 10vw, 5.5rem);
+  height: clamp(4rem, 10vw, 5.5rem);
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--pink-soft), var(--pink));
+  color: #fff;
+  font-family: var(--round);
+  font-weight: 900;
+  font-size: clamp(1.7rem, 4vw, 2.3rem);
+  box-shadow: 0 0 0 4px #fff, 0 0 0 7px var(--pink-soft);
+}
+
+.profile-avatar .account-badge {
+  right: 0;
+  bottom: 0;
+  width: 1.7rem;
+  height: 1.7rem;
+  padding: 0.25rem;
+}
+
+.profile-body {
+  display: grid;
+  gap: 0.35rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-name-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.profile-name {
+  margin: 0;
+  overflow: hidden;
+  font-family: var(--round);
+  font-weight: 900;
+  font-size: clamp(1.4rem, 3.5vw, 1.9rem);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.icon-btn {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 2.2rem;
+  height: 2.2rem;
+  border: 0;
+  border-radius: 50%;
+  background: var(--ground);
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.icon-btn:hover {
+  color: var(--ink);
+}
+
+.name-form {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.name-form input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.6rem 0.9rem;
+  border: 2px solid var(--ink);
+  border-radius: 0.8rem;
+  font: inherit;
+  font-size: 1rem;
+}
+
+.name-form .pill {
+  width: auto;
+  padding: 0.55rem 1rem;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  box-shadow: none;
+}
+
+.profile-sub {
+  display: flex;
+  white-space: nowrap;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.acc-prov {
+  display: inline-block;
+  width: 0.95rem;
+  height: 0.95rem;
+}
+
+.acc-prov svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.text-btn {
+  flex: none;
+  padding: 0.4rem 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.text-btn:hover {
+  color: var(--pink);
+}
+
+/* 成績 */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.stat {
+  display: grid;
+  gap: 0.35rem;
+  padding: 1rem 1.1rem;
+  border: 2px solid var(--line);
+  border-radius: 1.2rem;
+  background: #fff;
+}
+
+.stat-label {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.stat b {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(1.4rem, 3vw, 1.9rem);
+  line-height: 1;
+}
+
+.stat b small {
+  margin-left: 0.15rem;
+  color: var(--muted);
+  font-family: var(--body);
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
+.stat.is-accent {
+  border-color: transparent;
+  background: var(--pink);
+  color: #fff;
+}
+
+.stat.is-accent .stat-label,
+.stat.is-accent b small {
+  color: rgb(255 255 255 / 0.85);
+}
+
+/* 戦績 */
+.history {
+  display: grid;
+  gap: 1rem;
+}
+
+.history-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.history-head h2 {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 1.5rem;
+}
+
+.filter {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: inset 0 0 0 2px var(--line);
+}
+
+.filter button {
+  padding: 0.4rem 0.9rem;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.filter button[aria-pressed="true"] {
+  background: var(--ink);
+  color: #fff;
+}
+
+.matches {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.match {
+  display: grid;
+  grid-template-columns: 3.4rem 3.6rem minmax(0, 1fr) minmax(8rem, 12rem) 6rem;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.6rem 1.25rem 0.6rem 0.6rem;
+  border: 2px solid var(--line);
+  border-radius: 1.1rem;
+  background: #fff;
+  animation: rise 0.5s var(--ease-out) calc(var(--d) * 0.05s) both;
+}
+
+.match.is-win {
+  border-color: var(--pink-soft);
+  background: #fff7fb;
+}
+
+.match-thumb {
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  width: 3.4rem;
+  aspect-ratio: 832 / 1216;
+  border-radius: 0.6rem;
+  background: var(--ground);
+}
+
+.match-thumb svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.no-entry {
+  color: var(--muted);
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+
+.match-rank {
+  font-family: var(--latin);
+  font-style: italic;
+  font-weight: 800;
+  font-size: 1.35rem;
+  color: var(--muted);
+}
+
+.is-win .match-rank {
+  color: var(--pink);
+}
+
+.match-info {
+  display: grid;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.match-info b {
+  font-size: 0.95rem;
+}
+
+.match-info small,
+.match-sim small {
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.match-sim {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.meter {
+  height: 0.45rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--ground);
+}
+
+.meter i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--cyan), var(--pink));
+}
+
+.match-pt {
+  font-family: var(--display);
+  font-size: 1.35rem;
+  text-align: right;
+}
+
+.match-pt small {
+  margin-left: 0.15rem;
+  color: var(--muted);
+  font-family: var(--body);
+  font-weight: 700;
+  font-size: 0.7rem;
+}
+
+.empty {
+  display: grid;
+  justify-items: center;
+  gap: 0.5rem;
+  padding: 2.5rem 1.5rem;
+  border: 2px dashed var(--line);
+  border-radius: 1.25rem;
+  background: #fff;
+  color: var(--muted);
+  font-size: 0.88rem;
+  text-align: center;
+}
+
+.empty b {
+  color: var(--ink);
+  font-family: var(--round);
+  font-size: 1.1rem;
+}
+
+.empty .pill {
+  width: auto;
+  margin-top: 0.5rem;
+  padding-inline: 1.75rem;
+}
+
+/* ゲスト */
+.guest {
+  justify-self: center;
+  justify-items: center;
+  margin-top: 6vh;
+  text-align: center;
+}
+
+.guest .sub {
+  margin: -0.4rem 0 0.2rem;
+  line-height: 1.7;
+}
+
+.guest-ico {
+  display: grid;
+  place-items: center;
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 50%;
+  background: #fff0f7;
+  color: var(--pink);
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+@media (max-width: 860px) {
+  .stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .match {
+    grid-template-columns: 3rem 3rem minmax(0, 1fr) auto;
+    gap: 0.75rem;
+  }
+  .match-thumb {
+    width: 3rem;
+  }
+  .match-sim {
+    display: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .bar-title {
+    display: none;
+  }
+  .bar-start {
+    padding: 0.55rem 1rem;
+    font-size: 0.82rem;
+  }
+  .profile {
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  /* ログアウトは名前の下の行へ回し、名前に幅を残す */
+  .profile .text-btn {
+    flex-basis: 100%;
+    margin-left: calc(clamp(4rem, 10vw, 5.5rem) + 1rem);
+    padding: 0;
+    text-align: left;
+  }
+  .stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .stat.is-accent {
+    grid-column: span 2;
+  }
+  .match {
+    grid-template-columns: 2.6rem 2.6rem minmax(0, 1fr) auto;
+    padding-right: 0.9rem;
+  }
+  .match-thumb {
+    width: 2.6rem;
+  }
+  .match-rank {
+    font-size: 1.05rem;
+  }
+  .match-pt {
+    font-size: 1.1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .match {
+    animation: none;
+  }
+}

@@ -1503,6 +1503,11 @@ body {
   transform: translateY(-2px);
 }
 
+a.save-login {
+  padding-left: 1.1rem;
+  text-decoration: none;
+}
+
 /* Google と Discord の印を重ねて並べる */
 .save-provs {
   display: flex;

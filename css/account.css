@@ -262,8 +262,33 @@
   line-height: 1.6;
 }
 
+.acc-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px dashed var(--acc-line);
+}
+
+.acc-mypage {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.95rem;
+  border-radius: 999px;
+  background: var(--acc-ink);
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.acc-mypage:hover {
+  background: var(--acc-pink);
+}
+
 .acc-logout {
-  justify-self: start;
   padding: 0.3rem 0;
   border: 0;
   background: none;

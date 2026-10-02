@@ -2287,3 +2287,12 @@ html:not(.is-paged):not(.is-scroll) .carousel-controls {
 .carousel-dots button[aria-current="true"] {
   border-color: var(--pink);
 }
+
+/* ナビの中のアカウントのメニュー: ナビのリンクの見た目（文字色・余白）を打ち消す */
+.nav .account a.acc-mypage,
+.nav .account a.acc-mypage:hover {
+  padding: 0.5rem 0.95rem;
+  color: #fff;
+  font-size: 0.82rem;
+  letter-spacing: normal;
+}

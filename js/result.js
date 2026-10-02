@@ -491,9 +491,19 @@ function renderSave() {
   box.hidden = false;
   box.classList.toggle("is-saved", !!account);
   if (account) {
-    saveHistory({ key: historyKey, at: Date.now(), level, players: players.length, rank: me.score ? me.rank : null, total: me.score ? me.score.total : null });
+    saveHistory({
+      key: historyKey,
+      at: Date.now(),
+      level,
+      players: players.length,
+      rank: me.score ? me.rank : null,
+      total: me.score ? me.score.total : null,
+      sim: me.score ? me.score.sim : null,
+      art: me.entry ? artEncode(me.entry.features) : null,
+    });
     box.innerHTML = `<span class="save-ico" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg></span>
-      <p><b>戦績に保存しました</b><span>${escapeHtml(account.name)}（${escapeHtml(account.provider)}）の戦績に残っています。トップのアカウントのメニューから見返せます</span></p>`;
+      <p><b>戦績に保存しました</b><span>${escapeHtml(account.name)}（${escapeHtml(account.provider)}）の戦績に残っています</span></p>
+      <a class="save-login" href="mypage.html">マイページで見る</a>`;
     return;
   }
   box.innerHTML = `<span class="save-ico" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z" /><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3" /></svg></span>
