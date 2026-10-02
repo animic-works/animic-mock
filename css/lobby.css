@@ -1,0 +1,1134 @@
+:root {
+  --display: "Dela Gothic One", "Zen Maru Gothic", sans-serif;
+  /* カードの縁と影: 黒い縁ではなく、淡い縁とやわらかい影にする */
+  --edge: #dfe2e7;
+  --lift: 0 12px 32px -20px rgb(11 27 43 / 0.35);
+}
+
+/* ---------- 上部 ---------- */
+.bar {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem clamp(1rem, 4vw, 3rem) 0;
+}
+
+.bar img {
+  display: block;
+  width: 8rem;
+  height: auto;
+}
+
+.leave {
+  padding: 0.45rem 1.1rem;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: #fff;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+/* スマホのアプリバー・コードのチップ・下部バーの準備状況は、スマホだけで出す */
+.bar-room,
+.code-chip,
+.go-status,
+.leave svg {
+  display: none;
+}
+
+/* PC（2カラム）: 退出はヘッダーではなく、プレイヤーのカードの下に左寄せで置く */
+main .leave-pc {
+  display: none;
+}
+@media (min-width: 821px) {
+  .bar .leave {
+    display: none;
+  }
+  .col-players {
+    display: grid;
+    gap: 1rem;
+  }
+  main .leave-pc {
+    display: inline-block;
+    justify-self: start;
+  }
+}
+
+.lobby {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 72rem);
+  margin: 0 auto;
+  padding: clamp(1rem, 3vw, 2rem) 16px 3rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+  gap: clamp(1.25rem, 3vw, 2rem) clamp(1.25rem, 2.5vw, 1.75rem);
+  align-items: start;
+}
+
+/* プレイヤーのカードの上部: 人数と、ルームコード・招待 */
+.players-head {
+  display: grid;
+  gap: 1rem;
+  padding-bottom: 1.1rem;
+  border-bottom: 2px dashed var(--line);
+}
+
+#players-title {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 1.3rem;
+}
+
+/* ルームコードは、下のプレイヤーの見出しと同じく左端にそろえる */
+.room-card {
+  justify-self: start;
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: end;
+  gap: 0.4rem 0.75rem;
+}
+
+.room-card .room-label {
+  grid-column: 1 / -1;
+}
+
+/* 「ルームコード」は、下の「プレイヤー」と同じ太い見出しにする */
+.room-label {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 1.3rem;
+  color: var(--ink);
+}
+
+.code {
+  display: grid;
+  grid-template-columns: repeat(8, 2.2rem);
+  gap: 0.3rem;
+}
+
+.code span {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 3 / 4;
+  border-radius: 0.6rem;
+  background: #fff;
+  border: 2px solid var(--edge);
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.btn-s {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.6rem 1rem;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform 0.15s;
+}
+
+.btn-s:hover {
+  transform: translateY(-2px);
+}
+
+.btn-s.pink {
+  border-color: var(--pink);
+  background: var(--pink);
+  color: #fff;
+  box-shadow: 0 8px 18px -8px rgb(255 45 135 / 0.7);
+}
+
+/* ---------- 共通のカード ---------- */
+.card-box {
+  padding: clamp(1.1rem, 2.5vw, 1.5rem);
+  background: #fff;
+  border: 2px solid var(--edge);
+  border-radius: 1.6rem;
+  box-shadow: var(--lift);
+  display: grid;
+  gap: 1rem;
+}
+
+.box-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.box-head h2 {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 1.3rem;
+}
+
+.count {
+  font-family: var(--display);
+  font-size: 1.3rem;
+}
+
+.count small {
+  font-size: 0.75em;
+  color: #b5bcc6;
+}
+
+/* ---------- 2. プレイヤー ---------- */
+/* 最初から8人分（4列×2段）の高さを確保し、参加者が増えてもカードの大きさを変えない */
+.players {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(9.2rem, auto));
+  gap: 1rem 0.8rem;
+  margin: 0;
+  padding: 0.6rem 0 0.2rem;
+  list-style: none;
+}
+
+.player {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 0.3rem;
+  padding: 1.05rem 0.5rem 0.8rem;
+  border: 2px solid var(--edge);
+  border-radius: 1.1rem;
+  background: #fff;
+  text-align: center;
+  min-height: 9.2rem;
+}
+
+.player.is-me {
+  border-color: var(--pink);
+  box-shadow: 0 0 0 3px rgb(255 45 135 / 0.12);
+}
+
+.player .avatar {
+  display: grid;
+  place-items: center;
+  width: 3.3rem;
+  height: 3.3rem;
+  border-radius: 50%;
+  background: var(--c);
+  color: var(--on, #fff);
+  font-family: var(--display);
+  font-size: 1.3rem;
+}
+
+.player .name {
+  max-width: 100%;
+  font-family: var(--round);
+  font-weight: 900;
+  font-size: 0.95rem;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.player .ready {
+  margin-top: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #9aa3ae;
+}
+
+.player .ready::before {
+  content: "";
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: #d3d7dd;
+}
+
+.player .ready.is-on {
+  color: #15803d;
+}
+
+.player .ready.is-on::before {
+  background: #22c55e;
+}
+
+.player .tag {
+  position: absolute;
+  top: -0.75rem;
+  left: 50%;
+  padding: 0.12rem 0.55rem;
+  border-radius: 999px;
+  background: var(--yellow);
+  font-size: 0.66rem;
+  font-weight: 700;
+  white-space: nowrap;
+  translate: -50% 0;
+}
+
+.player .tag.me {
+  border-color: var(--pink);
+  background: var(--pink);
+  color: #fff;
+}
+
+.player.is-empty {
+  border: 2.5px dashed var(--pink-soft);
+  background: rgb(255 255 255 / 0.6);
+  box-shadow: none;
+  justify-content: center;
+  align-content: center;
+  color: var(--pink);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  width: 100%;
+}
+
+.player.is-empty .plus {
+  display: grid;
+  place-items: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 50%;
+  border: 2px dashed var(--pink-soft);
+  font-size: 1.3rem;
+  animation: waiting 1.4s ease-in-out infinite;
+}
+
+.players li {
+  display: grid;
+}
+
+@keyframes waiting {
+  50% {
+    transform: scale(0.88);
+  }
+}
+
+.player.is-joined {
+  animation: joined 0.5s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+
+@keyframes joined {
+  from {
+    transform: scale(0.85);
+    opacity: 0;
+  }
+}
+
+/* ---------- 3. ルールと開始 ---------- */
+.rules {
+  display: grid;
+  gap: 0.7rem;
+  margin: 0;
+}
+
+.rules > div {
+  display: grid;
+  grid-template-columns: 6.4rem minmax(0, 1fr);
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.rules dt {
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.rules dd {
+  margin: 0;
+  min-width: 0;
+}
+
+.rules .summary {
+  font-family: var(--round);
+  font-weight: 900;
+}
+
+.seg {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  padding: 0.25rem;
+  border-radius: 999px;
+  background: var(--ground);
+}
+
+.seg input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.seg label {
+  padding: 0.5rem 0.3rem;
+  border-radius: 999px;
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--muted);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.seg input:checked + label {
+  background: var(--ink);
+  color: #fff;
+}
+
+.seg.level input:checked + label {
+  background: var(--pink);
+}
+
+.seg input:focus-visible + label {
+  outline: 3px solid var(--cyan);
+  outline-offset: 2px;
+}
+
+.seg input:disabled + label {
+  cursor: default;
+}
+
+/* 挿絵の文字: 画像の下端に、濃い色のすりガラスの帯を敷いて白文字を重ねる（白背景の絵でも読めるように）。
+   帯の上端はマスクでぼかして、絵になじませる。英字の小見出し → 難易度の説明（見出しフォント）→ EXTRA の順 */
+.level-cap {
+  position: absolute;
+  z-index: 1;
+  inset: auto 0 0;
+  display: grid;
+  gap: 0.35rem;
+  padding: 4rem 1rem 1rem;
+  background: linear-gradient(to top, rgb(11 27 43 / 0.9), rgb(11 27 43 / 0.72) 40%, rgb(11 27 43 / 0.45));
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  /* 上に向かって緩やかなカーブで消えるように、段階的に薄くする */
+  -webkit-mask-image: linear-gradient(to top, #000 32%, rgb(0 0 0 / 0.78) 50%, rgb(0 0 0 / 0.42) 70%, rgb(0 0 0 / 0.14) 88%, transparent);
+  mask-image: linear-gradient(to top, #000 32%, rgb(0 0 0 / 0.78) 50%, rgb(0 0 0 / 0.42) 70%, rgb(0 0 0 / 0.14) 88%, transparent);
+  color: #fff;
+}
+
+/* 左上の小さなタグ（結果画面のお題タグと同じ見た目） */
+.level-tag {
+  position: absolute;
+  z-index: 1;
+  top: 0.75rem;
+  left: 0.75rem;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  background: rgb(11 27 43 / 0.72);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  color: #fff;
+  font-family: var(--latin);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 0.62rem;
+  letter-spacing: 0.22em;
+}
+
+/* 難易度の英語: 白い輪郭線だけの大きな文字で、帯の主役にする */
+.level-word {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--display);
+  font-size: clamp(1.7rem, 9cqi, 2.2rem); /* 枠の幅の9%。デスクトップで約2.1rem */
+  line-height: 1;
+  letter-spacing: 0.04em;
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgb(255 255 255 / 0.85);
+  paint-order: stroke fill;
+}
+
+/* EXTRA は黄色いステッカー風に、少し傾けて英語の横に添える */
+.level-word b {
+  padding: 0.18rem 0.65rem;
+  border-radius: 999px;
+  background: var(--yellow);
+  color: var(--ink);
+  -webkit-text-stroke: 0;
+  font-family: var(--latin);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 0.72rem;
+  letter-spacing: 0.15em;
+  rotate: -4deg;
+}
+
+/* 日本語の説明: 白文字にピンクの落ち影。条件は「・」ではなく細い線で区切る */
+.level-desc {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 0;
+  font-family: var(--round);
+  font-weight: 900;
+  font-size: clamp(1.05rem, 5.4cqi, 1.3rem);
+  line-height: 1.3;
+  text-shadow: 0 2px 0 var(--pink);
+}
+
+.level-desc span + span {
+  margin-left: 0.7rem;
+  padding-left: 0.7rem;
+  border-left: 2px solid rgb(255 255 255 / 0.5);
+}
+
+/* 難易度の挿絵: ルール欄の幅いっぱいの正方形にする。サンプル画像は縦長（832×1216）なので、
+   顔が入るように上寄りで切り取る。横に広い画面では高さを 24rem までに抑えて横長の帯にする */
+.level-art {
+  container-type: inline-size; /* 文字の大きさを枠の幅に連動させるため */
+  position: relative;
+  width: 100%;
+  max-height: 24rem;
+  margin: 0;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border: 2px solid var(--edge);
+  border-radius: 1rem;
+  background: var(--ground);
+}
+
+.level-art img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 15%;
+}
+
+/* 選んでいない難易度の絵は隠す */
+.level-art img[hidden] {
+  display: none;
+}
+
+.rules .wide {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.divider {
+  height: 0;
+  margin: 0.2rem 0;
+  border-top: 2px dashed var(--line);
+}
+
+.go {
+  display: grid;
+  gap: 0.7rem;
+}
+
+/* 準備の状況: プレイヤーの見出しの行の右端に置く（全員そろったら緑） */
+.players-title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+}
+
+.ready-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0.3rem 0.85rem;
+  border-radius: 999px;
+  background: var(--ground);
+  font-size: 0.82rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.ready-status::before {
+  content: "";
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: #c9ced6;
+}
+
+.ready-status b {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 1rem;
+}
+
+.ready-status.is-all {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.ready-status.is-all::before {
+  background: #22c55e;
+}
+
+.go .note {
+  margin: 0;
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.go .note:empty {
+  display: none;
+}
+
+/* ---------- QRコード ---------- */
+.qr-card {
+  justify-items: center;
+  text-align: center;
+}
+
+.invite-code {
+  display: flex;
+  gap: 0.3rem;
+  justify-content: center;
+}
+
+.invite-code span {
+  display: grid;
+  place-items: center;
+  width: 2.1rem;
+  aspect-ratio: 3 / 4;
+  border: 2px solid var(--edge);
+  border-radius: 0.5rem;
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.invite-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.qr-card canvas {
+  width: 9.5rem;
+  height: 9.5rem;
+  padding: 0.6rem;
+  border: 2px solid var(--edge);
+  border-radius: 1rem;
+  background: #fff;
+  image-rendering: pixelated;
+}
+
+.url {
+  width: 100%;
+  padding: 0.65rem 0.9rem;
+  border: 2px solid var(--line);
+  border-radius: 0.8rem;
+  background: var(--ground);
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  color: var(--muted);
+  text-align: center;
+}
+
+/* ---------- カウントダウン ---------- */
+.countdown {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 1rem;
+  padding: 16px;
+  background: rgb(11 27 43 / 0.88);
+  color: #fff;
+  text-align: center;
+}
+
+.countdown-label {
+  margin: 0;
+  padding: 0.35rem 1rem;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.12);
+  font-weight: 700;
+}
+
+.countdown-num {
+  font-family: var(--display);
+  font-size: clamp(6rem, 30vw, 12rem);
+  line-height: 1;
+  color: var(--yellow);
+  animation: pop 0.9s ease-out;
+}
+
+@keyframes pop {
+  from { transform: scale(1.6); opacity: 0; }
+  30% { transform: scale(1); opacity: 1; }
+}
+
+.countdown p {
+  margin: 0;
+  font-weight: 700;
+}
+
+@media (max-width: 820px) {
+  .lobby {
+    grid-template-columns: minmax(0, 1fr);
+    padding-bottom: calc(9rem + env(safe-area-inset-bottom, 0px));
+  }
+  .room-card {
+    width: 100%;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .code {
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+  }
+  /* 画面下に固定したボタンを含むカードを前面に（登場アニメーション中も隠れないように） */
+  .go-card[data-enter="fade"] {
+    position: relative;
+    z-index: 6;
+  }
+  /* スマホでは、状況と開始ボタンを画面下に固定する */
+  .go {
+    position: fixed;
+    z-index: 6;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.75rem 16px calc(0.75rem + env(safe-area-inset-bottom, 0px));
+    background: #fff;
+    border-top: 1px solid var(--edge);
+    box-shadow: 0 -12px 30px -22px rgb(11 27 43 / 0.45);
+  }
+  .go .note {
+    display: none;
+  }
+  /* 開始ボタンは画面下に固定するので、ルールのカードの区切り線は出さない */
+  .go-card .divider {
+    display: none;
+  }
+  .go .pill {
+    padding-inline: 0.5rem;
+    font-size: 0.95rem;
+  }
+
+}
+
+/* ---------- スマホ: アプリ風の画面 ---------- */
+@media (max-width: 560px) {
+  /* 上部のアプリバー: ロゴ・ルームコード・退出を1行に */
+  .bar {
+    position: sticky;
+    top: 0;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 0.5rem;
+    min-height: calc(56px + env(safe-area-inset-top, 0px));
+    padding: env(safe-area-inset-top, 0px) 16px 0;
+    background: rgb(255 255 255 / 0.92);
+    border-bottom: 1px solid var(--edge);
+    backdrop-filter: blur(10px);
+  }
+  .bar img {
+    width: 5.6rem;
+  }
+  .bar-room {
+    justify-self: center;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    min-height: 40px;
+    padding: 0 0.85rem;
+    border: 0;
+    border-radius: 999px;
+    background: var(--ground);
+    color: var(--ink);
+    font: inherit;
+    cursor: pointer;
+  }
+  .bar-room-label {
+    white-space: nowrap;
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--muted);
+  }
+  .bar-room-code {
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: 0.9rem;
+    letter-spacing: 0.08em;
+  }
+  .leave {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    margin-right: -6px;
+    padding: 0;
+    border: 0;
+    background: none;
+  }
+  .leave svg {
+    display: block;
+  }
+  .leave-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  .lobby {
+    gap: 12px;
+    padding: 12px 16px calc(7rem + env(safe-area-inset-bottom, 0px));
+  }
+  .card-box {
+    gap: 0.9rem;
+    padding: 16px;
+    border-radius: 20px;
+  }
+  .box-head h2,
+  #players-title,
+  .count,
+  .room-label {
+    font-size: 1.1rem;
+  }
+
+  /* ルームコード: 8マスの代わりに、タップでコピーできる1行のチップと招待ボタン */
+  .players-head {
+    padding-bottom: 1rem;
+  }
+  .room-card {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+  .room-card .code {
+    display: none;
+  }
+  .code-chip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    min-width: 0;
+    min-height: 52px;
+    padding: 0 0.8rem;
+    border: 2px dashed var(--line);
+    border-radius: 14px;
+    background: var(--ground);
+    color: var(--ink);
+    font: inherit;
+    cursor: pointer;
+  }
+  .code-chip:active {
+    background: #eceef2;
+  }
+  .code-chip-text {
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: clamp(1rem, 5.4vw, 1.35rem);
+    letter-spacing: 0.12em;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  .code-chip svg {
+    flex: none;
+    color: var(--muted);
+  }
+  .room-card .btn-s {
+    min-height: 52px;
+    padding: 0 1rem;
+    border-radius: 14px;
+    font-size: 0.9rem;
+  }
+
+  /* プレイヤー: アバター・名前・準備状況を並べた一覧の行 */
+  .players-title-row {
+    flex-wrap: nowrap;
+  }
+  .players {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 0;
+  }
+  .player {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr) auto;
+    grid-template-areas:
+      "avatar name tag"
+      "avatar ready tag";
+    justify-items: start;
+    align-items: center;
+    gap: 0.1rem 0.8rem;
+    min-height: 64px;
+    padding: 10px 12px;
+    border-width: 1.5px;
+    border-radius: 16px;
+    text-align: left;
+  }
+  .player.is-me {
+    background: #fff7fb;
+    box-shadow: none;
+  }
+  .player .avatar {
+    grid-area: avatar;
+    width: 44px;
+    height: 44px;
+    font-size: 1.1rem;
+  }
+  .player .name {
+    grid-area: name;
+    align-self: end;
+    font-size: 1rem;
+  }
+  .player .name small {
+    white-space: nowrap;
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+  .player .ready {
+    grid-area: ready;
+    align-self: start;
+    margin: 0;
+  }
+  .player .tag {
+    position: static;
+    grid-area: tag;
+    padding: 0.25rem 0.7rem;
+    font-size: 0.72rem;
+    translate: none;
+  }
+  .player.is-empty {
+    grid-template-areas: "avatar name name";
+    min-height: 60px;
+    border-width: 2px;
+    font-size: 0.95rem;
+  }
+  .player.is-empty .plus {
+    grid-area: avatar;
+    width: 44px;
+    height: 44px;
+  }
+
+  /* ルール: 見出しを上、選択肢を下に。選択肢は48px以上の高さで押しやすく */
+  #rules-edit > div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.45rem;
+  }
+  #rules-edit {
+    gap: 1rem;
+  }
+  .rules dt {
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+  .seg {
+    padding: 4px;
+  }
+  .seg label {
+    display: grid;
+    place-items: center;
+    min-height: 40px;
+    padding: 0 0.2rem;
+    font-size: 0.9rem;
+  }
+  .level-art {
+    margin-top: 0.2rem;
+  }
+  #rules-view > div:not(.wide) {
+    grid-template-columns: minmax(0, 1fr) auto;
+    min-height: 44px;
+    border-bottom: 1px solid var(--edge);
+  }
+  #rules-view > div:last-child {
+    border-bottom: 0;
+  }
+
+  /* 下部のアクションバー: 準備状況と開始ボタンを横に並べる */
+  .players-title-row .ready-status {
+    display: none;
+  }
+  .go {
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.75rem;
+    padding: 12px 16px max(12px, env(safe-area-inset-bottom, 0px));
+    border-top: 0;
+    border-radius: 20px 20px 0 0;
+    box-shadow: 0 -10px 30px -18px rgb(11 27 43 / 0.4);
+  }
+  .go-status {
+    display: grid;
+    justify-items: center;
+    gap: 0.05rem;
+    margin: 0;
+    min-width: 4.5rem;
+    padding: 0.35rem 0.7rem;
+    border-radius: 14px;
+    background: var(--ground);
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--muted);
+    line-height: 1.3;
+  }
+  .go-status b {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: 1.05rem;
+    color: var(--ink);
+  }
+  .go-status.is-all {
+    background: #dcfce7;
+    color: #15803d;
+  }
+  .go-status.is-all b {
+    color: #15803d;
+  }
+  .go .pill {
+    min-height: 56px;
+    padding-block: 0;
+    font-size: 1rem;
+  }
+  .go .pill-pink:not(:disabled) {
+    box-shadow: 0 10px 22px -10px rgb(255 45 135 / 0.7);
+  }
+
+  /* 通知は下部のアクションバーの上に出す */
+  .toast {
+    bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+    max-width: calc(100% - 32px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* ダイアログは画面下からのシート（退出の確認は中央のまま） */
+  .dialog:not(.dialog-center) {
+    width: 100%;
+    max-width: 100%;
+    max-height: 90svh;
+    margin: auto 0 0;
+    border-radius: 20px 20px 0 0;
+  }
+  .dialog:not(.dialog-center) .card {
+    padding: 1.5rem 16px max(16px, env(safe-area-inset-bottom, 0px));
+    border-radius: 20px 20px 0 0;
+  }
+  .dialog:not(.dialog-center) .card::before {
+    content: "";
+    justify-self: center;
+    width: 40px;
+    height: 5px;
+    margin: -0.6rem 0 -0.4rem;
+    border-radius: 999px;
+    background: var(--line);
+  }
+  .dialog:not(.dialog-center) .pill {
+    min-height: 52px;
+    padding-block: 0;
+  }
+}
+
+/* 開始の確認: 準備中の人の一覧 */
+.waiting {
+  display: grid;
+  gap: 0.4rem;
+  max-height: 12rem;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+.waiting li {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.45rem 0.75rem 0.45rem 0.45rem;
+  border-radius: 999px;
+  background: var(--ground);
+  font-weight: 700;
+}
+.waiting .avatar {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: var(--c);
+  color: var(--on);
+  font-size: 0.9rem;
+}
+.waiting small {
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+/* 幅の狭いスマホ: コードのチップと招待ボタンを縦に積む */
+@media (max-width: 359px) {
+  .room-card {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .bar-room-label {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .countdown-num,
+  .player.is-empty .plus,
+  .player.is-joined {
+    animation: none;
+  }
+  .btn-s {
+    transition: none;
+  }
+}
+
+/* スマホの横向き: 縦に積むと長くなるので2カラムのままにし、開始ボタンも画面下に固定しない */
+@media (orientation: landscape) and (max-height: 500px) {
+  .lobby {
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+    gap: 1rem;
+    padding: 0.75rem max(16px, env(safe-area-inset-left), env(safe-area-inset-right)) calc(1.5rem + env(safe-area-inset-bottom, 0px));
+  }
+  .go {
+    position: static;
+    padding: 0;
+    background: none;
+    border-top: 0;
+    box-shadow: none;
+  }
+  .go .note {
+    display: block;
+  }
+  .go-card .divider {
+    display: block;
+  }
+  /* ルールのカードは幅が狭いので、項目名を上、選択肢を下に積む */
+  #rules-edit > div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.4rem;
+  }
+  .rules dt {
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+}

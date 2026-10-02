@@ -23,7 +23,12 @@ Animicの画面デザインを確認するためのHTMLモックです。本番�
 | `terms.html` | 利用規約（仮の文面） |
 | `privacy.html` | プライバシーポリシー（仮の文面） |
 
-`common.css`・`common.js`・`transition.css` は画面共通のスタイルと画面遷移、`art.js` は生成画像の代わりに表示するイラストの描画処理です。
+各画面のスタイルは `css/<画面>.css`、処理は `js/<画面>.js` に分けています（利用規約とプライバシーポリシーは `css/legal.css` を共有）。
+
+| ファイル | 内容 |
+| --- | --- |
+| `css/common.css`・`js/common.js`・`css/transition.css` | 画面共通のスタイルと画面遷移 |
+| `js/art.js` | 生成画像の代わりに表示するイラストの描画処理 |
 
 ## 見方
 
