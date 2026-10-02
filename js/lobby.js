@@ -16,6 +16,8 @@ const COLORS = [
 ];
 const isHost = q.get("role") !== "guest";
 const me = { name: q.get("name") || "ゲスト", ready: false, isMe: true };
+// ログインしていれば、自分のアバターにログインしたサービスの印を付ける
+const account = getAccount();
 // ホストは開始の操作をするので、準備完了の操作はせず準備OKとして数える
 if (isHost) me.ready = true;
 const players = isHost ? [me] : [{ name: "ホストさん", ready: true }, me];
@@ -106,7 +108,7 @@ function renderPlayers() {
     const tag = p === host ? `<span class="tag">ホスト</span>` : p.isMe ? `<span class="tag me">あなた</span>` : "";
     cells.push(`<li class="player${p.isMe ? " is-me" : ""}${joined}" style="--c:${bg};--on:${fg}">
       ${tag}
-      <span class="avatar" aria-hidden="true">${escapeHtml([...p.name][0])}</span>
+      <span class="avatar" aria-hidden="true">${escapeHtml([...p.name][0])}${p.isMe && account ? `<span class="account-badge">${PROVIDER_ICONS[account.provider] || ""}</span>` : ""}</span>
       <b class="name">${escapeHtml(p.name)}${p.isMe && p === host ? "<small>（あなた）</small>" : ""}</b>
       <span class="ready ${p.ready ? "is-on" : ""}">${p.ready ? "準備OK" : "準備中"}</span>
     </li>`);

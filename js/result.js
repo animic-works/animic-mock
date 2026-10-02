@@ -473,15 +473,56 @@ function showFinal() {
       </li>`,
     )
     .join("");
+  renderSave();
   $("final").hidden = false;
   scrollTo({ top: 0 });
   if (me.score && me.rank === 1) confetti();
   else if (submitted) setTimeout(confetti, 900);
 }
 
+// ---------- 戦績 ----------
+// ログイン中は結果を自動で戦績に残す。ゲストには、ログインして残す案内を出す（ログインは任意）
+const submittedAny = players.some((p) => p.score);
+const historyKey = `${code}-${q.get("entries") || entries.join()}`;
+function renderSave() {
+  const box = $("save-box");
+  if (!submittedAny) return (box.hidden = true);
+  const account = getAccount();
+  box.hidden = false;
+  box.classList.toggle("is-saved", !!account);
+  if (account) {
+    saveHistory({ key: historyKey, at: Date.now(), level, players: players.length, rank: me.score ? me.rank : null, total: me.score ? me.score.total : null });
+    box.innerHTML = `<span class="save-ico" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg></span>
+      <p><b>戦績に保存しました</b><span>${escapeHtml(account.name)}（${escapeHtml(account.provider)}）の戦績に残っています。トップのアカウントのメニューから見返せます</span></p>`;
+    return;
+  }
+  box.innerHTML = `<span class="save-ico" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z" /><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3" /></svg></span>
+    <p><b>この結果を戦績に残しませんか？</b><span>ゲストのままだと、画面を閉じると消えてしまいます</span></p>
+    <button class="save-login" type="button" id="save-login"><span class="save-provs" aria-hidden="true">${PROVIDER_ICONS.Google}${PROVIDER_ICONS.Discord}</span>ログインして保存</button>`;
+  $("save-login").addEventListener("click", (event) => goLogin("save", { name: me.name, rank: me.score ? me.rank : "", pt: me.score ? fmt(me.score.total) : "" }, event.currentTarget));
+}
+mountAccount($("bar-account"), { compact: true });
+document.addEventListener("account-change", () => {
+  mountAccount($("bar-account"), { compact: true });
+  if (!$("final").hidden) renderSave();
+});
+
+// ログインして戻ってきたとき: 採点の演出は飛ばして、すぐ最終結果を出す
+const fromLogin = q.get("saved") === "1";
+if (fromLogin) {
+  const url = new URL(location.href);
+  url.searchParams.delete("saved");
+  history.replaceState(null, "", url);
+}
+
 async function run() {
   await playWipeOut();
   renderRail(0);
+  if (fromLogin) {
+    showFinal();
+    toast("戦績に保存しました");
+    return;
+  }
   if (reducedMotion) return showFinal();
   for (let i = 0; i < order.length; i++) {
     if (skipping) break;

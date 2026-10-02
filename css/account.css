@@ -1,0 +1,281 @@
+/* アカウント: ヘッダーの「ログイン」とアバター、押すと開くメニュー（js/common.js の mountAccount）。
+   common.css を読み込まない画面（トップ）でも使うので、色と書体はここで持つ */
+.account {
+  --acc-ink: #0b1b2b;
+  --acc-muted: #5b6573;
+  --acc-line: #dfe2e7;
+  --acc-ground: #f5f6f8;
+  --acc-pink: #ff2d87;
+  --acc-pink-soft: #ff72b9;
+  --acc-round: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "Yu Gothic", sans-serif;
+  --acc-latin: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  --acc-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  position: relative;
+  display: inline-flex;
+}
+
+.account-login {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  height: 2.5rem;
+  padding: 0 0.95rem;
+  border: 0;
+  border-radius: 999px;
+  background: rgb(11 27 43 / 0.06);
+  color: var(--acc-ink);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.account-login:hover {
+  background: rgb(11 27 43 / 0.12);
+}
+
+/* 幅の狭いバーでは人のアイコンだけ */
+.account-login.is-compact {
+  width: 2.5rem;
+  padding: 0;
+  justify-content: center;
+}
+
+.account-login.is-compact span {
+  display: none;
+}
+
+.account-avatar {
+  position: relative;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+}
+
+.account-initial {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--acc-pink-soft), var(--acc-pink));
+  color: #fff;
+  font-family: var(--acc-round);
+  font-weight: 900;
+  font-size: 1rem;
+  box-shadow: 0 0 0 2.5px #fff, 0 0 0 4.5px var(--acc-pink-soft);
+}
+
+.account-initial.is-lg {
+  flex: none;
+  width: 2.75rem;
+  height: 2.75rem;
+  box-shadow: none;
+  font-size: 1.15rem;
+}
+
+/* ログインに使ったサービスの小さな印 */
+.account-badge {
+  position: absolute;
+  right: -0.3rem;
+  bottom: -0.3rem;
+  display: grid;
+  place-items: center;
+  width: 1.15rem;
+  height: 1.15rem;
+  padding: 0.15rem;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 4px rgb(11 27 43 / 0.25);
+}
+
+.account-badge svg,
+.acc-prov svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.account-menu {
+  position: absolute;
+  top: calc(100% + 0.75rem);
+  right: 0;
+  z-index: 30;
+  display: grid;
+  gap: 0.85rem;
+  width: 17.5rem;
+  padding: 1.1rem;
+  border: 2px solid var(--acc-line);
+  border-radius: 1.25rem;
+  background: #fff;
+  box-shadow: 0 24px 48px -24px rgb(11 27 43 / 0.45);
+  text-align: left;
+  animation: acc-pop 0.18s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+@keyframes acc-pop {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+}
+
+.acc-head {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.acc-head > span:last-child {
+  display: grid;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.acc-head b {
+  font-family: var(--acc-round);
+  font-weight: 900;
+  font-size: 1.05rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.acc-head small {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--acc-muted);
+  font-size: 0.75rem;
+}
+
+.acc-prov {
+  width: 0.85rem;
+  height: 0.85rem;
+}
+
+.acc-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.acc-stats span {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.25rem;
+  padding: 0.5rem;
+  border-radius: 0.8rem;
+  background: var(--acc-ground);
+  color: var(--acc-muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.acc-stats b {
+  color: var(--acc-ink);
+  font-family: var(--acc-latin);
+  font-style: italic;
+  font-weight: 800;
+  font-size: 1.25rem;
+}
+
+.acc-label {
+  margin: 0 0 -0.45rem;
+  color: var(--acc-pink);
+  font-family: var(--acc-latin);
+  font-style: italic;
+  font-weight: 800;
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.acc-history {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.acc-history li {
+  display: grid;
+  grid-template-columns: 2.6rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.6rem;
+  border-radius: 0.75rem;
+  background: var(--acc-ground);
+}
+
+.acc-rank {
+  font-family: var(--acc-latin);
+  font-style: italic;
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: var(--acc-muted);
+}
+
+.acc-rank.is-win {
+  color: var(--acc-pink);
+}
+
+.acc-what {
+  display: grid;
+  min-width: 0;
+  font-size: 0.78rem;
+}
+
+.acc-what small {
+  color: var(--acc-muted);
+  font-size: 0.68rem;
+}
+
+.acc-pt {
+  font-family: var(--acc-mono);
+  font-size: 0.85rem;
+}
+
+.acc-pt small {
+  margin-left: 0.1rem;
+  font-size: 0.65rem;
+  color: var(--acc-muted);
+}
+
+.acc-empty {
+  margin: 0;
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  background: var(--acc-ground);
+  color: var(--acc-muted);
+  text-align: center;
+  font-size: 0.78rem;
+  line-height: 1.6;
+}
+
+.acc-logout {
+  justify-self: start;
+  padding: 0.3rem 0;
+  border: 0;
+  background: none;
+  color: var(--acc-muted);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.acc-logout:hover {
+  color: var(--acc-pink);
+}

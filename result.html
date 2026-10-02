@@ -19,6 +19,7 @@
         if (sessionStorage.getItem("animic-wipe")) document.documentElement.classList.add("wipe-pending");
       } catch {}
     </script>
+    <link rel="stylesheet" href="css/account.css" />
     <link rel="stylesheet" href="css/result.css" />
   </head>
   <body>
@@ -35,6 +36,7 @@
           スキップ
           <svg width="12" height="12" viewBox="0 0 20 16" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true"><path d="M4 2 13 8l-9 6V2Zm11 0v12" /></svg>
         </button>
+        <span id="bar-account"></span>
       </div>
     </header>
     <div class="track" aria-hidden="true"><i id="track"></i></div>
@@ -68,6 +70,8 @@
       </div>
       <div class="podium" id="podium" style="margin-top: 1.4rem"></div>
       <ol class="ranking" id="ranking" aria-label="順位"></ol>
+      <!-- 戦績: ゲストにはログインして残す案内、ログイン中は保存したことを出す -->
+      <div class="save-box" id="save-box" hidden></div>
       <div class="actions">
         <button class="pill pill-pink" type="button" id="rematch">同じメンバーで再戦</button>
         <button class="pill pill-x" type="button" id="share">

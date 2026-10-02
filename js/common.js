@@ -263,3 +263,101 @@ addEventListener("pageshow", (event) => {
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", sync);
   else sync();
 })();
+
+// ---------- アカウント（モック） ----------
+// docs/product.md: ログインは参加の条件にしない。ログインは「戦績を残したい人」向けの任意の機能として扱う。
+// サーバーとは通信せず、ログインの状態と戦績はこの端末（localStorage）に覚えておく
+const ACCOUNT_KEY = "animic-account";
+const HISTORY_KEY = "animic-history";
+const NAME_KEY = "animic-name";
+const PROVIDER_ICONS = {
+  Google:
+    '<svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z" /><path fill="#FF3D00" d="m6.306 14.691 6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z" /><path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238A11.91 11.91 0 0 1 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z" /><path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 0 1-4.087 5.571l.003-.002 6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z" /></svg>',
+  Discord:
+    '<svg viewBox="0 0 24 24" aria-hidden="true" fill="#5865f2"><path d="M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.865-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.74 19.74 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.058a.082.082 0 0 0 .031.056 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.1 13.1 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .078-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.099.246.198.373.292a.077.077 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.029 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.331c-1.183 0-2.157-1.086-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.095 2.157 2.42 0 1.332-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.086-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.095 2.157 2.42 0 1.332-.946 2.418-2.157 2.418z" /></svg>',
+};
+
+function readStore(key, fallback) {
+  try {
+    return JSON.parse(localStorage.getItem(key)) ?? fallback;
+  } catch {
+    return fallback;
+  }
+}
+function writeStore(key, value) {
+  try {
+    if (value == null) localStorage.removeItem(key);
+    else localStorage.setItem(key, JSON.stringify(value));
+  } catch {}
+}
+
+// { provider: "Google" | "Discord", name: 表示名 } またはログインしていなければ null
+const getAccount = () => readStore(ACCOUNT_KEY, null);
+const setAccount = (account) => writeStore(ACCOUNT_KEY, account);
+function signOut() {
+  writeStore(ACCOUNT_KEY, null);
+  writeStore(HISTORY_KEY, null);
+}
+// 最後に使った表示名（ゲストでも次の入力の初期値にする）
+const lastName = () => readStore(NAME_KEY, "");
+const rememberName = (name) => writeStore(NAME_KEY, name);
+
+// 戦績: 新しい順。同じ対戦（key）は1つだけ残す
+const getHistory = () => readStore(HISTORY_KEY, []);
+function saveHistory(entry) {
+  const list = getHistory().filter((e) => e.key !== entry.key);
+  writeStore(HISTORY_KEY, [entry, ...list].slice(0, 30));
+}
+
+// ログイン画面へ。戻り先（back）には今の画面を渡す
+function goLogin(next, extra = {}, trigger) {
+  wipeTo("login.html", { next, back: location.pathname.split("/").pop() + location.search, ...extra }, trigger);
+}
+
+// アカウントのボタン: ゲストなら「ログイン」、ログイン中ならアバターを押してメニュー（戦績・ログアウト）を開く
+function mountAccount(slot, { compact = false } = {}) {
+  const account = getAccount();
+  slot.classList.add("account");
+  if (!account) {
+    slot.innerHTML = `<button class="account-login${compact ? " is-compact" : ""}" type="button" aria-label="ログイン"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8.5" r="4" /><path d="M4.5 20.5c1.2-4 4-6 7.5-6s6.3 2 7.5 6" /></svg><span>ログイン</span></button>`;
+    slot.firstChild.addEventListener("click", (event) => goLogin("login", {}, event.currentTarget));
+    return;
+  }
+  const list = getHistory();
+  const ord = (n) => (n === 1 ? "1st" : n === 2 ? "2nd" : n === 3 ? "3rd" : `${n}th`);
+  const rows = list.slice(0, 3).map(
+    (e) =>
+      `<li><span class="acc-rank${e.rank === 1 ? " is-win" : ""}">${e.rank ? ord(e.rank) : "—"}</span><span class="acc-what"><b>${escapeHtml(e.level)}・${e.players}人</b><small>${new Date(e.at).toLocaleDateString("ja-JP", { month: "numeric", day: "numeric" })}</small></span><span class="acc-pt">${e.total != null ? `${e.total.toFixed(1)}<small>pt</small>` : "未提出"}</span></li>`,
+  );
+  const wins = list.filter((e) => e.rank === 1).length;
+  slot.innerHTML = `
+    <button class="account-avatar" type="button" aria-haspopup="true" aria-expanded="false" aria-label="アカウント（${escapeHtml(account.name)}）">
+      <span class="account-initial">${escapeHtml([...account.name][0] || "?")}</span>
+      <span class="account-badge">${PROVIDER_ICONS[account.provider] || ""}</span>
+    </button>
+    <div class="account-menu" role="menu" hidden>
+      <div class="acc-head">
+        <span class="account-initial is-lg">${escapeHtml([...account.name][0] || "?")}</span>
+        <span><b>${escapeHtml(account.name)}</b><small><span class="acc-prov">${PROVIDER_ICONS[account.provider] || ""}</span>${escapeHtml(account.provider)}でログイン中</small></span>
+      </div>
+      <div class="acc-stats"><span><b>${list.length}</b>対戦</span><span><b>${wins}</b>勝</span></div>
+      <p class="eyebrow acc-label">Recent</p>
+      ${rows.length ? `<ol class="acc-history">${rows.join("")}</ol>` : `<p class="acc-empty">まだ戦績がありません。<br />対戦すると、ここに残ります。</p>`}
+      <button class="acc-logout" type="button" role="menuitem">ログアウト</button>
+    </div>`;
+  const button = slot.querySelector(".account-avatar");
+  const menu = slot.querySelector(".account-menu");
+  const toggle = (open) => {
+    menu.hidden = !open;
+    button.setAttribute("aria-expanded", String(open));
+  };
+  button.addEventListener("click", () => toggle(menu.hidden));
+  document.addEventListener("click", (event) => !slot.contains(event.target) && toggle(false));
+  addEventListener("keydown", (event) => event.key === "Escape" && !menu.hidden && (toggle(false), button.focus()));
+  slot.querySelector(".acc-logout").addEventListener("click", () => {
+    signOut();
+    toast("ログアウトしました");
+    mountAccount(slot, { compact });
+    slot.dispatchEvent(new CustomEvent("account-change", { bubbles: true }));
+  });
+}

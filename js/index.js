@@ -39,6 +39,14 @@ const msg = document.getElementById("code-msg");
 const submit = document.getElementById("join-submit");
 const HINT = msg.textContent;
 
+// ログインの入口（PCは上のナビ、スマホは上のバー）
+mountAccount(document.getElementById("nav-account"));
+mountAccount(document.getElementById("appbar-account"), { compact: true });
+document.addEventListener("account-change", () => {
+  mountAccount(document.getElementById("nav-account"));
+  mountAccount(document.getElementById("appbar-account"), { compact: true });
+});
+
 const startButton = document.getElementById("start");
 startButton.addEventListener("click", () => wipeTo("login.html", { next: "create" }, startButton));
 const navStart = document.getElementById("nav-start");

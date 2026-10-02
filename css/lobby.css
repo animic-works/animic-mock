@@ -222,6 +222,7 @@ main .leave-pc {
 }
 
 .player .avatar {
+  position: relative;
   display: grid;
   place-items: center;
   width: 3.3rem;

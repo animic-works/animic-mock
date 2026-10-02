@@ -165,6 +165,13 @@ html:not(.is-paged):not(.is-scroll) .nav a[aria-current="page"]::after {
   transform: translateY(-2px);
 }
 
+/* 右端のアカウント: 細い区切り線のあとに置く */
+.nav-account {
+  margin-left: calc(0.4rem - clamp(1rem, 3.5vw, 3.5rem) / 2);
+  padding-left: calc(clamp(1rem, 3.5vw, 3.5rem) / 2);
+  border-left: 2px solid #dfe2e7;
+}
+
 /* 右端の現在位置 */
 .pager {
   position: fixed;
@@ -1704,7 +1711,7 @@ html:not(.is-paged):not(.is-scroll) .carousel-controls {
   .appbar-join-long {
     display: none;
   }
-  @media (min-width: 390px) {
+  @media (min-width: 430px) {
     .appbar-join-long {
       display: inline;
     }
