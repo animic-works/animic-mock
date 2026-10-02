@@ -29,6 +29,7 @@ Animicの画面デザインを確認するためのHTMLモックです。本番�
 | --- | --- |
 | `css/common.css`・`js/common.js`・`css/transition.css` | 画面共通のスタイルと画面遷移 |
 | `js/art.js` | 生成画像の代わりに表示するイラストの描画処理 |
+| `js/prompt.js`・`js/prompt-dict.js` | 対戦画面のプロンプトの管理（タブ・語句と重み・入力候補・検索）と、表現の辞書 |
 
 ## 見方
 
