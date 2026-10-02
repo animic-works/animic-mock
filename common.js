@@ -228,3 +228,38 @@ addEventListener("pageshow", (event) => {
   document.querySelectorAll(".wipe").forEach((el) => el.remove());
   document.querySelectorAll(".is-pressed").forEach((el) => el.classList.remove("is-pressed"));
 });
+
+// スマホを横にしたら「縦向きで遊んでね」のダイアログを出す。縦に戻すと自動で閉じる
+(() => {
+  const landscape = matchMedia("(orientation: landscape) and (pointer: coarse) and (max-height: 500px)");
+  let dialog;
+  let dismissed = false;
+  function sync() {
+    if (!landscape.matches) {
+      dismissed = false;
+      if (dialog?.open) dialog.close();
+      return;
+    }
+    if (dismissed) return;
+    if (!dialog) {
+      dialog = document.createElement("dialog");
+      dialog.className = "dialog dialog-center rotate-dialog";
+      dialog.setAttribute("aria-labelledby", "rotate-title");
+      dialog.innerHTML =
+        '<form class="card" method="dialog">' +
+        '<svg class="rotate-icon" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2.2" /><path d="M11 18.5h2" /></svg>' +
+        '<h1 id="rotate-title">縦向きがおすすめです</h1>' +
+        '<p class="sub">このアプリは縦向きで遊ぶように作られています。<br />スマホを縦に戻してください。</p>' +
+        '<button class="pill" value="close">このまま使う</button>' +
+        "</form>";
+      dialog.addEventListener("close", () => {
+        if (landscape.matches) dismissed = true;
+      });
+      document.body.append(dialog);
+    }
+    if (!dialog.open) dialog.showModal();
+  }
+  landscape.addEventListener("change", sync);
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", sync);
+  else sync();
+})();

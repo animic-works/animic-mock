@@ -1041,19 +1041,19 @@
           text-overflow: ellipsis;
         }
 
-        /* ダイアログは画面下からのシート */
-        .dialog {
+        /* ダイアログは画面下からのシート（退出の確認は中央のまま） */
+        .dialog:not(.dialog-center) {
           width: 100%;
           max-width: 100%;
           max-height: 90svh;
           margin: auto 0 0;
           border-radius: 20px 20px 0 0;
         }
-        .dialog .card {
+        .dialog:not(.dialog-center) .card {
           padding: 1.5rem 16px max(16px, env(safe-area-inset-bottom, 0px));
           border-radius: 20px 20px 0 0;
         }
-        .dialog .card::before {
+        .dialog:not(.dialog-center) .card::before {
           content: "";
           justify-self: center;
           width: 40px;
@@ -1062,7 +1062,7 @@
           border-radius: 999px;
           background: var(--line);
         }
-        .dialog .pill {
+        .dialog:not(.dialog-center) .pill {
           min-height: 52px;
           padding-block: 0;
         }
@@ -1121,6 +1121,37 @@
         }
         .btn-s {
           transition: none;
+        }
+      }
+
+      /* スマホの横向き: 縦に積むと長くなるので2カラムのままにし、開始ボタンも画面下に固定しない */
+      @media (orientation: landscape) and (max-height: 500px) {
+        .lobby {
+          grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+          gap: 1rem;
+          padding: 0.75rem max(16px, env(safe-area-inset-left), env(safe-area-inset-right)) calc(1.5rem + env(safe-area-inset-bottom, 0px));
+        }
+        .go {
+          position: static;
+          padding: 0;
+          background: none;
+          border-top: 0;
+          box-shadow: none;
+        }
+        .go .note {
+          display: block;
+        }
+        .go-card .divider {
+          display: block;
+        }
+        /* ルールのカードは幅が狭いので、項目名を上、選択肢を下に積む */
+        #rules-edit > div {
+          grid-template-columns: minmax(0, 1fr);
+          gap: 0.4rem;
+        }
+        .rules dt {
+          font-size: 0.8rem;
+          color: var(--muted);
         }
       }
     </style>
@@ -1255,7 +1286,7 @@
       </form>
     </dialog>
 
-    <dialog class="dialog" id="leave-dialog">
+    <dialog class="dialog dialog-center" id="leave-dialog">
       <form class="card" method="dialog">
         <h1>ルームを出ますか？</h1>
         <p class="sub">ホストの場合は、次に参加した人にホストを引き継ぎます。</p>
@@ -1351,7 +1382,7 @@
 
       // 難易度の英語と説明。選んでいるものだけを挿絵の上に表示する
       const LEVELS = {
-        かんたん: { en: "EASY", desc: ["白背景", "1キャラクター"] },
+        かんたん: { en: "EASY", desc: ["背景なし", "1キャラクター"] },
         ふつう: { en: "NORMAL", desc: ["背景あり", "1キャラクター"] },
         むずかしい: { en: "HARD", desc: ["背景あり", "2キャラクター"], extra: true },
       };

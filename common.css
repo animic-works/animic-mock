@@ -479,3 +479,44 @@ input:focus-visible {
     border-bottom: 0;
   }
 }
+
+/* スマホを横にしたときのダイアログ: 背の低い画面に収まるよう詰める */
+.rotate-dialog .card {
+  justify-items: center;
+  gap: 0.9rem;
+  padding: 1.5rem 1.75rem;
+}
+
+.rotate-dialog .card h1 {
+  font-size: 1.35rem;
+}
+
+.rotate-dialog .sub {
+  margin: -0.4rem 0 0.2rem;
+}
+
+.rotate-dialog .pill {
+  width: 100%;
+}
+
+.rotate-icon {
+  color: var(--pink);
+  animation: rotate-hint 2.4s var(--ease-out, ease) infinite;
+}
+
+@keyframes rotate-hint {
+  0%,
+  20% {
+    transform: rotate(90deg);
+  }
+  50%,
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rotate-icon {
+    animation: none;
+  }
+}

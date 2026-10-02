@@ -29,8 +29,6 @@
         --edge: #dfe2e7;
         --lift: 0 12px 32px -20px rgb(11 27 43 / 0.35);
         --ease-out: cubic-bezier(0.2, 0.9, 0.3, 1);
-        /* 画面の中の「ざらざら」（生成中のノイズ） */
-        --noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
       }
 
       body {
@@ -177,11 +175,17 @@
       }
 
       /* 残り時間のバー: 3色の斜線が流れ続ける */
+      /* 画面の端から端ではなく、下のパネルと同じ幅のレールにする */
       .time-track {
         position: relative;
         z-index: 5;
         height: var(--track-h);
-        background: rgb(11 27 43 / 0.08);
+        margin: 0 clamp(16px, 2vw, 1.75rem);
+        border-radius: 999px;
+        background: #fff;
+        box-shadow:
+          inset 0 0 0 1px var(--edge),
+          0 4px 10px -6px rgb(11 27 43 / 0.25);
       }
 
       .time-track span {
@@ -195,8 +199,9 @@
         background-size:
           32px 100%,
           100% 100%;
-        transform-origin: left;
-        transition: transform 0.25s linear;
+        /* 縮めずに右から切り取る（縞とグラデーションが潰れないように） */
+        clip-path: inset(0 calc(100% - var(--left, 1) * 100%) 0 0 round 999px);
+        transition: clip-path 0.25s linear;
         animation: stripes 0.9s linear infinite;
       }
 
@@ -806,18 +811,6 @@
         background: #16b37e;
       }
 
-      /* 書いてあるタブには右上に小さな点 */
-      .ptab.has-text::after {
-        content: "";
-        position: absolute;
-        top: 0.15rem;
-        right: 0.25rem;
-        width: 0.3rem;
-        height: 0.3rem;
-        border-radius: 50%;
-        background: var(--pink);
-      }
-
       .ptab-x {
         display: grid;
         place-items: center;
@@ -870,7 +863,7 @@
         max-width: 100%;
         padding: 0.2rem 0.2rem 0.2rem 0.8rem;
         border: 1.5px solid var(--edge);
-        border-radius: 999px;
+        border-radius: 0.8rem; /* 中の＋−の角（0.65rem）＋余白に合わせる */
         background: var(--ground);
         font-size: 0.82rem;
         font-weight: 700;
@@ -920,22 +913,18 @@
       .tok-ws {
         display: grid;
         grid-template-rows: 1fr 1fr;
-        gap: 2px;
-        margin-left: 0.25rem;
+        gap: 1px;
+        margin-left: 0.05rem;
+        overflow: hidden;
+        border-radius: 0.65rem;
+        background: var(--edge);
+        box-shadow: 0 0 0 1px var(--edge);
       }
 
       .tok .tok-ws button {
-        width: 1.25rem;
-        height: 0.9rem;
-        border-radius: 0.45rem;
-      }
-
-      .tok .tok-ws button:first-child {
-        border-radius: 0.6rem 0.6rem 0.25rem 0.25rem;
-      }
-
-      .tok .tok-ws button:last-child {
-        border-radius: 0.25rem 0.25rem 0.6rem 0.6rem;
+        width: 1.3rem;
+        height: 0.95rem;
+        border-radius: 0;
       }
 
       .tok button:hover:not(:disabled) {
@@ -944,7 +933,7 @@
       }
 
       .tok button:disabled {
-        opacity: 0.35;
+        color: #c4cad2;
         cursor: default;
       }
 
@@ -2118,83 +2107,32 @@
         font-weight: 500;
       }
 
-      /* 生成中: ノイズの中から絵が浮かび上がる（拡散モデル風） */
+      /* 生成中: 途中の絵は取得できないので、スピナーだけを出す */
       .gen {
         position: absolute;
         inset: 0;
+        display: grid;
+        place-items: center;
         overflow: hidden;
-        background: #fff;
+        background:
+          radial-gradient(circle, rgb(11 27 43 / 0.08) 1.2px, transparent 1.6px) 0 0 / 16px 16px,
+          var(--ground);
       }
 
-      .gen svg {
-        animation: develop var(--dur, 3s) cubic-bezier(0.4, 0, 0.3, 1) both;
-        animation-delay: calc(var(--t, 0ms) * -1);
+      /* 3色のリングが回る */
+      .gen-spin {
+        width: clamp(1.4rem, 28%, 3.6rem);
+        aspect-ratio: 1;
+        border-radius: 50%;
+        background: conic-gradient(from 0deg, transparent 0 10%, var(--cyan) 40%, var(--pink) 75%, var(--yellow));
+        -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 0.32rem), #000 calc(100% - 0.3rem));
+        mask: radial-gradient(farthest-side, transparent calc(100% - 0.32rem), #000 calc(100% - 0.3rem));
+        animation: spin 0.9s linear infinite;
       }
 
-      @keyframes develop {
-        from {
-          filter: blur(28px) saturate(2) hue-rotate(60deg) contrast(1.4);
-          transform: scale(1.25);
-        }
-        55% {
-          filter: blur(10px) saturate(1.5) hue-rotate(15deg) contrast(1.15);
-        }
-        to {
-          filter: blur(3px) saturate(1.1);
-          transform: scale(1.03);
-        }
-      }
-
-      .gen::before {
-        content: "";
-        position: absolute;
-        inset: -50%;
-        background: var(--noise);
-        mix-blend-mode: hard-light;
-        animation:
-          grain 0.35s steps(3) infinite,
-          denoise var(--dur, 3s) linear both;
-        animation-delay: 0s, calc(var(--t, 0ms) * -1);
-      }
-
-      @keyframes grain {
-        33% {
-          transform: translate(-7%, 4%);
-        }
-        66% {
-          transform: translate(5%, -6%);
-        }
-      }
-
-      @keyframes denoise {
-        from {
-          opacity: 0.95;
-        }
-        to {
-          opacity: 0.15;
-        }
-      }
-
-      /* 上から下へ走る走査線 */
-      .gen::after {
-        content: "";
-        position: absolute;
-        left: 0;
-        right: 0;
-        top: 0;
-        height: 30%;
-        background: linear-gradient(to bottom, transparent, rgb(0 180 252 / 0.28) 85%, rgb(255 255 255 / 0.9));
-        mix-blend-mode: screen;
-        animation: scan 1.4s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-      }
-
-      @keyframes scan {
-        from {
-          translate: 0 -100%;
-        }
-        to {
-          translate: 0 340%;
-        }
+      .shot .gen-spin {
+        -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2.5px));
+        mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2.5px));
       }
 
       .gen-hud {
@@ -4377,7 +4315,7 @@
           font-size: 0.78rem;
         }
         .tok .tok-ws button {
-          width: 1.15rem;
+          width: 1.2rem;
           height: 0.85rem;
         }
         .prompt-tools {
@@ -4448,10 +4386,312 @@
           animation-iteration-count: 1 !important;
           transition-duration: 0.01ms !important;
         }
-        .gen::after,
         .kickoff,
         .scan-beam {
           display: none;
+        }
+      }
+
+      /* ---------- スマホの横向き: 背が低いので、PCと同じ「左にプロンプト、右に比較」を詰めて1画面に収める ----------
+         上部は1行（ロゴ・残り時間・プレイヤー）、比較の見出しは隠して画像に高さを回す */
+      @media (orientation: landscape) and (max-height: 500px) {
+        :root {
+          --bar-h: calc(3.4rem + env(safe-area-inset-top));
+          --track-h: 5px;
+          --side: max(12px, env(safe-area-inset-left), env(safe-area-inset-right));
+        }
+        .bar {
+          grid-template-columns: auto auto minmax(0, 1fr);
+          grid-template-rows: none;
+          grid-template-areas: "left timer hud";
+          gap: 0.75rem;
+          padding: env(safe-area-inset-top) var(--side) 0;
+        }
+        .bar-left img {
+          width: 4.8rem;
+          margin: 0;
+        }
+        .bar-left .chip {
+          display: none;
+        }
+        .timer {
+          grid-auto-flow: column;
+          align-items: center;
+          gap: 0.5rem;
+          width: auto;
+          padding: 0.3rem 0.85rem;
+          border-radius: 999px;
+          box-shadow: none;
+        }
+        .timer .eyebrow {
+          font-size: 0.5rem;
+        }
+        .timer-num {
+          font-size: 1.3rem;
+        }
+        .hud {
+          justify-self: end;
+        }
+        .roster {
+          padding: 0.2rem;
+          box-shadow: none;
+        }
+        .member {
+          gap: 0.35rem;
+          width: 6.4rem;
+          padding: 0.15rem 0.5rem 0.15rem 0.15rem;
+        }
+        .roster.is-narrow .member {
+          width: 4.9rem;
+        }
+        .m-avatar {
+          width: 1.7rem;
+          height: 1.7rem;
+          font-size: 0.72rem;
+        }
+        .time-track {
+          margin: 0 var(--side);
+        }
+
+        .play {
+          height: calc(100svh - var(--bar-h) - var(--track-h));
+          padding: 8px var(--side) max(8px, env(safe-area-inset-bottom));
+          grid-template-columns: minmax(17rem, 40%) minmax(0, 1fr);
+          grid-template-rows: minmax(0, 1fr);
+          grid-template-areas: "compose stage";
+          gap: 8px;
+        }
+        .panel {
+          padding: 0.6rem 0.7rem 0.7rem;
+          border-radius: 1.1rem;
+        }
+
+        /* 左: 見出しの文字は隠し、文章／タグの切り替えをタブの行の右に寄せる */
+        .compose,
+        .compose.is-chips-open {
+          grid-template-columns: minmax(0, 1fr) auto;
+          grid-template-rows: auto minmax(0, 1fr) auto auto;
+          grid-template-areas:
+            "tabs head"
+            "prompt prompt"
+            "search search"
+            "foot foot";
+          gap: 0.45rem;
+        }
+        .compose .panel-title {
+          display: none;
+        }
+        .seg button {
+          padding: 0.28rem 0.65rem;
+          font-size: 0.72rem;
+        }
+        .seg button svg {
+          display: none;
+        }
+        .ptab,
+        .ptab-add {
+          padding: 0.2rem 0.55rem;
+          font-size: 0.7rem;
+        }
+        .compose > .prompt-box .tokens {
+          min-height: 0;
+          padding: 0.45rem 0.6rem 0.2rem;
+        }
+        .psearch {
+          grid-template-columns: 1fr 1fr;
+          gap: 0.4rem;
+        }
+        .psearch .find {
+          padding: 0.25rem 0.5rem 0.25rem 0.25rem;
+          font-size: 0.68rem;
+        }
+        .psearch-ico {
+          width: 1.5rem;
+          height: 1.5rem;
+        }
+        .psearch-mid {
+          display: none;
+        }
+        .compose-foot {
+          grid-template-columns: auto minmax(0, 1fr);
+          gap: 0.6rem;
+        }
+        .meter .eyebrow,
+        .pips {
+          display: none;
+        }
+        .key {
+          min-height: 2.6rem;
+          font-size: 0.92rem;
+        }
+        .key-gen .kbd {
+          display: none;
+        }
+
+        /* 右: お題とあなたの画像を並べ、履歴と提出は右の細い列に */
+        .stage {
+          grid-template-columns: minmax(0, 1fr) clamp(7.5rem, 18vw, 10rem);
+          grid-template-rows: minmax(0, 1fr);
+          grid-template-areas: "compare rail";
+          column-gap: 0.8rem;
+          min-width: 0;
+        }
+        .stage > .panel-head {
+          display: none;
+        }
+        .compare {
+          grid-area: compare;
+          container-type: size;
+          gap: 0.8rem;
+        }
+        .compare-item {
+          gap: 0.35rem;
+          width: min(100%, calc((100cqh - 1.6rem) * 832 / 1216));
+        }
+        .compare-label {
+          font-size: 0.7rem;
+        }
+        .compare-label small {
+          display: none;
+        }
+        .empty-sub,
+        .stage-empty .kbd {
+          display: none;
+        }
+        .stage-empty {
+          gap: 0.4rem;
+          padding: 0.5rem;
+          font-size: 0.64rem;
+          line-height: 1.5;
+        }
+        .stage-empty svg {
+          width: 34%;
+        }
+        .frame {
+          border-radius: 0.9rem;
+        }
+        .stage-foot {
+          grid-area: rail;
+          grid-template-columns: minmax(0, 1fr);
+          grid-template-rows: minmax(0, 1fr) auto;
+          align-items: stretch;
+          gap: 0.5rem;
+          padding: 0 0 0 0.8rem;
+          border-top: 0;
+          border-left: 2px dashed var(--line);
+        }
+        .history {
+          grid-template-rows: auto minmax(0, 1fr);
+          min-height: 0;
+        }
+        .history-title {
+          font-size: 0.78rem;
+        }
+        .shots {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          align-content: start;
+          gap: 0.35rem;
+          min-height: 0;
+          padding: 0.2rem 0.1rem;
+          overflow-x: hidden;
+          overflow-y: auto;
+        }
+        .shots:empty::before {
+          grid-column: 1 / -1;
+          width: auto;
+          max-width: none;
+          height: 100%;
+          padding: 0 0.5rem;
+          text-align: center;
+          line-height: 1.5;
+          font-size: 0.66rem;
+        }
+        .shot {
+          width: 100%;
+          height: auto;
+          aspect-ratio: 832 / 1216;
+          border-radius: 0.5rem;
+        }
+        .submit-box {
+          justify-items: stretch;
+          gap: 0.35rem;
+        }
+        .submit-box .quick {
+          justify-self: start;
+          gap: 0.35rem;
+          font-size: 0.62rem;
+          line-height: 1.3;
+          white-space: normal;
+        }
+        .submit-box .key {
+          width: 100%;
+          min-width: 0;
+          min-height: 2.6rem;
+          padding: 0 0.6rem;
+          font-size: 0.8rem;
+          letter-spacing: 0.02em;
+        }
+        .submit-box .key svg {
+          display: none;
+        }
+
+        /* 検索のモーダル: 見出し・検索欄・閉じるを1行にし、決定は見出しの行に。カードの一覧に高さを回す */
+        dialog.dialog.search-dialog {
+          width: 100%;
+          height: 100%;
+          max-height: 100svh;
+          margin: 0;
+          aspect-ratio: auto;
+          border-radius: 0;
+        }
+        .sd {
+          grid-template-columns: minmax(0, 1fr);
+          grid-template-rows: auto auto minmax(0, 1fr) auto;
+          grid-template-areas:
+            "head"
+            "nav"
+            "main"
+            "foot";
+          border-radius: 0;
+          padding: 0 env(safe-area-inset-right) 0 env(safe-area-inset-left);
+        }
+        .sd-head {
+          flex-wrap: nowrap;
+          padding: 0.45rem 1rem;
+        }
+        .sd-head h1 {
+          font-size: 0.95rem;
+          white-space: nowrap;
+        }
+        .search-field {
+          order: 0;
+          flex: 1 1 auto;
+          max-width: none;
+        }
+        .sd-nav {
+          padding: 0.4rem 1rem;
+        }
+        .sd-nav button {
+          padding: 0.3rem 0.7rem;
+          font-size: 0.72rem;
+        }
+        .sd-main {
+          padding: 0.5rem 1rem 0;
+        }
+        .sd-grid {
+          grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr));
+          gap: 0.5rem;
+        }
+        .sd-foot {
+          padding: 0.4rem 1rem calc(0.4rem + env(safe-area-inset-bottom));
+        }
+        .sd-foot > span:first-child {
+          display: none;
+        }
+        .sd-done.pill {
+          padding: 0.4rem 1.4rem;
+          font-size: 0.85rem;
         }
       }
     </style>
@@ -4687,7 +4927,7 @@
       $("level-chip").textContent = `${level}・${total}秒${LIMIT ? `・${LIMIT}回まで` : ""}`;
       // お題の画像と難易度の表示は、ロビーの「TOPIC IMAGE」と揃える
       const LEVELS = {
-        かんたん: { en: "EASY", desc: ["白背景", "1キャラクター"], art: "images/sample-solo-white-bg.png" },
+        かんたん: { en: "EASY", desc: ["背景なし", "1キャラクター"], art: "images/sample-solo-white-bg.png" },
         ふつう: { en: "NORMAL", desc: ["背景あり", "1キャラクター"], art: "images/sample-solo-with-bg.png" },
         むずかしい: { en: "HARD", desc: ["背景あり", "2キャラクター"], extra: true, art: "images/sample-duo-with-bg.png" },
       };
@@ -4843,7 +5083,7 @@
           blocks
             .map(
               (b, i) =>
-                `<button type="button" class="ptab${b.tokens.length ? " has-text" : ""}" role="tab" data-i="${i}" aria-selected="${i === active}" style="--c:${i === 0 ? "#16b37e" : CHAR_COLORS[(i - 1) % 2]}"><i aria-hidden="true"></i>${blockLabel(i)}${
+                `<button type="button" class="ptab" role="tab" data-i="${i}" aria-selected="${i === active}" style="--c:${i === 0 ? "#16b37e" : CHAR_COLORS[(i - 1) % 2]}"><i aria-hidden="true"></i>${blockLabel(i)}${
                   i === 2 && !locked() ? '<span class="ptab-x" data-remove role="button" aria-label="キャラ2を消す">×</span>' : ""
                 }</button>`,
             )
@@ -5378,14 +5618,13 @@
       // 生成画像（モックは正方形）を縦長の枠いっぱいに表示する
       const fillFrame = (root) => root.querySelectorAll(".stage-shot > svg, .gen > svg, .scan svg").forEach((svg) => svg.setAttribute("preserveAspectRatio", "xMidYMax slice"));
 
-      // まだ何も選んでいないときのステージ表示（生成中はノイズから浮かび上がる絵を出す）
+      // まだ何も選んでいないときのステージ表示（生成中はスピナーと進み具合を出す）
       function showStageIdle() {
         if (selected) return;
         const view = $("stage-view");
         const job = newestJob();
         if (job) {
-          const t = performance.now() - job.start;
-          view.innerHTML = `<div class="gen" data-job="${job.no}" style="--dur:${job.dur}ms;--t:${t}ms">${artSvg(job.features, "生成中の画像")}</div>
+          view.innerHTML = `<div class="gen" data-job="${job.no}" role="img" aria-label="生成中の画像"><span class="gen-spin"></span></div>
             ${shotLabel(job.no)}
             <div class="gen-hud" aria-hidden="true">
               <div class="gen-hud-row"><span>GENERATING</span><span data-step="${job.no}">STEP 0/${STEPS}</span></div>
@@ -5434,7 +5673,7 @@
         const job = { no, features, start: performance.now(), dur: 1800 + Math.random() * 1600 };
         jobs.push(job);
         const li = document.createElement("li");
-        li.innerHTML = `<div class="shot is-pending" aria-label="${no}回目を生成中"><div class="gen" style="--dur:${job.dur}ms">${artSvg(features, "")}</div><span class="gen-bar" data-job="${no}"><i></i></span></div>`;
+        li.innerHTML = `<div class="shot is-pending" aria-label="${no}回目を生成中"><div class="gen"><span class="gen-spin"></span></div><span class="gen-bar" data-job="${no}"><i></i></span></div>`;
         $("shots").prepend(li);
         $("shots").scrollTo({ left: 0, behavior: motion ? "smooth" : "auto" });
         showStageIdle();
@@ -5596,7 +5835,7 @@
         if (phase === "play") {
           const shown = Math.max(0, Math.ceil(remain));
           setTime(fmt(shown));
-          $("time-bar").style.transform = `scaleX(${Math.max(0, remain / total)})`;
+          $("time-bar").style.setProperty("--left", Math.max(0, remain / total));
           const hurry = shown <= 10 && !mine.submitted;
           $("timer").classList.toggle("is-hurry", shown <= 10);
           document.body.classList.toggle("is-hurry", hurry);
@@ -5617,7 +5856,7 @@
         if (phase === "select") {
           const left = Math.max(0, Math.ceil(GRACE + remain));
           setTime(fmt(left));
-          $("time-bar").style.transform = `scaleX(${left / GRACE})`;
+          $("time-bar").style.setProperty("--left", left / GRACE);
           if ($("phase-left")) $("phase-left").textContent = left;
           if (left <= 0) {
             phase = "done";
@@ -5643,7 +5882,6 @@
         await wait(1900);
         const m = mine.submitted;
         const o = opp.submitted;
-        // 結果画面は今は1対1の表示なので、最初の相手の結果を渡す
         wipeTo("result.html", {
           code,
           level,
@@ -5653,6 +5891,15 @@
           role,
           me: m ? `${artEncode(m.features)}~${m.sim}~${Math.round(m.remain)}~${m.gens}` : "none",
           them: o ? `${artEncode(o.features)}~${o.sim}~${Math.round(o.remain)}~${o.gens}` : "none",
+          // 全員の結果（名前と提出内容）。結果画面で一人ずつ採点して発表する
+          players: JSON.stringify(players.map((p) => p.name)),
+          seat,
+          entries: JSON.stringify(
+            players.map((p) => {
+              const e = p.isMe ? mine.submitted : p.submitted;
+              return e ? `${artEncode(e.features)}~${e.sim}~${Math.round(e.remain)}~${e.gens}` : "none";
+            }),
+          ),
         });
       }
 
