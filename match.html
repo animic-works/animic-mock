@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <link rel="icon" type="image/svg+xml" href="images/animic-favicon.svg" />
+    <title>戦績の詳細 | Animic</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Maru+Gothic:wght@900&family=Zen+Kaku+Gothic+New:wght@500;700&family=Montserrat:ital,wght@1,500;1,800&family=JetBrains+Mono:wght@500;700&display=swap"
+    />
+    <link rel="stylesheet" href="css/common.css" />
+    <link rel="stylesheet" href="css/transition.css" />
+    <script>
+      // 前の画面から塗りつぶして来た場合、描画前に中身を隠す
+      try {
+        if (sessionStorage.getItem("animic-wipe")) document.documentElement.classList.add("wipe-pending");
+      } catch {}
+    </script>
+    <link rel="stylesheet" href="css/account.css" />
+    <link rel="stylesheet" href="css/mypage.css" />
+    <link rel="stylesheet" href="css/match.css" />
+  </head>
+  <body>
+    <header class="bar">
+      <a class="bar-logo" href="index.html"><img src="images/animic-logo.svg" alt="Animic トップ" width="2078" height="607" /></a>
+      <p class="bar-title"><span class="eyebrow">Match detail</span><b>戦績の詳細</b></p>
+      <a class="bar-back" id="back" href="mypage.html">
+        <svg width="9" height="14" viewBox="0 0 12 20" aria-hidden="true"><path d="M10 2 L2 10 L10 18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        マイページ
+      </a>
+    </header>
+
+    <main class="detail" id="detail" hidden>
+      <!-- 左: お題と提出画像を並べて比べる -->
+      <section class="compare" aria-label="お題と提出画像">
+        <figure class="shot">
+          <figcaption><span class="eyebrow">Topic</span>お題</figcaption>
+          <div class="shot-frame" id="topic"></div>
+        </figure>
+        <span class="vs" id="vs" aria-hidden="true"></span>
+        <figure class="shot">
+          <figcaption><span class="eyebrow">Submitted</span>あなたの提出画像</figcaption>
+          <div class="shot-frame" id="mine"></div>
+        </figure>
+      </section>
+
+      <!-- 右: 順位・スコアの内訳・指標・プロンプト -->
+      <div class="side">
+        <section class="summary" aria-labelledby="rank">
+          <p class="summary-rank" id="rank"></p>
+          <div class="summary-meta">
+            <b id="meta-title"></b>
+            <span id="meta-sub"></span>
+          </div>
+          <p class="summary-total" id="total"></p>
+        </section>
+
+        <section class="panel" aria-labelledby="breakdown-title" id="breakdown-panel">
+          <h2 id="breakdown-title">スコアの内訳</h2>
+          <div class="formula" id="formula"></div>
+          <dl class="cats" id="cats"></dl>
+        </section>
+
+        <section class="panel" aria-labelledby="prompt-title" id="prompt-panel">
+          <div class="panel-head">
+            <h2 id="prompt-title">提出したプロンプト</h2>
+            <button class="copy" type="button" id="copy">コピー</button>
+          </div>
+          <ul class="tags" id="tags"></ul>
+        </section>
+      </div>
+
+      <section class="panel ranking-panel" aria-labelledby="ranking-title">
+        <h2 id="ranking-title">この対戦の順位</h2>
+        <ol class="board" id="board"></ol>
+      </section>
+
+      <div class="detail-actions">
+        <button class="pill pill-pink" type="button" id="again">もう一度あそぶ</button>
+        <button class="pill pill-x" type="button" id="share">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z" /></svg>
+          結果をシェア
+        </button>
+      </div>
+    </main>
+
+    <!-- 戦績が見つからないとき -->
+    <section class="card missing" id="missing" hidden>
+      <h1>戦績が見つかりません</h1>
+      <p class="sub">ログアウトしたか、この端末に保存されていない戦績です。</p>
+      <a class="pill pill-pink" href="mypage.html">マイページへ戻る</a>
+    </section>
+
+    <script src="js/common.js"></script>
+    <script src="js/art.js"></script>
+    <script src="js/history-sample.js"></script>
+    <script src="js/match.js"></script>
+  </body>
+</html>

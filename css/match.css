@@ -1,0 +1,482 @@
+/* 戦績の詳細（バー・メーター・見出しの書体は mypage.css と共通） */
+.bar-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-left: auto;
+  padding: 0.55rem 1.1rem;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink);
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.bar-back:hover {
+  background: var(--ink);
+  color: #fff;
+}
+
+/* PC: 左に画像の比較、右に順位と内訳。順位表とボタンは下に横いっぱい */
+.detail {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  grid-template-areas:
+    "compare side"
+    "ranking ranking"
+    "actions actions";
+  gap: 1.5rem;
+  width: min(100% - 32px, 66rem);
+  margin: 1rem auto 4rem;
+}
+
+.compare {
+  grid-area: compare;
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  align-self: start;
+  padding: 1.1rem;
+  border: 2px solid var(--line);
+  border-radius: 1.6rem;
+  background: #fff;
+  box-shadow: var(--lift);
+}
+
+.shot {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0;
+}
+
+.shot figcaption {
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.shot-frame {
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  aspect-ratio: 832 / 1216;
+  border-radius: 1rem;
+  background: var(--ground);
+}
+
+.shot-frame img,
+.shot-frame svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.shot-none {
+  margin: 0;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+/* 2枚のあいだの再現度 */
+.vs {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  width: 5.2rem;
+  height: 5.2rem;
+  border: 4px solid #fff;
+  border-radius: 50%;
+  background: var(--ink);
+  color: #fff;
+  translate: -50% -30%;
+  box-shadow: 0 10px 24px -10px rgb(11 27 43 / 0.6);
+}
+
+.vs small {
+  font-size: 0.62rem;
+  font-weight: 700;
+  opacity: 0.8;
+}
+
+.vs b {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 1.35rem;
+  line-height: 1.1;
+}
+
+.side {
+  grid-area: side;
+  display: grid;
+  gap: 1rem;
+  align-content: start;
+}
+
+.summary {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.1rem 1.4rem;
+  border-radius: 1.4rem;
+  background: var(--ink);
+  color: #fff;
+}
+
+.summary-rank {
+  margin: 0;
+  font-family: var(--latin);
+  font-style: italic;
+  font-weight: 800;
+  font-size: 2.6rem;
+  line-height: 1;
+}
+
+.summary-rank.is-win {
+  color: var(--yellow);
+}
+
+.summary-rank small {
+  margin-left: 0.3rem;
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+.summary-meta {
+  display: grid;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.summary-meta b {
+  font-size: 1rem;
+}
+
+.summary-meta span {
+  color: rgb(255 255 255 / 0.7);
+  font-size: 0.78rem;
+}
+
+.summary-meta code {
+  font-family: var(--mono);
+  letter-spacing: 0.08em;
+}
+
+.summary-total {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 2rem;
+}
+
+.summary-total small {
+  margin-left: 0.15rem;
+  font-family: var(--body);
+  font-weight: 700;
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+.panel {
+  display: grid;
+  gap: 0.9rem;
+  padding: 1.2rem 1.3rem;
+  border: 2px solid var(--line);
+  border-radius: 1.4rem;
+  background: #fff;
+}
+
+.panel h2 {
+  margin: 0;
+  font-family: var(--round);
+  font-weight: 900;
+  font-size: 1.05rem;
+}
+
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+/* 再現度 + 提出速度 + 生成回数 = 合計 */
+.formula {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.term {
+  display: grid;
+  gap: 0.1rem;
+  padding: 0.45rem 0.75rem;
+  border-radius: 0.8rem;
+  background: var(--ground);
+}
+
+.term:last-child {
+  background: #fff0f7;
+}
+
+.term small {
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.term b {
+  font-family: var(--mono);
+  font-size: 1rem;
+}
+
+.term:last-child b {
+  color: var(--pink);
+}
+
+.op {
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.cats {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0;
+}
+
+.cat {
+  display: grid;
+  grid-template-columns: 9.5rem minmax(0, 1fr);
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.cat dt {
+  display: grid;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.cat dt small {
+  color: var(--muted);
+  font-size: 0.66rem;
+  font-weight: 500;
+}
+
+.cat dd {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 3rem;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0;
+}
+
+.cat dd b {
+  font-family: var(--mono);
+  font-size: 0.9rem;
+  text-align: right;
+}
+
+.copy {
+  padding: 0.4rem 0.9rem;
+  border: 2px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.copy:hover {
+  border-color: var(--ink);
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tags li {
+  padding: 0.3rem 0.65rem;
+  border-radius: 0.55rem;
+  background: var(--ground);
+  font-family: var(--mono);
+  font-size: 0.78rem;
+}
+
+/* この対戦の順位 */
+.ranking-panel {
+  grid-area: ranking;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr));
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.board li {
+  display: grid;
+  grid-template-columns: 1.6rem 2.6rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.8rem 0.5rem 0.6rem;
+  border: 2px solid var(--line);
+  border-radius: 1rem;
+  animation: rise 0.5s var(--ease-out) calc(var(--d) * 0.06s) both;
+}
+
+.board li.is-me {
+  border-color: var(--pink);
+  background: #fff7fb;
+}
+
+.board-rank {
+  font-family: var(--display);
+  font-size: 1.1rem;
+  text-align: center;
+}
+
+.board li.is-win .board-rank {
+  color: var(--pink);
+}
+
+.board-thumb {
+  overflow: hidden;
+  aspect-ratio: 1;
+  border-radius: 0.6rem;
+  background: var(--ground);
+}
+
+.board-thumb svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.board-name {
+  overflow: hidden;
+  font-weight: 700;
+  font-size: 0.88rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.board-name small {
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+
+.board-pt {
+  font-family: var(--mono);
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.board-pt small {
+  margin-left: 0.1rem;
+  color: var(--muted);
+  font-size: 0.65rem;
+}
+
+.detail-actions {
+  grid-area: actions;
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.detail-actions .pill {
+  width: auto;
+  min-width: 12rem;
+}
+
+.pill-x {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: #fff;
+}
+
+.missing {
+  margin: 12vh auto 0;
+  justify-items: center;
+  text-align: center;
+}
+
+.missing h1 {
+  font-size: 1.4rem;
+}
+
+.missing .pill {
+  width: auto;
+  padding-inline: 2rem;
+}
+
+@media (max-width: 860px) {
+  .detail {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "side"
+      "compare"
+      "ranking"
+      "actions";
+  }
+}
+
+@media (max-width: 560px) {
+  .bar-back {
+    padding: 0.45rem 0.9rem;
+    font-size: 0.8rem;
+  }
+  .compare {
+    gap: 0.6rem;
+    padding: 0.75rem;
+  }
+  .vs {
+    width: 4.2rem;
+    height: 4.2rem;
+  }
+  .vs b {
+    font-size: 1.1rem;
+  }
+  .summary {
+    grid-template-columns: auto minmax(0, 1fr);
+    padding: 1rem 1.1rem;
+  }
+  .summary-total {
+    grid-column: 1 / -1;
+    font-size: 1.6rem;
+  }
+  .cat {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.3rem;
+  }
+  .detail-actions {
+    flex-direction: column;
+  }
+  .detail-actions .pill {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .board li {
+    animation: none;
+  }
+}

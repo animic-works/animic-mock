@@ -500,6 +500,13 @@ function renderSave() {
       total: me.score ? me.score.total : null,
       sim: me.score ? me.score.sim : null,
       art: me.entry ? artEncode(me.entry.features) : null,
+      // 詳細画面用: ルーム・スコアの内訳・指標（%）・生成回数・全員の順位
+      code,
+      speed: me.score ? me.score.speed : null,
+      bonus: me.score ? me.score.gens : null,
+      gens: me.entry ? me.entry.gens : null,
+      cats: me.score ? Object.fromEntries(Object.entries(metricsOf(me).cats).map(([k, x]) => [k, Math.round(x * 1000) / 10])) : null,
+      ranking: ranked.map((p) => ({ name: p.name, rank: p.score ? p.rank : null, total: p.score ? p.score.total : null, art: p.entry ? artEncode(p.entry.features) : null, isMe: p.isMe })),
     });
     box.innerHTML = `<span class="save-ico" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg></span>
       <p><b>戦績に保存しました</b><span>${escapeHtml(account.name)}（${escapeHtml(account.provider)}）の戦績に残っています</span></p>

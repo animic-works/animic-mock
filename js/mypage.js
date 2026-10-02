@@ -2,16 +2,8 @@ playWipeOut();
 const $ = (id) => document.getElementById(id);
 const q = params();
 
-// ?sample で、ログイン中のサンプルの戦績を表示する（保存はしない）
-const SAMPLE_ACCOUNT = { provider: "Google", name: "ねこぜ" };
+// ?sample で、ログイン中のサンプルの戦績を表示する（js/history-sample.js。保存はしない）
 const DAY = 864e5;
-const SAMPLE_HISTORY = [
-  { key: "s1", at: Date.now() - 0.1 * DAY, level: "ふつう", players: 4, rank: 1, total: 128.4, sim: 91.2, art: "pink.twin.blue.sailor.smile.sky" },
-  { key: "s2", at: Date.now() - 0.3 * DAY, level: "ふつう", players: 4, rank: 3, total: 88.0, sim: 70.4, art: "blonde.long.red.hoodie.wink.white" },
-  { key: "s3", at: Date.now() - 1.2 * DAY, level: "かんたん", players: 2, rank: 1, total: 112.6, sim: 86.1, art: "pink.bob.blue.sailor.smile.white" },
-  { key: "s4", at: Date.now() - 3 * DAY, level: "むずかしい", players: 3, rank: 2, total: 79.3, sim: 64.8, art: "silver.long.green.dress.calm.room" },
-  { key: "s5", at: Date.now() - 6 * DAY, level: "かんたん", players: 2, rank: null, total: null, sim: null, art: null },
-];
 const sample = q.has("sample");
 let account = sample ? SAMPLE_ACCOUNT : getAccount();
 const history = sample ? SAMPLE_HISTORY : getHistory();
@@ -64,7 +56,8 @@ function renderMatches() {
   $("matches").innerHTML = list
     .map((e, i) => {
       const f = e.art ? artDecode(e.art) : null;
-      return `<li class="match${e.rank === 1 ? " is-win" : ""}" style="--d:${i}">
+      const href = `match.html?${new URLSearchParams({ key: e.key, ...(sample ? { sample: "" } : {}) })}`;
+      return `<li><a class="match${e.rank === 1 ? " is-win" : ""}" style="--d:${i}" href="${escapeHtml(href)}" aria-label="${escapeHtml(`${e.level}・${e.players}人対戦（${e.rank ? `${e.rank}位` : "未提出"}）の詳細`)}">
         <span class="match-thumb">${f ? artSvg(f, "提出画像") : '<span class="no-entry">未提出</span>'}</span>
         <span class="match-rank">${e.rank ? ord(e.rank) : "—"}</span>
         <span class="match-info">
@@ -73,7 +66,7 @@ function renderMatches() {
         </span>
         <span class="match-sim">${e.sim != null ? `<span class="meter"><i style="width:${Math.min(100, e.sim)}%"></i></span><small>再現度 ${e.sim.toFixed(1)}</small>` : "<small>提出なし</small>"}</span>
         <span class="match-pt">${e.total != null ? `${e.total.toFixed(1)}<small>pt</small>` : "—"}</span>
-      </li>`;
+      </a></li>`;
     })
     .join("");
 }

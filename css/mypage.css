@@ -329,6 +329,19 @@
   animation: rise 0.5s var(--ease-out) calc(var(--d) * 0.05s) both;
 }
 
+a.match {
+  color: inherit;
+  text-decoration: none;
+  transition:
+    border-color 0.15s,
+    transform 0.15s;
+}
+
+a.match:hover {
+  border-color: var(--ink);
+  transform: translateY(-2px);
+}
+
 .match.is-win {
   border-color: var(--pink-soft);
   background: #fff7fb;
