@@ -4757,7 +4757,7 @@
         </div>
         <!-- 表現の一覧をモーダルで開く -->
         <div class="psearch">
-          <!-- ベース: 背景・構図（景色の額縁のアイコン、緑） / キャラ: 人物（人のアイコン、黄色） -->
+          <!-- 入れる先のタブを選んで開く（一覧は同じ）。ベース: 景色の額縁のアイコン、緑 / キャラ: 人のアイコン、黄色 -->
           <button class="find psearch-btn is-base" type="button" id="search-base" aria-haspopup="dialog">
             <span class="psearch-ico" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3" /><circle cx="9" cy="10" r="1.8" fill="currentColor" /><path d="m3.5 18 5.5-5.5 4 4 2.5-2.5 5 5" /></svg></span>
             <span class="psearch-text"><b>ベース</b><span class="psearch-mid">プロンプト</span>を検索</span>
@@ -4983,9 +4983,8 @@
 
       // ---------- よく使う表現 ----------
       // 押すと入力欄に足し、入力欄にある表現はもう一度押すと消せる
-      // 表現の辞書（検索用）。base: true はベースに入る種類
       // 表現の辞書（検索・入力候補用）。Danbooru の tag groups（https://danbooru.donmai.us/wiki_pages/tag_groups）から
-      // キャラの絵作りによく使うタグを選んでいる。base: true はベースに入る種類
+      // キャラの絵作りによく使うタグを選んでいる。どのタグもベース・キャラのどちらにも入れられる
       const T = (list) => list.map(([ja, tag]) => [ja, tag]);
       const DICT_GROUPS = [
         { key: "who", label: "人数", extra: T([["1人の女の子", "1girl"], ["2人の女の子", "2girls"], ["1人の男の子", "1boy"], ["1人だけ", "solo"], ["複数の女の子", "multiple girls"]]) },
@@ -5002,14 +5001,14 @@
         { key: "hold", label: "持ち物", extra: T([["本を持つ", "holding book"], ["傘を持つ", "holding umbrella"], ["花を持つ", "holding flower"], ["カップを持つ", "holding cup"], ["スマホを持つ", "holding phone"], ["剣を持つ", "holding sword"], ["杖を持つ", "holding staff"], ["ぬいぐるみを持つ", "holding stuffed toy"], ["食べ物を持つ", "holding food"], ["マイクを持つ", "holding microphone"]]) },
         { key: "gesture", label: "しぐさ・視線", extra: T([["振り返る", "looking back"], ["横を向く", "looking to the side"], ["見上げる", "looking up"], ["うつむく", "looking down"], ["首をかしげる", "head tilt"], ["ウインク", "one eye closed"], ["指さす", "pointing"], ["ハートの手", "heart hands"], ["敬礼", "salute"], ["人差し指を口に", "finger to mouth"], ["両手を合わせる", "own hands together"], ["髪をいじる", "playing with own hair"]]) },
         { key: "pose", label: "ポーズ", extra: T([["立つ", "standing"], ["座る", "sitting"], ["ひざまずく", "kneeling"], ["寝そべる", "lying"], ["腕を上げる", "arms up"], ["腕を組む", "crossed arms"], ["手を後ろで組む", "arms behind back"], ["腰に手", "hand on hip"], ["ピース", "v"], ["手を振る", "waving"], ["頬に手", "hand on own cheek"], ["手を広げる", "outstretched arms"]]) },
-        { key: "bg", label: "背景", base: true, extra: T([["シンプルな背景", "simple background"], ["グラデーション背景", "gradient background"], ["黒背景", "black background"], ["ピンクの背景", "pink background"], ["ぼかした背景", "blurry background"], ["透過背景", "transparent background"]]) },
-        { key: "scene", label: "場所・天気", base: true, extra: T([["屋外", "outdoors"], ["屋内", "indoors"], ["夜空", "night sky"], ["星空", "starry sky"], ["夕焼け", "sunset"], ["雲", "cloud"], ["森", "forest"], ["海辺", "beach"], ["街", "city"], ["寝室", "bedroom"], ["桜", "cherry blossoms"], ["雪", "snow"], ["雨", "rain"], ["カフェ", "cafe"], ["図書館", "library"], ["屋上", "rooftop"], ["神社", "shrine"], ["水中", "underwater"], ["草原", "field"], ["夜の街", "night, city lights"], ["ファンタジー", "fantasy"]]) },
-        { key: "comp", label: "構図", base: true, extra: T([["バストアップ", "upper body"], ["膝上（カウボーイショット）", "cowboy shot"], ["全身", "full body"], ["顔のアップ", "portrait"], ["クローズアップ", "close-up"], ["カメラ目線", "looking at viewer"], ["横から", "from side"], ["後ろから", "from behind"], ["上から", "from above"], ["下から", "from below"], ["斜めの構図", "dutch angle"], ["引きの構図", "wide shot"]]) },
-        { key: "art", label: "画風", base: true, extra: T([["アニメ塗り", "anime coloring"], ["水彩", "watercolor (medium)"], ["油絵", "oil painting (medium)"], ["線画", "lineart"], ["スケッチ", "sketch"], ["ピクセルアート", "pixel art"], ["ちびキャラ", "chibi"], ["レトロアニメ風", "retro artstyle"], ["厚塗り", "impasto"], ["3D", "3d"]]) },
-        { key: "quality", label: "品質", base: true, extra: T([["傑作", "masterpiece"], ["高画質", "best quality"], ["高解像度", "highres"], ["非常に美しい", "very aesthetic"], ["細部まで描き込み", "highly detailed"], ["最新", "newest"]]) },
-        { key: "light", label: "光・効果", base: true, extra: T([["逆光", "backlighting"], ["日差し", "sunlight"], ["木漏れ日", "dappled sunlight"], ["ネオン", "neon lights"], ["リムライト", "rim lighting"], ["被写界深度", "depth of field"], ["ボケ", "bokeh"], ["レンズフレア", "lens flare"], ["きらきら", "sparkle"], ["光の粒", "light particles"], ["花びら", "petals"], ["色収差", "chromatic aberration"]]) },
-        { key: "color", label: "色調", base: true, extra: T([["モノクロ", "monochrome"], ["グレースケール", "greyscale"], ["パステルカラー", "pastel colors"], ["カラフル", "colorful"], ["淡い色", "muted color"], ["ハイコントラスト", "high contrast"], ["セピア", "sepia"], ["暖色", "warm colors"], ["寒色", "cool colors"]]) },
-        { key: "season", label: "季節・行事", base: true, extra: T([["春", "spring (season)"], ["夏", "summer"], ["秋", "autumn"], ["冬", "winter"], ["紅葉", "autumn leaves"], ["クリスマス", "christmas"], ["ハロウィン", "halloween"], ["お正月", "new year"], ["バレンタイン", "valentine"], ["夏祭り", "summer festival"], ["花火", "fireworks"]]) },
+        { key: "bg", label: "背景", extra: T([["シンプルな背景", "simple background"], ["グラデーション背景", "gradient background"], ["黒背景", "black background"], ["ピンクの背景", "pink background"], ["ぼかした背景", "blurry background"], ["透過背景", "transparent background"]]) },
+        { key: "scene", label: "場所・天気", extra: T([["屋外", "outdoors"], ["屋内", "indoors"], ["夜空", "night sky"], ["星空", "starry sky"], ["夕焼け", "sunset"], ["雲", "cloud"], ["森", "forest"], ["海辺", "beach"], ["街", "city"], ["寝室", "bedroom"], ["桜", "cherry blossoms"], ["雪", "snow"], ["雨", "rain"], ["カフェ", "cafe"], ["図書館", "library"], ["屋上", "rooftop"], ["神社", "shrine"], ["水中", "underwater"], ["草原", "field"], ["夜の街", "night, city lights"], ["ファンタジー", "fantasy"]]) },
+        { key: "comp", label: "構図", extra: T([["バストアップ", "upper body"], ["膝上（カウボーイショット）", "cowboy shot"], ["全身", "full body"], ["顔のアップ", "portrait"], ["クローズアップ", "close-up"], ["カメラ目線", "looking at viewer"], ["横から", "from side"], ["後ろから", "from behind"], ["上から", "from above"], ["下から", "from below"], ["斜めの構図", "dutch angle"], ["引きの構図", "wide shot"]]) },
+        { key: "art", label: "画風", extra: T([["アニメ塗り", "anime coloring"], ["水彩", "watercolor (medium)"], ["油絵", "oil painting (medium)"], ["線画", "lineart"], ["スケッチ", "sketch"], ["ピクセルアート", "pixel art"], ["ちびキャラ", "chibi"], ["レトロアニメ風", "retro artstyle"], ["厚塗り", "impasto"], ["3D", "3d"]]) },
+        { key: "quality", label: "品質", extra: T([["傑作", "masterpiece"], ["高画質", "best quality"], ["高解像度", "highres"], ["非常に美しい", "very aesthetic"], ["細部まで描き込み", "highly detailed"], ["最新", "newest"]]) },
+        { key: "light", label: "光・効果", extra: T([["逆光", "backlighting"], ["日差し", "sunlight"], ["木漏れ日", "dappled sunlight"], ["ネオン", "neon lights"], ["リムライト", "rim lighting"], ["被写界深度", "depth of field"], ["ボケ", "bokeh"], ["レンズフレア", "lens flare"], ["きらきら", "sparkle"], ["光の粒", "light particles"], ["花びら", "petals"], ["色収差", "chromatic aberration"]]) },
+        { key: "color", label: "色調", extra: T([["モノクロ", "monochrome"], ["グレースケール", "greyscale"], ["パステルカラー", "pastel colors"], ["カラフル", "colorful"], ["淡い色", "muted color"], ["ハイコントラスト", "high contrast"], ["セピア", "sepia"], ["暖色", "warm colors"], ["寒色", "cool colors"]]) },
+        { key: "season", label: "季節・行事", extra: T([["春", "spring (season)"], ["夏", "summer"], ["秋", "autumn"], ["冬", "winter"], ["紅葉", "autumn leaves"], ["クリスマス", "christmas"], ["ハロウィン", "halloween"], ["お正月", "new year"], ["バレンタイン", "valentine"], ["夏祭り", "summer festival"], ["花火", "fireworks"]]) },
       ];
       // 生成画像のモックで扱う特徴（ART_FEATURES）を先頭に置き、タグが同じものは1つにまとめる
       const DICT = (() => {
@@ -5021,7 +5020,6 @@
           return true;
         });
       })();
-      const BASE_KEYS = DICT_GROUPS.filter((g) => g.base).map((g) => g.key);
       // カタカナはひらがなにそろえて、ゆるく探す
       const norm = (v) => v.toLowerCase().replace(/[\u30a1-\u30f6]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0x60)).replace(/\s+/g, " ").trim();
 
@@ -5053,8 +5051,6 @@
         text: ["「、」で区切って入力（例：白背景、アニメ塗り）", "「、」で区切って入力（例：ピンクの髪、ツインテール、笑顔）", "「、」で区切って入力（例：銀髪、ロングヘア、赤い目）"],
         tag: ["「,」で区切って入力（例：white background, anime coloring）", "「,」で区切って入力（例：pink hair, twintails, smile）", "「,」で区切って入力（例：silver hair, long hair, red eyes）"],
       };
-      // 背景の表現はベースへ、それ以外は選んでいるキャラへ入れる
-      const targetFor = (key) => (BASE_KEYS.includes(key) ? 0 : active === 0 ? 1 : active);
       const tokenText = (k) => (k.w === 1 ? k.t : `(${k.t}:${k.w.toFixed(1)})`);
       const fullPrompt = () =>
         blocks
@@ -5132,7 +5128,7 @@
           ? hits
               .map(
                 (e, i) =>
-                  `<button type="button" role="option" aria-selected="${i === hot}" data-d="${DICT.indexOf(e)}" class="${i === hot ? "is-hot" : ""}"><span>${mark(e.ja)}</span><small>${mark(e.tag)}</small><em>${e.g.label}・${e.g.base ? "ベース" : "キャラ"}</em>${i === hot ? '<kbd class="sg-key">Tab</kbd>' : ""}</button>`,
+                  `<button type="button" role="option" aria-selected="${i === hot}" data-d="${DICT.indexOf(e)}" class="${i === hot ? "is-hot" : ""}"><span>${mark(e.ja)}</span><small>${mark(e.tag)}</small><em>${e.g.label}</em>${i === hot ? '<kbd class="sg-key">Tab</kbd>' : ""}</button>`,
               )
               .join("")
           : `<p class="suggest-none">候補なし ─ 「、」で区切ればそのまま入ります</p>`;
@@ -5144,9 +5140,8 @@
         const cut = Math.max(v.lastIndexOf("、"), v.lastIndexOf(","), v.lastIndexOf("，"));
         input.value = cut >= 0 ? v.slice(0, cut + 1) : "";
         commitInput(true);
-        const target = targetFor(e.g.key);
         const word = wordOf(e);
-        if (!hasToken(target, word)) blocks[target].tokens.push({ t: word, w: 1 });
+        if (!hasToken(active, word)) blocks[active].tokens.push({ t: word, w: 1 });
         hot = 0;
         syncPrompt();
         input.focus();
@@ -5227,8 +5222,7 @@
         $("chips")
           .querySelectorAll(".chip-row")
           .forEach((row) => {
-            const t = targetFor(row.dataset.key);
-            row.querySelectorAll("button[data-word]").forEach((b) => b.setAttribute("aria-pressed", String(hasToken(t, b.dataset.word))));
+            row.querySelectorAll("button[data-word]").forEach((b) => b.setAttribute("aria-pressed", String(hasToken(active, b.dataset.word))));
           });
         $("prompt-len").textContent = `${blocks[active].tokens.length}語（合計 ${blocks.reduce((n, b) => n + b.tokens.length, 0)}語）`;
         $("clear").disabled = locked() || (!blocks[active].tokens.length && !$("prompt").value);
@@ -5241,8 +5235,6 @@
         const b = event.target.closest("button[data-word]");
         if (!b) return;
         commitInput(true);
-        const target = targetFor(b.closest(".chip-row").dataset.key);
-        if (target !== active) active = target;
         const word = b.dataset.word;
         const list = blocks[active].tokens;
         const i = list.findIndex((k) => k.t.toLowerCase() === word.toLowerCase());
@@ -5366,8 +5358,8 @@
       });
 
       // ---------- プロンプトを検索 ----------
-      // ジャンル: "base"／"char" はそれぞれのすべて、それ以外は DICT_GROUPS の key
-      let searchCat = "char";
+      // ジャンル: "all" はすべて、それ以外は DICT_GROUPS の key。選んだカードはいま開いているタブに入る
+      let searchCat = "all";
       const wordOf = (e) => (mode === "tag" ? e.tag : e.ja);
       const GENRE_DOTS = { hair: "var(--pink)", style: "#ffb200", eyes: "var(--cyan)", outfit: "#7c5cff", face: "#ff7a45", pose: "#16b37e", who: "#5b6573", head: "#ff72b9", acc: "#e8414f", legs: "#5b6573", race: "#ffb200", role: "#7c5cff", hold: "#00b4fc", gesture: "#ff7a45", bg: "#16b37e", scene: "#00b4fc", comp: "#0b7a54", art: "#ff72b9", quality: "#f5c400", light: "#ffb200", color: "#7c5cff", season: "#e8414f" };
       const slug = (e) => e.tag.toLowerCase().replace(/[^a-z0-9]+/g, "_");
@@ -5381,11 +5373,10 @@
         return `<img src="${LOCAL[i]}" alt="" loading="lazy" class="is-crop-face" />`;
       }
       function searchGroups() {
-        if (searchCat === "base") return DICT_GROUPS.filter((g) => g.base);
-        if (searchCat === "char") return DICT_GROUPS.filter((g) => !g.base);
+        if (searchCat === "all") return DICT_GROUPS;
         return DICT_GROUPS.filter((g) => g.key === searchCat);
       }
-      const inPrompt = (e) => hasToken(targetFor(e.g.key), wordOf(e));
+      const inPrompt = (e) => hasToken(active, wordOf(e));
       function renderNav() {
         const count = (gs) => DICT.filter((e) => gs.includes(e.g)).length;
         const picked = (gs) => DICT.filter((e) => gs.includes(e.g) && inPrompt(e)).length;
@@ -5393,21 +5384,12 @@
           const n = picked(gs);
           return `<button type="button" data-cat="${key}" aria-pressed="${searchCat === key}" style="--dot:${dot}"><i aria-hidden="true"></i>${label}${n ? `<span class="sd-in">${n}</span>` : ""}<small>${count(gs)}</small></button>`;
         };
-        const base = DICT_GROUPS.filter((g) => g.base);
-        const char = DICT_GROUPS.filter((g) => !g.base);
-        $("search-cats").innerHTML =
-          `<h2>Base</h2>` +
-          btn("base", "ベースのすべて", base, "#16b37e") +
-          base.map((g) => btn(g.key, g.label, [g], GENRE_DOTS[g.key])).join("") +
-          `<h2>Character</h2>` +
-          btn("char", "キャラのすべて", char, "#f5c400") +
-          char.map((g) => btn(g.key, g.label, [g], GENRE_DOTS[g.key])).join("");
+        $("search-cats").innerHTML = `<h2>Genre</h2>` + btn("all", "すべて", DICT_GROUPS, "var(--ink)") + DICT_GROUPS.map((g) => btn(g.key, g.label, [g], GENRE_DOTS[g.key])).join("");
       }
       function renderSearch() {
         const q = norm($("search-q").value);
         const groups = searchGroups();
-        const isBase = groups.every((g) => g.base);
-        $("search-title").textContent = isBase ? "ベースプロンプトを検索" : "キャラプロンプトを検索";
+        $("search-title").textContent = `${blockLabel(active)}プロンプトを検索`;
         renderNav();
         // 検索語があるときは、ジャンルをまたいで探す
         const pool = q ? DICT : DICT.filter((e) => groups.includes(e.g));
@@ -5416,7 +5398,7 @@
           const i = q ? norm(text).indexOf(q) : -1;
           return i < 0 ? escapeHtml(text) : `${escapeHtml(text.slice(0, i))}<mark>${escapeHtml(text.slice(i, i + q.length))}</mark>${escapeHtml(text.slice(i + q.length))}`;
         };
-        $("search-sub").innerHTML = q ? `「<b>${escapeHtml($("search-q").value.trim())}</b>」の結果 ${hits.length}件` : `${groups.length === 1 ? groups[0].label : isBase ? "ベースのすべて" : "キャラのすべて"} <b>${hits.length}</b>件`;
+        $("search-sub").innerHTML = q ? `「<b>${escapeHtml($("search-q").value.trim())}</b>」の結果 ${hits.length}件` : `${groups.length === 1 ? groups[0].label : "すべて"} <b>${hits.length}</b>件`;
         $("search-results").innerHTML = hits.length
           ? hits
               .map(
@@ -5428,25 +5410,24 @@
               .join("")
           : `<p class="sd-empty">見つかりませんでした。プロンプト欄にそのまま書くこともできます</p>`;
         // サンプル画像は未用意のため、いまはすべて「No Image」を出す
-        $("search-target").textContent = isBase ? "ベース" : blockLabel(active === 0 ? 1 : active);
+        $("search-target").textContent = blockLabel(active);
         const total = blocks.reduce((n, b) => n + b.tokens.length, 0);
         $("search-picked").textContent = `プロンプト 合計${total}語`;
       }
-      function openSearch(scope) {
-        searchCat = scope;
+      // tab: 入れる先のタブ（0: ベース, 1〜: キャラ）。一覧はどちらも同じ
+      function openSearch(tab) {
+        searchCat = "all";
         $("search-q").value = "";
         commitInput(true);
-        // 開いた種類に合わせて、プロンプト欄のタブも切り替える
-        if (scope === "base") active = 0;
-        else if (active === 0) active = 1;
+        active = tab;
         syncPrompt();
         renderSearch();
         $("search").showModal();
         $("search-results").scrollTop = 0;
         if (!narrow.matches) $("search-q").focus();
       }
-      $("search-base").addEventListener("click", () => openSearch("base"));
-      $("search-char").addEventListener("click", () => openSearch("char"));
+      $("search-base").addEventListener("click", () => openSearch(0));
+      $("search-char").addEventListener("click", () => openSearch(active === 0 ? 1 : active));
       $("search-done").addEventListener("click", () => $("search").close());
       $("search-q").addEventListener("input", renderSearch);
       $("search-cats").addEventListener("click", (event) => {
@@ -5461,13 +5442,11 @@
         const b = event.target.closest("[data-d]");
         if (!b || locked()) return;
         const e = DICT[Number(b.dataset.d)];
-        const target = targetFor(e.g.key);
-        const list = blocks[target].tokens;
+        const list = blocks[active].tokens;
         const word = wordOf(e);
         const i = list.findIndex((k) => k.t.toLowerCase() === word.toLowerCase());
         if (i >= 0) list.splice(i, 1);
         else list.push({ t: word, w: 1 });
-        active = target;
         syncPrompt();
         // カードは作り直さず、押された状態と左の件数だけ更新する
         b.setAttribute("aria-pressed", String(i < 0));
@@ -5480,7 +5459,7 @@
       addEventListener("keydown", (event) => {
         if (event.key.toLowerCase() === "k" && (event.metaKey || event.ctrlKey) && !locked()) {
           event.preventDefault();
-          openSearch(active === 0 ? "base" : "char");
+          openSearch(active);
         }
       });
 
